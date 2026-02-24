@@ -1,0 +1,9 @@
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/image-son-equipement-musique/image_0.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/image-son-equipement-musique/image_1.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/image-son-equipement-musique/image_2.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/image-son-equipement-musique/image_3.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/image-son-equipement-musique/image_3.jpg'

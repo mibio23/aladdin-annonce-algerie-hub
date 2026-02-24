@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrousel Fashion Hub - Design Cadre</title>
+    <style>
+        /* =========================================
+           RESET ET STYLE DE BASE
+           ========================================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            /* --- MODIFICATION : Fond noir enlevé, remplacé par gris clair --- */
+            background-color: #f4f4f4;
+            color: #333;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px; /* Un peu plus d'espace sous le titre */
+            padding: 20px;
+        }
+
+        h1 {
+            font-weight: 700; /* Titre un peu plus gras sur fond clair */
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-size: 1.8rem;
+            color: #000; /* Titre noir */
+        }
+
+        /* Le style .subtitle a été retiré car le texte HTML a été supprimé */
+
+        /* =========================================
+           SLIDER CARROUSEL
+           ========================================= */
+        .slider {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 450px; 
+            
+            /* --- MODIFICATION : Cadre 3mm en haut et en bas --- */
+            border-top: 3mm solid #000;
+            border-bottom: 3mm solid #000;
+            
+            margin: 0 auto;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Ombre plus douce sur fond clair */
+            box-sizing: border-box; /* Important pour que la bordure soit incluse dans la hauteur */
+        }
+
+        .slider__slides {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            perspective: 1500px;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1;
+        }
+
+        .bg-img {
+            background-size: cover;
+            background-position: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .slide__inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.1));
+            pointer-events: none;
+        }
+
+        .slide__content {
+            text-align: center;
+            opacity: 0;
+        }
+
+        .slide__heading {
+            font-size: 3.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            letter-spacing: 4px;
+            line-height: 1.2;
+        }
+
+        .slide.s--active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        /* =========================================
+           EFFET GAUCHE : BULLE EXPLOSIVE
+           ========================================= */
+        
+        @keyframes bubble-explode-mask {
+            0% {
+                clip-path: circle(0% at 50% 50%);
+                transform: scale(1.5);
+            }
+            100% {
+                clip-path: circle(150% at 50% 50%);
+                transform: scale(1);
+            }
+        }
+
+        .slide.bubble-enter {
+            z-index: 3;
+            animation: bubble-explode-mask 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Texte Gauche : Monte (Slide Up + Blur) */
+        @keyframes text-slide-up {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+                filter: blur(10px);
+                letter-spacing: 8px;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+                letter-spacing: 4px;
+            }
+        }
+
+        .slide.text-up .slide__content {
+            animation: text-slide-up 1.0s ease-out forwards;
+        }
+        
+        .slide.bubble-enter.text-up .slide__content {
+            animation-delay: 0.6s;
+        }
+
+
+        /* =========================================
+           EFFET DROITE : ZOOM ARRIÈRE (Utilisé pour l'Auto-play)
+           ========================================= */
+
+        @keyframes zoom-slide-enter {
+            0% {
+                opacity: 0;
+                transform: scale(1.4) translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateX(0);
+            }
+        }
+
+        .slide.zoom-enter {
+            z-index: 3;
+            animation: zoom-slide-enter 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards;
+        }
+
+        /* Texte Droite : Descente du haut (Slide Down + Blur) */
+        @keyframes text-fall-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px); 
+                filter: blur(12px);
+                letter-spacing: -2px;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+                letter-spacing: 4px;
+            }
+        }
+
+        .slide.text-down .slide__content {
+            animation: text-fall-down 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .slide.zoom-enter.text-down .slide__content {
+            animation-delay: 0.5s;
+        }
+
+
+        /* =========================================
+           CONTRÔLES
+           ========================================= */
+        .slider__control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.2); /* Un peu plus clair sur fond sombre */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .slider__control:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .slider__control::after {
+            content: '';
+            display: block;
+            width: 12px;
+            height: 12px;
+            border-top: 2px solid #fff;
+            border-right: 2px solid #fff;
+        }
+
+        .slider__control:not(.m--right) {
+            left: 20px;
+            transform: translateY(-50%) rotate(-135deg);
+        }
+        .slider__control:not(.m--right):hover {
+            transform: translateY(-50%) rotate(-135deg) scale(1.1);
+        }
+
+        .slider__control.m--right {
+            right: 20px;
+            transform: translateY(-50%) rotate(45deg);
+        }
+        .slider__control.m--right:hover {
+            transform: translateY(-50%) rotate(45deg) scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .slider { height: 350px; }
+            .slide__heading { font-size: 2rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Fashion Hub</h1>
+        <!-- Texte supprimé ici -->
+    </header>
+
+    <!-- DÉBUT DU CARROUSEL -->
+    <div class="slider banner">
+        <div class="slider__slides">
+            
+            <div class="slide s--active bg-img" style="background-image: url('https://picsum.photos/seed/fashion1/1200/600.jpg');">
+                <div class="slide__inner">
+                    <div class="slide__content">
+                        <h2 class="slide__heading">Fashion Hub</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide bg-img" style="background-image: url('https://picsum.photos/seed/dress2/1200/600.jpg');">
+                <div class="slide__inner">
+                    <div class="slide__content">
+                        <h2 class="slide__heading">Robes Formelles</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide bg-img" style="background-image: url('https://picsum.photos/seed/plus3/1200/600.jpg');">
+                <div class="slide__inner">
+                    <div class="slide__content">
+                        <h2 class="slide__heading">Grande Taille</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide bg-img" style="background-image: url('https://picsum.photos/seed/cloth4/1200/600.jpg');">
+                <div class="slide__inner">
+                    <div class="slide__content">
+                        <h2 class="slide__heading">Vêtements</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide bg-img" style="background-image: url('https://picsum.photos/seed/arrive5/1200/600.jpg');">
+                <div class="slide__inner">
+                    <div class="slide__content">
+                        <h2 class="slide__heading">Nouveautés</h2>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BOUTONS -->
+        <div class="slider__control" aria-label="Précédent"></div>
+        <div class="slider__control slider__control--right m--right" aria-label="Suivant"></div>
+    </div>
+
+    <script>
+        (function () {
+            var $slides = document.querySelectorAll('.slide');
+            var $controls = document.querySelectorAll('.slider__control');
+            var numOfSlides = $slides.length;
+            var transitionTime = 1200; 
+            var slidingBlocked = false;
+            
+            // Variables pour l'auto-play
+            var autoPlayTimer;
+            var intervalTime = 3000; 
+
+            // Initialisation
+            [].slice.call($slides).forEach(function ($el, index) {
+                var i = index + 1;
+                $el.classList.add('slide-' + i);
+                $el.dataset.slide = i;
+            });
+
+            // Chargement initial
+            var $firstSlide = document.querySelector('.slide.s--active');
+            if($firstSlide) {
+                setTimeout(() => {
+                    $firstSlide.classList.add('text-down');
+                }, 500);
+            }
+
+            // --- FONCTION PRINCIPALE DE CHANGEMENT ---
+            function changeSlide(isRight) {
+                if (slidingBlocked) return;
+                slidingBlocked = true;
+
+                var $curActive = document.querySelector('.slide.s--active');
+                var index = +$curActive.dataset.slide;
+                
+                (isRight) ? index++ : index--;
+                
+                if (index < 1) index = numOfSlides;
+                if (index > numOfSlides) index = 1;
+                
+                var $newActive = document.querySelector('.slide-' + index);
+
+                // Nettoyage
+                $slides.forEach(s => {
+                    s.classList.remove('bubble-enter', 'zoom-enter', 'text-up', 'text-down');
+                });
+
+                // --- SUIVANT (DROITE) ---
+                if (isRight) {
+                    $curActive.classList.remove('s--active');
+                    $newActive.classList.add('s--active');
+                    $newActive.classList.add('zoom-enter'); 
+                    $newActive.classList.add('text-down'); 
+                } 
+                // --- PRÉCÉDENT (GAUCHE) ---
+                else {
+                    $curActive.classList.remove('s--active');
+                    $newActive.classList.add('s--active');
+                    $newActive.classList.add('bubble-enter'); 
+                    $newActive.classList.add('text-up');       
+                }
+
+                setTimeout(function () {
+                    slidingBlocked = false;
+                }, transitionTime);
+            };
+
+            // --- GESTION DU CLIC MANUEL ---
+            [].slice.call($controls).forEach(function ($el) {
+                $el.addEventListener('click', function() {
+                    // Arrêter l'auto-play actuel
+                    clearInterval(autoPlayTimer);
+                    
+                    // Exécuter le changement manuel (Gauche ou Droite)
+                    var isRight = this.classList.contains('m--right');
+                    changeSlide(isRight);
+                    
+                    // Relancer l'auto-play
+                    startAutoPlay();
+                });
+            });
+
+            // --- GESTION DE L'AUTO-PLAY ---
+            function startAutoPlay() {
+                autoPlayTimer = setInterval(function() {
+                    // Toujours 'true' pour forcer l'effet Droite en auto
+                    changeSlide(true);
+                }, intervalTime);
+            }
+
+            // Démarrage immédiat
+            startAutoPlay();
+
+        }());
+    </script>
+</body>
+</html>
