@@ -2,30 +2,12 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const rawEnv = import.meta.env as unknown as Record<string, string | undefined>;
+const SUPABASE_URL = 'https://smsvybphkdxzvgawzoru.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtc3Z5YnBoa2R4enZnYXd6b3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMTk1MDYsImV4cCI6MjA2Mjc5NTUwNn0.BnS7qmTl1a4htjiv3qN7zyjZ04DZgdV7N6Z0a0AU40g';
 
-const firstNonEmpty = (...values: Array<string | undefined>) =>
-  values.find((value) => typeof value === 'string' && value.trim().length > 0)?.trim() ?? '';
-
-const SUPABASE_URL = firstNonEmpty(
-  rawEnv.VITE_SUPABASE_URL,
-  rawEnv.SUPABASE_URL,
-  'https://smsvybphkdxzvgawzoru.supabase.co'
-);
-
-const SUPABASE_PUBLISHABLE_KEY = firstNonEmpty(
-  rawEnv.VITE_SUPABASE_PUBLISHABLE_KEY,
-  rawEnv.VITE_SUPABASE_ANON_KEY,
-  rawEnv.SUPABASE_ANON_KEY,
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtc3Z5YnBoa2R4enZnYXd6b3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMTk1MDYsImV4cCI6MjA2Mjc5NTUwNn0.BnS7qmTl1a4htjiv3qN7zyjZ04DZgdV7N6Z0a0AU40g'
-);
-
-export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+export const isSupabaseConfigured = true;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(
-  isSupabaseConfigured ? SUPABASE_URL : 'https://placeholder.supabase.co',
-  isSupabaseConfigured ? SUPABASE_PUBLISHABLE_KEY : 'public-anon-key'
-);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
