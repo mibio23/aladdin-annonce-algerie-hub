@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { isSupabaseConfigured, supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/silentLogger';
 import { AuthContext, AuthContextType } from './useAuth';
 
@@ -134,19 +134,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signUp = async (email: string, password: string, metadata?: Record<string, unknown>): Promise<{ error: Error | null }> => {
     try {
       setLoading(true);
-      
-      // Use the current site URL, avoiding localhost in production
-      const redirectUrl = window.location.origin.includes('localhost') 
-        ? window.location.origin.replace('localhost:3000', window.location.hostname !== 'localhost' ? window.location.host : 'lovable.app')
-        : `${window.location.origin}/`;
+
+      if (!isSupabaseConfigured) {
+        return { error: new Error('Configuration Supabase manquante') };
+      }
+
+      const rawEnv = import.meta.env as unknown as Record<string, string | undefined>;
+      const emailRedirectTo =
+        rawEnv.VITE_AUTH_REDIRECT_URL || rawEnv.VITE_PUBLIC_SITE_URL || rawEnv.VITE_SITE_URL || undefined;
 
       const { error } = await supabase.auth.signUp({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         options: {
-          emailRedirectTo: redirectUrl,
-          data: metadata
-        }
+          data: metadata,
+          ...(emailRedirectTo ? { emailRedirectTo } : {}),
+        },
       });
 
       if (error) {

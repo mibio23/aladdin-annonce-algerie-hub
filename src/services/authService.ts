@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { isSupabaseConfigured, supabase } from '@/integrations/supabase/client';
 import { cleanupAuthState, validatePasswordClient } from '@/utils/authUtils';
 import { logger } from '@/utils/silentLogger';
 
@@ -39,6 +39,10 @@ export const authService = {
 
   async signUp(email: string, password: string, additionalData?: Record<string, unknown>) {
     try {
+      if (!isSupabaseConfigured) {
+        return { data: null, error: { message: 'Configuration Supabase manquante' } };
+      }
+
       // Enhanced client-side password validation
       const passwordValidation = validatePasswordClient(password);
       if (!passwordValidation.isValid) {
@@ -51,24 +55,24 @@ export const authService = {
       // Clean up any existing auth state
       cleanupAuthState();
 
-      // Use the current site URL, avoiding localhost in production
-      const redirectUrl = window.location.origin.includes('localhost') 
-        ? window.location.origin.replace('localhost:3000', window.location.hostname !== 'localhost' ? window.location.host : 'lovable.app')
-        : `${window.location.origin}/`;
+      const rawEnv = import.meta.env as unknown as Record<string, string | undefined>;
+      const emailRedirectTo =
+        rawEnv.VITE_AUTH_REDIRECT_URL || rawEnv.VITE_PUBLIC_SITE_URL || rawEnv.VITE_SITE_URL || undefined;
 
       const { data, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
         options: {
-          emailRedirectTo: redirectUrl,
-          data: additionalData
+          data: additionalData,
+          ...(emailRedirectTo ? { emailRedirectTo } : {}),
         }
       });
 
       return { data, error };
     } catch (error) {
       logger.error('Sign up error:', error);
-      return { data: null, error };
+      const message = (error as { message?: string } | null)?.message;
+      return { data: null, error: { message: message || 'Erreur inattendue lors de l’inscription' } };
     }
   },
 

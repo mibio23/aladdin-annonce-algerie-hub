@@ -78,13 +78,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onMessage, onSuccess }) => 
       
       if (error) {
         let errorMessage = t('auth.errors.signupFailed');
+        const rawMessage = error.message || '';
         
-        if (error.message.includes('User already registered')) {
+        if (rawMessage.includes('User already registered')) {
           errorMessage = t('auth.errors.userExists');
-        } else if (error.message.includes('Password should be at least')) {
+        } else if (rawMessage.includes('Password should be at least')) {
           errorMessage = t('auth.errors.passwordTooShort');
-        } else if (error.message.includes('Invalid email')) {
+        } else if (rawMessage.includes('Invalid email')) {
           errorMessage = t('auth.errors.invalidEmail');
+        } else if (rawMessage.toLowerCase().includes('signup') && rawMessage.toLowerCase().includes('disabled')) {
+          errorMessage = "Les inscriptions sont désactivées dans Supabase (Auth).";
+        } else if (rawMessage.toLowerCase().includes('redirect') && rawMessage.toLowerCase().includes('not allowed')) {
+          errorMessage = "URL de redirection non autorisée. Ajoutez ce domaine dans Supabase → Auth → URL Configuration.";
+        } else if (rawMessage.includes('Failed to fetch') || rawMessage.toLowerCase().includes('network')) {
+          errorMessage = "Impossible de contacter Supabase. Vérifiez l’URL/clé et la connexion réseau.";
+        } else if (rawMessage) {
+          errorMessage = rawMessage;
         }
         
         onMessage({ type: 'error', text: errorMessage });
