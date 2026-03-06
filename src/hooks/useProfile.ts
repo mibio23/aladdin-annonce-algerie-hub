@@ -55,11 +55,17 @@ export const useProfile = () => {
       }
     } catch (error) {
       logger.error('Error fetching profile:', error);
-      toast({
-        title: "Erreur",
-        description: "Erreur lors du chargement du profil",
-        variant: "destructive",
-      });
+      setProfile(createDefaultProfile(user));
+
+      const message = (error as { message?: string } | null)?.message || '';
+      const lower = message.toLowerCase();
+      if (message.includes('Failed to fetch') || lower.includes('network') || lower.includes('fetch')) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger le profil (problème de connexion).",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }

@@ -60,10 +60,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 .single();
 
               if (error && error.code === 'PGRST116') {
-                await supabase.from('profiles').insert({
-                  user_id: currentSession.user.id,
-                  display_name: currentSession.user.user_metadata?.full_name || currentSession.user.email
-                });
+                await supabase
+                  .from('profiles')
+                  .upsert(
+                    {
+                      user_id: currentSession.user.id,
+                      email: currentSession.user.email,
+                      full_name: currentSession.user.user_metadata?.full_name || currentSession.user.email,
+                      first_name: currentSession.user.user_metadata?.first_name || null,
+                      last_name: currentSession.user.user_metadata?.last_name || null,
+                    },
+                    { onConflict: 'user_id' }
+                  );
               }
             } catch (error) {
               logger.error('[AUTH] Profile creation error', error);
