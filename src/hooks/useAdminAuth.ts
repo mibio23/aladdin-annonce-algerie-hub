@@ -34,7 +34,10 @@ export const useAdminAuth = () => {
           .select('role, is_active, granted_at')
           .eq('user_id', user.id)
           .eq('is_active', true)
-          .single();
+          .in('role', ['admin', 'moderator'])
+          .order('granted_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
         if (error && (error as { code?: string }).code !== 'PGRST116') {
           logger.error('Error checking user role:', error);
