@@ -29,16 +29,19 @@ export const profileService = {
         throw new Error('Invalid profile update parameters');
       }
 
-      // Remove potentially sensitive and protected fields from updates
-      const { _user_id, _id, _created_at, first_name: _first_name, last_name: _last_name, gender: _gender, phone: _phone, ...sanitizedUpdates } = updates as Record<string, unknown>;
+      // Remove unsafe internal markers only
+      const { _user_id, _id, _created_at, ...sanitizedUpdates } = updates as Record<string, unknown>;
 
       const { data, error } = await supabase
         .from('profiles')
-        .update({
-          ...sanitizedUpdates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
+        .upsert(
+          {
+            user_id: userId,
+            ...sanitizedUpdates,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: 'user_id' }
+        )
         .select()
         .single();
 

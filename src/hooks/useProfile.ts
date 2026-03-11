@@ -76,8 +76,7 @@ export const useProfile = () => {
 
     try {
       setSaving(true);
-      const { first_name: _first_name, last_name: _last_name, gender: _gender, phone: _phone, ...allowedUpdates } = updatedProfile as Record<string, unknown>;
-      const data = await profileService.updateProfile(user.id, allowedUpdates);
+      const data = await profileService.updateProfile(user.id, updatedProfile as Record<string, unknown>);
       
       setProfile(prev => prev ? { ...prev, ...normalizeProfile(data) } : normalizeProfile(data));
       toast({

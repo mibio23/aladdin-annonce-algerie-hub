@@ -194,6 +194,8 @@ export const legacyRedirectRoutes = [
   <Route key="root-redirect" path="/" element={<Navigate to={`/${languageConfig.defaultLanguage}/`} replace />} />,
   
   // Redirections pour les anciennes routes sans préfixe
+  <Route key="legacy-admin-root" path="/admin" element={<Navigate to={`/${languageConfig.defaultLanguage}/admin`} replace />} />,
+  <Route key="legacy-admin-wildcard" path="/admin/*" element={<Navigate to={`/${languageConfig.defaultLanguage}/admin`} replace />} />,
   <Route key="legacy-category" path="/category/:slug" element={<Navigate to={`/${languageConfig.defaultLanguage}/category/:slug`} replace />} />,
   <Route key="legacy-subcategory" path="/category/:slug/:subslug" element={<Navigate to={`/${languageConfig.defaultLanguage}/category/:slug/:subslug`} replace />} />,
   <Route key="legacy-annonce" path="/annonce/:id" element={<Navigate to={`/${languageConfig.defaultLanguage}/annonce/:id`} replace />} />,
