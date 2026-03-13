@@ -161,7 +161,7 @@ const InteractiveOptionsCarousel = React.memo(() => {
   const handleOptionClick = useCallback((index: number) => {
     setActiveOption(index);
     // Log optimisé pour éviter le spam
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.MODE === 'development') {
       logger.info('carousel_option_clicked', { index, optionId: displayOptions[index]?.id });
     }
   }, [displayOptions]);
