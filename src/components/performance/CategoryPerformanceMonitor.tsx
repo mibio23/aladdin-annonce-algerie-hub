@@ -136,7 +136,7 @@ const CategoryPerformanceMonitor: React.FC = () => {
     logger.info(`🚀 Prefetching test completed in ${endTime - startTime}ms`);
   };
 
-  if (process.env.NODE_ENV !== 'development' && !showMetrics) {
+  if (import.meta.env.MODE !== 'development' && !showMetrics) {
     return (
       <button
         onClick={() => setShowMetrics(true)}
