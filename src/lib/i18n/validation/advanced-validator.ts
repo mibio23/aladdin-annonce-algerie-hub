@@ -12,6 +12,9 @@ export const translationValidator = {
       completionPercentage: 0,
       lastUpdated: new Date().toISOString(),
       languageBreakdown: {},
-    } as TranslationMetrics;
+      coverage: {},
+      missingByLanguage: {},
+      domains: [],
+    } as unknown as TranslationMetrics;
   },
 };
