@@ -26,7 +26,7 @@ const InteractiveOptionsCarousel = React.memo(() => {
   const [activeOption, setActiveOption] = useState(0);
   const [panelVisible, setPanelVisible] = useState(false);
   const { createTimeout } = useOptimizedTimeout();
-  const [_autoAdvanceInterval, setAutoAdvanceInterval] = useState<NodeJS.Timeout | null>(null);
+  const [_autoAdvanceInterval, setAutoAdvanceInterval] = useState<ReturnType<typeof setTimeout> | null>(null);
   
   // Utiliser le hook optimisé au lieu de faire une requête directe
   const { banners, loading: _loading, error: _error } = useAdvertising();
