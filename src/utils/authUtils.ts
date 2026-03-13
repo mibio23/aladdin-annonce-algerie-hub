@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 
 // Enhanced authentication utilities with security hardening
 export const cleanupAuthState = () => {
