@@ -83,7 +83,7 @@ const CategoryPerformanceMonitorSafe: React.FC = () => {
     }
   };
 
-  if (process.env.NODE_ENV !== 'development' && !showMetrics) {
+  if (import.meta.env.MODE !== 'development' && !showMetrics) {
     return (
       <button
         onClick={() => setShowMetrics(true)}
