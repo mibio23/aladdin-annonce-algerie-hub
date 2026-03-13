@@ -1,19 +1,10 @@
-// Service Supabase pour la gestion des catégories avec cache React Query et cache local
+// Service Supabase pour la gestion des catégories avec cache React Query
 import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
 import { MenuCategory } from '@/data/categoryTypes';
 import { createIcon } from '@/utils/iconMapper';
-import { useExtendedCategories } from '@/services/extendedCategories/extendedCategoriesService';
 import { cacheService, categoryCacheKeys } from '@/services/cacheService';
-
-// Import du service local pour le développement
-import { fetchCategoriesFromLocal } from '@/services/localCategoriesService';
-
-// Utiliser le client Supabase déjà configuré
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/silentLogger';
-
-// Variable pour basculer entre le mode local et Supabase
-const USE_LOCAL_CATEGORIES = import.meta.env.VITE_USE_LOCAL_CATEGORIES === 'true';
 
 // Types pour les données Supabase (view categories_with_translations)
 export interface SupabaseCategoryView {
@@ -25,7 +16,7 @@ export interface SupabaseCategoryView {
   updated_at: string | null;
   position_order: number | null;
   is_active: boolean | null;
-  id_uuid: string | null; // Deprecated but kept for type compatibility if needed, will be null
+  id_uuid: string | null; // Deprecated
   parent_id_uuid: string | null; // Deprecated
   description: string | null;
   icon: string | null;
@@ -37,9 +28,8 @@ export interface SupabaseCategoryView {
   category_image_url: string | null;
 }
 
-// Clés de cache pour React Query et le cache local
-// Ajout d'une version pour forcer le rafraîchissement du cache après les correctifs de fusion
-const CACHE_VERSION = 'v13_dynamic_attributes_update';
+// Clés de cache pour React Query
+const CACHE_VERSION = 'v14_pure_supabase';
 
 export const categoriesKeys = {
   all: ['categories', CACHE_VERSION] as const,
@@ -63,17 +53,11 @@ const transformSupabaseCategory = (category: SupabaseCategoryView): MenuCategory
   };
 };
 
-// Fonction pour récupérer les catégories depuis Supabase avec cache local optimisé
+// Fonction pour récupérer les catégories depuis Supabase (100% Distant)
 export const fetchCategoriesFromSupabase = async (language: string = 'fr'): Promise<MenuCategory[]> => {
-  // Si nous sommes en mode local, utiliser le service local
-  if (USE_LOCAL_CATEGORIES) {
-    logger.info(`📁 Utilisation du service local pour les catégories en ${language}`);
-    return fetchCategoriesFromLocal(language);
-  }
-
   const cacheKey = `${categoryCacheKeys.categories(language)}_${CACHE_VERSION}`;
   
-  // Vérifier d'abord le cache local
+  // Vérifier d'abord le cache local (Service Worker / LocalStorage via cacheService)
   const cachedData = cacheService.get<MenuCategory[]>(cacheKey);
   if (cachedData) {
     logger.info(`Catégories récupérées depuis le cache local pour ${language}`);
@@ -81,59 +65,62 @@ export const fetchCategoriesFromSupabase = async (language: string = 'fr'): Prom
   }
 
   try {
-    // Optimisation : sélectionner uniquement les champs nécessaires
-    const [categoriesResult, translationsResult] = await Promise.all([
-      supabase
-        .from('categories')
-        .select('id, parent_id, name, slug, icon, description, position_order, is_active')
-        .eq('is_active', true)
-        .order('position_order', { ascending: true })
-        .limit(5000), // Augmenté pour couvrir toutes les catégories (actuellement ~5000)
+    // 1. Récupérer les catégories actives
+    const { data: categoriesData, error: categoriesError } = await supabase
+      .from('categories')
+      .select('id, parent_id, name, slug, icon, description, position_order, is_active')
+      .eq('is_active', true)
+      .order('position_order', { ascending: true })
+      .limit(5000);
       
-      supabase
-        .from('category_translations')
-        .select('category_id, name, description')
-        .eq('language_code', language)
-        .limit(5000) // Augmenté pour couvrir toutes les traductions
-    ]);
-
-    const { data: categoriesData, error: categoriesError } = categoriesResult;
-    const { data: translationsData, error: _translationsError } = translationsResult;
-
     if (categoriesError) {
       logger.error('Erreur lors de la récupération des catégories:', categoriesError);
-      return fetchCategoriesFromLocal(language);
+      throw categoriesError;
     }
 
     if (!categoriesData || categoriesData.length === 0) {
-      logger.warn(`Aucune catégorie trouvée`);
-      return fetchCategoriesFromLocal(language);
+      logger.warn(`Aucune catégorie trouvée dans la base de données.`);
+      return [];
     }
 
-    // Fusionner les catégories avec leurs traductions de manière optimisée
+    // 2. Récupérer les traductions pour la langue demandée
+    const { data: translationsData, error: translationsError } = await supabase
+      .from('category_translations')
+      .select('category_id, name, description')
+      .eq('language_code', language)
+      .limit(5000);
+
+    if (translationsError) {
+      logger.warn('Erreur lors de la récupération des traductions (fallback sur défaut):', translationsError);
+    }
+
+    // 3. Préparer la map des traductions
     const translationsMap = new Map<string, { name: string | null; description: string | null }>();
     if (translationsData) {
-      translationsData.forEach((translation: { category_id: any; name: string | null; description: string | null }) => {
-        // category_id est maintenant un string (TEXT dans la DB)
-        translationsMap.set(String(translation.category_id), { name: translation.name, description: translation.description });
+      translationsData.forEach((translation) => {
+        translationsMap.set(String(translation.category_id), { 
+          name: translation.name, 
+          description: translation.description 
+        });
       });
     }
 
+    // 4. Fusionner Données + Traductions
     const data: SupabaseCategoryView[] = categoriesData.map((category) => {
       const translation = translationsMap.get(String(category.id));
       return {
-        id: category.id as string | null,
-        id_uuid: null, // Deprecated
-        parent_id: category.parent_id as string | null,
-        parent_id_uuid: null, // Deprecated
-        name: category.name as string | null,
-        slug: category.slug as string | null,
-        icon: category.icon as string | null,
-        description: category.description as string | null,
-        position_order: (category.position_order ?? 0) as number | null,
-        is_active: (category.is_active ?? true) as boolean | null,
-        translated_name: (translation?.name ?? category.name) as string | null,
-        translated_description: (translation?.description ?? category.description) as string | null,
+        id: category.id,
+        id_uuid: null,
+        parent_id: category.parent_id,
+        parent_id_uuid: null,
+        name: category.name,
+        slug: category.slug,
+        icon: category.icon,
+        description: category.description,
+        position_order: category.position_order ?? 0,
+        is_active: category.is_active ?? true,
+        translated_name: translation?.name ?? category.name,
+        translated_description: translation?.description ?? category.description,
         language_code: language,
         created_at: null,
         updated_at: null,
@@ -143,86 +130,48 @@ export const fetchCategoriesFromSupabase = async (language: string = 'fr'): Prom
       };
     });
 
-    // Transformer les données en structure hiérarchique optimisée
+    // 5. Construire la hiérarchie (Arbre)
     const categoriesMap = new Map<string, MenuCategory>();
     const rootCategories: MenuCategory[] = [];
 
-    // Première passe : créer toutes les catégories
+    // Passe 1 : Instancier
     data.forEach((category) => {
       const transformedCategory = transformSupabaseCategory(category);
-      const id = String(category.id);
-      if (id) {
-        categoriesMap.set(id, transformedCategory);
+      if (category.id) {
+        categoriesMap.set(String(category.id), transformedCategory);
       }
     });
 
-    // Deuxième passe : construire la hiérarchie
+    // Passe 2 : Lier Parents/Enfants
     data.forEach((category) => {
       const id = String(category.id);
       const transformedCategory = categoriesMap.get(id);
       
       if (!category.parent_id) {
+        // Racine
         if (transformedCategory) {
           rootCategories.push(transformedCategory);
         }
       } else {
+        // Enfant
         const parentId = String(category.parent_id);
-        if (parentId && categoriesMap.has(parentId)) {
-          const parent = categoriesMap.get(parentId);
-          if (parent && transformedCategory) {
-            if (!parent.subcategories) {
-              parent.subcategories = [];
-            }
-            parent.subcategories.push(transformedCategory);
+        const parent = categoriesMap.get(parentId);
+        if (parent && transformedCategory) {
+          if (!parent.subcategories) {
+            parent.subcategories = [];
           }
+          parent.subcategories.push(transformedCategory);
+        } else if (transformedCategory) {
+          // Si parent introuvable (orphelin), on le met à la racine pour ne pas le perdre
+          // rootCategories.push(transformedCategory); // Optionnel : décommenter si on veut voir les orphelins
         }
       }
     });
 
-    // Fonction récursive pour mettre à jour les traductions avec les données locales
-    // Et surtout, pour utiliser les données locales comme structure principale
-    const mergeWithLocalAsPrimary = (
-      supabaseCats: MenuCategory[], 
-      localCats: MenuCategory[]
-    ): MenuCategory[] => {
-      const supabaseMap = new Map(supabaseCats.map(c => [c.slug, c]));
-      
-      return localCats.map(lCat => {
-        // Chercher la correspondance dans Supabase par slug
-        const sCat = supabaseMap.get(lCat.slug);
-        
-        // Créer une nouvelle catégorie basée sur la locale (qui a la bonne traduction)
-        // Mais enrichie avec l'ID de Supabase si disponible
-        const mergedCat: MenuCategory = {
-          ...lCat,
-          id: sCat ? sCat.id : lCat.id,
-          icon: lCat.icon ?? sCat?.icon,
-          attributes: lCat.attributes,
-          // Garder le nom et description locaux car ils sont garantis d'être dans la bonne langue
-        };
-
-        // Gérer récursivement les sous-catégories
-        if (lCat.subcategories && lCat.subcategories.length > 0) {
-          // Si Supabase a aussi des sous-catégories, on essaie de les matcher
-          const supabaseSubcats = sCat?.subcategories || [];
-          mergedCat.subcategories = mergeWithLocalAsPrimary(supabaseSubcats, lCat.subcategories);
-        }
-
-        return mergedCat;
-      });
-    };
-
-    // Fusionner avec les catégories locales pour garantir la présence des ajouts locaux
-    const localCategories = await fetchCategoriesFromLocal(language);
-    
-    // Utiliser les catégories locales comme structure de référence (source de vérité pour la langue et l'ordre)
-    // Et enrichir avec les IDs de Supabase
-    const finalCategories = mergeWithLocalAsPrimary(rootCategories, localCategories);
-    
     // Mettre en cache le résultat pour 24 heures
-    cacheService.set(cacheKey, finalCategories, 1000 * 60 * 60 * 24);
+    cacheService.set(cacheKey, rootCategories, 1000 * 60 * 60 * 24);
 
-    return finalCategories;
+    return rootCategories;
   } catch (error) {
     logger.error('Erreur critique lors du chargement des catégories:', error);
     throw error;
@@ -233,35 +182,29 @@ export const fetchCategoriesFromSupabase = async (language: string = 'fr'): Prom
 export const useCategories = (language: string = 'fr') => {
   return useQuery({
     queryKey: categoriesKeys.list(language),
-    queryFn: () => USE_LOCAL_CATEGORIES ? fetchCategoriesFromLocal(language) : fetchCategoriesFromSupabase(language),
+    queryFn: () => fetchCategoriesFromSupabase(language),
     staleTime: 1000 * 60 * 60 * 24, // Cache pendant 24 heures
     gcTime: 1000 * 60 * 60 * 24 * 7, // Garde en cache pendant 7 jours
-    retry: 2, // Réduire le nombre de tentatives
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Délai plus court
+    retry: 2,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false, // Désactiver pour éviter les rechargements
-    // Optimisations supplémentaires
+    refetchOnReconnect: false,
     networkMode: 'online',
-    refetchOnMount: false,
-    enabled: !!language, // N'exécuter que si la langue est définie
+    enabled: !!language,
   });
 };
 
-// Hook pour récupérer les catégories featured avec cache local
+// Hook pour récupérer les catégories featured (Top 10)
 export const useFeaturedCategories = (language: string = 'fr') => {
   return useQuery({
     queryKey: categoriesKeys.featured(language),
     queryFn: async () => {
       const cacheKey = `${categoryCacheKeys.featuredCategories(language)}_${CACHE_VERSION}`;
       
-      // Vérifier d'abord le cache local
       const cachedData = cacheService.get<MenuCategory[]>(cacheKey);
-      if (cachedData) {
-        logger.info(`Catégories featured récupérées depuis le cache local pour ${language}`);
-        return cachedData;
-      }
+      if (cachedData) return cachedData;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // On utilise la vue 'categories_with_translations' si elle existe, ou on fait manuel
+      // Ici on suppose que la vue existe comme dans le code original
       const { data, error } = await supabase
         .from('categories_with_translations')
         .select('*')
@@ -271,25 +214,25 @@ export const useFeaturedCategories = (language: string = 'fr') => {
         .limit(10);
 
       if (error) {
-        throw new Error(`Impossible de charger les catégories featured: ${error.message}`);
+        // Fallback si la vue n'existe pas : on prend les root categories du fetch principal
+        logger.warn("Impossible de charger via la vue, fallback sur fetchCategoriesFromSupabase");
+        const allCats = await fetchCategoriesFromSupabase(language);
+        return allCats.slice(0, 10);
       }
 
-      const result = (data as unknown as SupabaseCategoryView[] | null)?.map(transformSupabaseCategory) || [];
-      
-      // Mettre en cache le résultat pour 12 heures
+      const result = (data as unknown as SupabaseCategoryView[])?.map(transformSupabaseCategory) || [];
       cacheService.set(cacheKey, result, 1000 * 60 * 60 * 12);
 
       return result;
     },
-    staleTime: 1000 * 60 * 60 * 12, // Cache pendant 12 heures
-    gcTime: 1000 * 60 * 60 * 24, // Garde en cache pendant 24 heures
+    staleTime: 1000 * 60 * 60 * 12,
+    gcTime: 1000 * 60 * 60 * 24,
     networkMode: 'online',
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
   });
 };
 
-// Hook pour précharger les catégories avec cache optimisé
+// Hook pour précharger les catégories
 export const usePreloadCategories = () => {
   const queryClient = useQueryClient();
 
@@ -297,59 +240,44 @@ export const usePreloadCategories = () => {
     queryClient.prefetchQuery({
       queryKey: categoriesKeys.list(language),
       queryFn: () => fetchCategoriesFromSupabase(language),
-      staleTime: 1000 * 60 * 60 * 24, // Cache pendant 24 heures
-      gcTime: 1000 * 60 * 60 * 24 * 7, // Garde en cache pendant 7 jours
+      staleTime: 1000 * 60 * 60 * 24,
     });
   };
 };
 
-// Hook pour invalider le cache des catégories (React Query + cache local)
+// Hook pour invalider le cache
 export const useInvalidateCategories = () => {
   const queryClient = useQueryClient();
 
   return (language?: string) => {
-    // Invalider le cache React Query
     if (language) {
       queryClient.invalidateQueries({ queryKey: categoriesKeys.list(language) });
-      // Vider aussi le cache local pour cette langue (anciennes et nouvelles clés)
       cacheService.delete(categoryCacheKeys.categories(language));
       cacheService.delete(`${categoryCacheKeys.categories(language)}_${CACHE_VERSION}`);
-      cacheService.delete(categoryCacheKeys.featuredCategories(language));
-      cacheService.delete(`${categoryCacheKeys.featuredCategories(language)}_${CACHE_VERSION}`);
     } else {
       queryClient.invalidateQueries({ queryKey: categoriesKeys.all });
-      // Vider tout le cache local des catégories
       cacheService.clear();
     }
   };
 };
 
-// Hook pour rafraîchir les catégories
-export const useRefreshCategories = () => {
-  const queryClient = useQueryClient();
+// --- Mutations Admin ---
 
-  return (language: string = 'fr') => {
-    queryClient.refetchQueries({ queryKey: categoriesKeys.list(language) });
-  };
-};
-
-// Service pour les mutations (admin)
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (categoryData: Partial<MenuCategory>) => {
-      const insertData = {
-        id: categoryData.id || crypto.randomUUID(),
-        name: categoryData.name || '',
-        slug: categoryData.slug || '',
-        icon: categoryData.icon ? String(categoryData.icon) : null,
-        position_order: 0,
-        is_active: true,
-      };
       const { data, error } = await supabase
         .from('categories')
-        .insert(insertData)
+        .insert({
+          id: categoryData.id || crypto.randomUUID(),
+          name: categoryData.name || '',
+          slug: categoryData.slug || '',
+          icon: categoryData.icon ? String(categoryData.icon) : null,
+          position_order: 0,
+          is_active: true,
+        })
         .select()
         .single();
 
@@ -394,11 +322,7 @@ export const useDeleteCategory = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await supabase.from('categories').delete().eq('id', id);
       if (error) throw error;
       return id;
     },
@@ -421,50 +345,4 @@ export const createCategoriesQueryClient = () => {
   });
 };
 
-// Export du client par défaut
 export const categoriesQueryClient = createCategoriesQueryClient();
-
-
-// Fonction pour récupérer les catégories étendues
-export const useExtendedSupabaseCategories = (language: string = 'fr') => {
-  const { extendedCategories } = useExtendedCategories();
-  
-  // Simuler la structure de données de Supabase
-  const data = extendedCategories.map(category => ({
-    id: category.id,
-    id_uuid: null, // Deprecated
-    name: category.name,
-    slug: category.slug,
-    description: category.description,
-    parent_id: null,
-    parent_id_uuid: null, // Deprecated
-    position_order: 0,
-    is_active: true,
-    translated_name: category.name,
-    translated_description: category.description,
-    language_code: language
-  }));
-  
-  // Transformer en structure hiérarchique
-  const categoriesMap = new Map<string, MenuCategory>();
-  const rootCategories: MenuCategory[] = [];
-  
-  // Première passe : créer toutes les catégories
-  data.forEach((category) => {
-    const transformedCategory = transformSupabaseCategory(category as SupabaseCategoryView);
-    categoriesMap.set(String(category.id), transformedCategory);
-  });
-  
-  // Deuxième passe : construire la hiérarchie
-  data.forEach((category) => {
-    const transformedCategory = categoriesMap.get(String(category.id));
-    
-    if (!category.parent_id) {
-      if (transformedCategory) {
-        rootCategories.push(transformedCategory);
-      }
-    }
-  });
-  
-  return rootCategories;
-};
