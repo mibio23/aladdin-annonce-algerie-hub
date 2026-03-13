@@ -4963,6 +4963,11 @@ export type Database = {
         Args: { announcement_uuid: string }
         Returns: undefined
       }
+      is_admin: { Args: never; Returns: boolean }
+      log_admin_access: {
+        Args: { attempted_path: string; user_id: string }
+        Returns: undefined
+      }
       log_phone_access: {
         Args: { p_announcement_id: string; p_user_id?: string }
         Returns: undefined
