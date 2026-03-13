@@ -49,7 +49,7 @@ const CategoryPerformanceMonitor: React.FC = () => {
       logger.info('📊 Catégories Performance Metrics:', newMetrics);
 
       // Envoyer les métriques à un service d'analyse (optionnel)
-      if (process.env.NODE_ENV === 'production') {
+      if (import.meta.env.MODE === 'production') {
         // AnalyticsService.track('categories_load', newMetrics);
       }
     }
