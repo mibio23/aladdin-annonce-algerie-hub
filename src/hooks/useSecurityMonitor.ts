@@ -161,8 +161,8 @@ export const useSecurityMonitor = () => {
       }));
 
       // Force garbage collection hint (not guaranteed)
-      if (window.gc) {
-        window.gc();
+      if ((window as Window & { gc?: () => void }).gc) {
+        (window as Window & { gc?: () => void }).gc?.();
       }
     } catch {
       logger.error('[Security] Cleanup failed - details hidden for security');

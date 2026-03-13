@@ -141,4 +141,3 @@ export const validatePasswordClient = (password: string): { isValid: boolean; er
 export const generateSecureSessionId = (): string => {
   return crypto.randomUUID();
 };
-import { logger } from '@/utils/silentLogger';

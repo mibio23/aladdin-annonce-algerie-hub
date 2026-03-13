@@ -141,7 +141,7 @@ export function sanitizeUrl(url: string): string {
     }
     
     // Block dangerous hosts in production
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.MODE === 'production') {
       const dangerousHosts = [
         'localhost', '127.0.0.1', '0.0.0.0', '10.0.0.0',
         '172.16.0.0', '192.168.0.0', 'metadata.google.internal'

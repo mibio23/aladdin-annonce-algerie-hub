@@ -106,7 +106,7 @@ export function useDevTranslationTools() {
  */
 export function useTranslationDebug() {
   const [debugMode, setDebugMode] = useState(
-    process.env.NODE_ENV === 'development' && 
+    import.meta.env.MODE === 'development' && 
     localStorage.getItem('translation-debug') === 'true'
   );
 

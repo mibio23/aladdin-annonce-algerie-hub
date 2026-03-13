@@ -5,10 +5,10 @@ import { useRef, useCallback, useEffect } from 'react';
  * Evite les fuites mémoire et optimise les performances
  */
 export const useOptimizedTimeout = () => {
-  const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
+  const timeoutRefs = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
   // Fonction pour créer un timeout avec cleanup automatique
-  const createTimeout = useCallback((callback: () => void, delay: number): NodeJS.Timeout => {
+  const createTimeout = useCallback((callback: () => void, delay: number): ReturnType<typeof setTimeout> => {
     const timeoutId = setTimeout(() => {
       callback();
       timeoutRefs.current.delete(timeoutId);
@@ -19,7 +19,7 @@ export const useOptimizedTimeout = () => {
   }, []);
 
   // Fonction pour nettoyer un timeout spécifique
-  const clearOptimizedTimeout = useCallback((timeoutId: NodeJS.Timeout) => {
+  const clearOptimizedTimeout = useCallback((timeoutId: ReturnType<typeof setTimeout>) => {
     clearTimeout(timeoutId);
     timeoutRefs.current.delete(timeoutId);
   }, []);

@@ -64,7 +64,7 @@ export const useCategoryPrefetch = () => {
 
   // Précharger les catégories au survol (avec délai pour éviter les requêtes inutiles)
   const prefetchOnHover = useCallback((callback: () => void, delay: number = 200) => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
     
     return () => {
       clearTimeout(timeoutId);

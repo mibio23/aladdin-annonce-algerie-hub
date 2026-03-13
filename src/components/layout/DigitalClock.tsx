@@ -10,7 +10,7 @@ const DigitalClock = () => {
     const now = new Date();
     const msUntilNextMinute = (60 - now.getSeconds()) * 1000;
     
-    let intervalId: NodeJS.Timeout;
+    let intervalId: ReturnType<typeof setInterval>;
     
     // Initial timeout to sync with minute boundary
     const initialTimeout = setTimeout(() => {

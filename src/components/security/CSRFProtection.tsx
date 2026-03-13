@@ -62,7 +62,7 @@ export const CSRFProvider: React.FC<CSRFProviderProps> = ({ children }) => {
     }
 
     // Rafraîchir le token périodiquement avec setTimeout récursif
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
     
     const scheduleRefresh = () => {
       timeoutId = setTimeout(() => {

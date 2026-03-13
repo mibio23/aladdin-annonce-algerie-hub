@@ -177,7 +177,7 @@ const InteractiveOptionsCarousel = React.memo(() => {
   useEffect(() => {
     if (!displayOptions.length) return;
     
-    let timeoutId: NodeJS.Timeout | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     
     const scheduleNext = () => {
       timeoutId = setTimeout(() => {
