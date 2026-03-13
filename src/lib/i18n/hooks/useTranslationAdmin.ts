@@ -82,7 +82,7 @@ export function useDevTranslationTools() {
   const admin = useTranslationAdmin();
   
   // Add keyboard shortcuts in development
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.MODE === 'development') {
     document.addEventListener('keydown', (e) => {
       // Ctrl/Cmd + Shift + T for admin
       if (e.ctrlKey && e.shiftKey && e.key === 'T') {
@@ -106,7 +106,7 @@ export function useDevTranslationTools() {
  */
 export function useTranslationDebug() {
   const [debugMode, setDebugMode] = useState(
-    process.env.NODE_ENV === 'development' && 
+    import.meta.env.MODE === 'development' && 
     localStorage.getItem('translation-debug') === 'true'
   );
 

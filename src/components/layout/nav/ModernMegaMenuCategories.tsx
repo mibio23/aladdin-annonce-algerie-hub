@@ -29,7 +29,7 @@ const ModernMegaMenuCategories: React.FC = () => {
   const [hoveredSubcategory, setHoveredSubcategory] = useState<string | null>(null);
   // Track hovered state only
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
-  const menuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const categoriesContainerRef = useRef<HTMLDivElement>(null);
 

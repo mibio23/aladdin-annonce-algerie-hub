@@ -49,7 +49,7 @@ const CategoryPerformanceMonitor: React.FC = () => {
       logger.info('📊 Catégories Performance Metrics:', newMetrics);
 
       // Envoyer les métriques à un service d'analyse (optionnel)
-      if (process.env.NODE_ENV === 'production') {
+      if (import.meta.env.MODE === 'production') {
         // AnalyticsService.track('categories_load', newMetrics);
       }
     }
@@ -136,7 +136,7 @@ const CategoryPerformanceMonitor: React.FC = () => {
     logger.info(`🚀 Prefetching test completed in ${endTime - startTime}ms`);
   };
 
-  if (process.env.NODE_ENV !== 'development' && !showMetrics) {
+  if (import.meta.env.MODE !== 'development' && !showMetrics) {
     return (
       <button
         onClick={() => setShowMetrics(true)}
@@ -163,7 +163,7 @@ const CategoryPerformanceMonitor: React.FC = () => {
     <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-4 rounded-lg text-xs z-50 max-w-xs">
       <div className="flex justify-between items-center mb-3">
         <h3 className="font-bold text-sm">📊 Performance Catégories</h3>
-        {process.env.NODE_ENV === 'development' ? (
+        {import.meta.env.MODE === 'development' ? (
           <button
             onClick={() => setShowMetrics(false)}
             className="text-gray-400 hover:text-white"

@@ -7,8 +7,8 @@ interface LoggingConfig {
 }
 
 const config: LoggingConfig = {
-  enableSensitiveData: process.env.NODE_ENV === 'development',
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'development'
+  enableSensitiveData: import.meta.env.MODE === 'development',
+  environment: import.meta.env.MODE === 'production' ? 'production' : 'development'
 };
 
 // Fields that should never be logged

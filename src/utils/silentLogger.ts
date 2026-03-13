@@ -2,7 +2,7 @@
  * Silent logger for production - zero overhead
  */
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = import.meta.env.MODE === 'production';
 
 export const logger = {
   debug: (...args: unknown[]) => {

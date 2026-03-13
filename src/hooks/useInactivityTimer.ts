@@ -17,8 +17,8 @@ export const useInactivityTimer = ({
 }: UseInactivityTimerOptions = {}) => {
   const { user, signOut } = useAuth();
   const { t } = useSafeI18nWithRouter();
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const warningTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const warningTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const lastActivityRef = useRef<number>(Date.now());
 
   const resetTimer = useCallback(() => {

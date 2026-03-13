@@ -35,7 +35,7 @@ const AdvancedSearchBar = React.memo(() => {
   const [selectedWilaya, setSelectedWilaya] = useState("");
   
   // État pour gérer les timeouts
-  const [timeoutRef, setTimeoutRef] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutRef, setTimeoutRef] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Utiliser le hook useCategories pour récupérer les catégories
   const { data: categoryMenu = [], isLoading: categoriesLoading, error: categoriesError } = useCategories(language);

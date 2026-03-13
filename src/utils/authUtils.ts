@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 
 // Enhanced authentication utilities with security hardening
 export const cleanupAuthState = () => {
@@ -140,4 +141,3 @@ export const validatePasswordClient = (password: string): { isValid: boolean; er
 export const generateSecureSessionId = (): string => {
   return crypto.randomUUID();
 };
-import { logger } from '@/utils/silentLogger';
