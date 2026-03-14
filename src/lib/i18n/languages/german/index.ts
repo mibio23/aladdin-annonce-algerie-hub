@@ -10,7 +10,9 @@ import { search, germanSearch } from './search';
 import { germanFooter } from './footer';
 import { germanCategories } from './categories';
 import { createAd } from './createAd';
-
+import { germanSections } from './sections';
+import { germanAnnouncements } from './announcements';
+import homeDe from './home';
 
 const germanTranslations = {
   ...germanAuth,
@@ -26,6 +28,9 @@ const germanTranslations = {
   ...germanFooter,
   ...germanCategories,
   ...createAd,
+  ...germanSections,
+  ...germanAnnouncements,
+  ...homeDe,
 };
 
 export default germanTranslations;

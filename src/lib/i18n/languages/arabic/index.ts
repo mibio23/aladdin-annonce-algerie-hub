@@ -1,4 +1,3 @@
-
 import { arabicAuth } from './auth';
 import { arabicEcoCarousel } from './ecoCarousel';
 import { arabicIntelligentAssistant } from './intelligentAssistant';
@@ -13,7 +12,9 @@ import { search, arabicSearch } from './search';
 import { arabicFooter } from './footer';
 import { arabicCategories } from './categories';
 import { createAd } from './createAd';
-
+import { arabicSections } from './sections';
+import { arabicAnnouncements } from './announcements';
+import homeAr from './home';
 
 const arabicTranslations = {
   ...arabicAuth,
@@ -31,6 +32,8 @@ const arabicTranslations = {
   ...arabicFooter,
   ...arabicCategories,
   ...createAd,
+  ...arabicSections,
+  ...arabicAnnouncements,
+  ...homeAr,
 };
-
 export default arabicTranslations;

@@ -12,6 +12,9 @@ import { spanishCategories } from './categories';
 import { spanishFooter } from './footer';
 import { createAd } from './createAd';
 import { shop } from './shop';
+import { spanishSections } from './sections';
+import { spanishAnnouncements } from './announcements';
+import homeEs from './home';
 
 const spanishTranslations = {
   ...spanishAuth,
@@ -29,6 +32,9 @@ const spanishTranslations = {
   ...spanishCategories,
   ...createAd,
   ...shop,
+  ...spanishSections,
+  ...spanishAnnouncements,
+  ...homeEs,
 };
 
 export default spanishTranslations;
