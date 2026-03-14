@@ -70,6 +70,26 @@ serve(async (req) => {
         throw updateError;
       }
 
+      // Record payment in payments table
+      const { error: paymentError } = await supabaseService
+        .from('payments')
+        .insert({
+          user_id,
+          announcement_id,
+          payment_type,
+          payment_method: 'stripe',
+          amount: (session.amount_total || 0) / 100,
+          currency: session.currency?.toUpperCase() || 'DZD',
+          status: 'completed',
+          stripe_session_id: session.id,
+          stripe_payment_intent_id: typeof session.payment_intent === 'string' ? session.payment_intent : null,
+          metadata: { premium_duration_days: premiumDurationDays },
+        });
+
+      if (paymentError) {
+        logStep("Warning: failed to record payment", { error: paymentError });
+      }
+
       logStep("Announcement updated successfully", { announcement_id, payment_type });
 
       return new Response(JSON.stringify({ 
