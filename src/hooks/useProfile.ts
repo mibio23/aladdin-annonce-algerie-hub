@@ -40,6 +40,9 @@ export const useProfile = () => {
               full_name: user.user_metadata?.full_name || user.email,
               first_name: user.user_metadata?.first_name || null,
               last_name: user.user_metadata?.last_name || null,
+              phone: user.user_metadata?.phone || null,
+              gender: user.user_metadata?.gender || null,
+              display_name: user.user_metadata?.full_name || null,
             });
             if (created) {
               setProfile(normalizeProfile(created));
@@ -86,10 +89,17 @@ export const useProfile = () => {
       return true;
     } catch (error) {
       logger.error('Error updating profile:', error);
+      let message = (error as { message?: string } | null)?.message || '';
+      
+      // Personnalisation du message d'erreur spécifique pour les champs protégés
+      if (message.includes("Modification des champs d'identité interdite") || message.includes("identity fields")) {
+        message = "L'utilisateur n'a pas le droit de changer ces cases d'informations (Nom, Prénom, Sexe, Téléphone Principal).";
+      }
+
       toast({
-        title: "Erreur",
-        description: "Erreur lors de la mise à jour du profil",
-        variant: "destructive",
+        title: message.includes("L'utilisateur n'a pas le droit") ? "Action non autorisée" : "Erreur",
+        description: message ? message : "Erreur lors de la mise à jour du profil",
+        variant: message.includes("L'utilisateur n'a pas le droit") ? "default" : "destructive",
       });
       return false;
     } finally {

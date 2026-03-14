@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { MapPin, Briefcase, User, Mail, Save, Loader2 } from 'lucide-react';
+import { MapPin, Briefcase, User, Mail, Save, Loader2, Phone, Home } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
+import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,16 +24,26 @@ const Profile = () => {
   const { t } = useSafeI18nWithRouter();
   const [isEditing, setIsEditing] = useState(false);
 
+  // Schéma de validation
   const profileSchema = z.object({
-    display_name: z.string().min(2, t('profile.validation.nameMinLength')),
-    first_name: z.string().min(2, t('profile.validation.nameMinLength')),
-    last_name: z.string().min(2, t('profile.validation.nameMinLength')),
-    gender: z.enum(['homme', 'femme']).nullable(),
+    // Champs immuables (affichés mais non modifiables)
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
+    gender: z.enum(['homme', 'femme']).nullable().optional(),
     phone: z.string().optional(),
+    
+    // Champs modifiables
+    display_name: z.string().min(2, t('profile.validation.nameMinLength')).optional(),
     date_of_birth: z.string().optional(),
-    location: z.string().optional(),
     profession: z.string().max(100, t('profile.validation.professionMaxLength')).optional(),
     bio: z.string().max(500, t('profile.validation.bioMaxLength')).optional(),
+    
+    // Nouveaux champs de contact et localisation
+    phone_secondary: z.string().optional(),
+    phone_tertiary: z.string().optional(),
+    address: z.string().optional(),
+    commune: z.string().min(1, t('profile.validation.required')).optional(), // Marqué comme requis dans la demande (*)
+    wilaya: z.string().min(1, t('profile.validation.required')).optional(),  // Marqué comme requis dans la demande (*)
   });
 
   type ProfileFormData = z.infer<typeof profileSchema>;
@@ -51,18 +61,23 @@ const Profile = () => {
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      display_name: profile?.display_name || '',
-      first_name: profile?.first_name || '',
-      last_name: profile?.last_name || '',
-      gender: normalizeGender(profile?.gender),
-      phone: profile?.phone || '',
-      date_of_birth: profile?.date_of_birth || '',
-      location: profile?.location || '',
-      profession: profile?.profession || '',
-      bio: profile?.bio || '',
+      display_name: '',
+      first_name: '',
+      last_name: '',
+      gender: null,
+      phone: '',
+      date_of_birth: '',
+      profession: '',
+      bio: '',
+      phone_secondary: '',
+      phone_tertiary: '',
+      address: '',
+      commune: '',
+      wilaya: '',
     },
   });
 
+  // Mise à jour du formulaire quand le profil change
   React.useEffect(() => {
     if (profile) {
       form.reset({
@@ -72,15 +87,25 @@ const Profile = () => {
         gender: normalizeGender(profile.gender),
         phone: profile.phone || '',
         date_of_birth: profile.date_of_birth || '',
-        location: profile.location || '',
         profession: profile.profession || '',
         bio: profile.bio || '',
+        phone_secondary: profile.phone_secondary || '',
+        phone_tertiary: profile.phone_tertiary || '',
+        address: profile.address || '',
+        commune: profile.commune || '',
+        wilaya: profile.wilaya || '',
       });
     }
   }, [profile, form]);
 
   const onSubmit = async (data: ProfileFormData) => {
-    const success = await updateProfile(data);
+    // Filtrage strict des champs immuables
+    // On retire first_name, last_name, gender, phone de l'objet envoyé
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { first_name, last_name, gender, phone, ...editableData } = data;
+    
+    // On envoie uniquement les champs autorisés à la modification
+    const success = await updateProfile(editableData);
     if (success) {
       setIsEditing(false);
     }
@@ -124,7 +149,8 @@ const Profile = () => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Profile Photo Section */}
+            
+            {/* 1. Photo et Identité Principale */}
             <Card className="border-0 shadow-lg bg-card/50 backdrop-blur">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
@@ -151,11 +177,9 @@ const Profile = () => {
               <CardContent>
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <ProfileAvatar size="xl" editable={isEditing} />
-                  <div className="text-center md:text-left">
+                  <div className="text-center md:text-left space-y-1">
                     <h3 className="text-lg font-semibold">
-                      {profile?.display_name || 
-                       `${profile?.first_name} ${profile?.last_name}`.trim() || 
-                       t('profile.user')}
+                      {profile?.display_name || `${profile?.first_name} ${profile?.last_name}`.trim()}
                     </h3>
                     {user?.email && (
                       <p className="text-muted-foreground flex items-center gap-1 justify-center md:justify-start">
@@ -163,18 +187,16 @@ const Profile = () => {
                         {user.email}
                       </p>
                     )}
-                    {profile?.public_user_id != null && (
-                      <div className="text-muted-foreground flex items-center gap-2 justify-center md:justify-start">
-                        <span>{t('profile.userId')}:</span>
-                        <Badge variant="outline" className="font-mono">
-                          {String(profile.public_user_id).padStart(14, '0')}
-                        </Badge>
-                      </div>
+                    {profile?.phone && (
+                      <p className="text-muted-foreground flex items-center gap-1 justify-center md:justify-start">
+                        <Phone className="h-4 w-4" />
+                        {profile.phone}
+                      </p>
                     )}
-                    {profile?.location && (
+                    {profile?.wilaya && (
                       <p className="text-muted-foreground flex items-center gap-1 justify-center md:justify-start">
                         <MapPin className="h-4 w-4" />
-                        {profile.location}
+                        {profile.commune}, {profile.wilaya}
                       </p>
                     )}
                   </div>
@@ -182,16 +204,13 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Personal Information */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur">
+            {/* 2. Informations Immuables (Lecture Seule) */}
+            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur opacity-90">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  {t('profile.personalInfo')}
+                <CardTitle className="flex items-center gap-2 text-base text-muted-foreground">
+                  <User className="h-4 w-4" />
+                  Informations d'identité (Non modifiables)
                 </CardTitle>
-                <CardDescription>
-                  {t('profile.personalInfoDesc')}
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
@@ -200,83 +219,35 @@ const Profile = () => {
                     name="first_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          {t('profile.firstName')} <span className="text-destructive">*</span>
-                        </FormLabel>
+                        <FormLabel>{t('profile.firstName')}</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder={t('profile.firstNamePlaceholder')} 
-                            {...field} 
-                            disabled={true}
-                            className="bg-background"
-                          />
+                          <Input {...field} disabled={true} className="bg-muted" />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
                   <FormField
                     control={form.control}
                     name="last_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          {t('profile.lastName')} <span className="text-destructive">*</span>
-                        </FormLabel>
+                        <FormLabel>{t('profile.lastName')}</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder={t('profile.lastNamePlaceholder')} 
-                            {...field} 
-                            disabled={true}
-                            className="bg-background"
-                          />
+                          <Input {...field} disabled={true} className="bg-muted" />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="display_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('profile.displayName')}</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder={t('profile.displayNamePlaceholder')} 
-                          {...field} 
-                          disabled={!isEditing}
-                          className="bg-background"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t('profile.displayNameDesc')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          {t('profile.gender')} <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value || ''} 
-                          disabled={true}
-                        >
+                        <FormLabel>{t('profile.gender')}</FormLabel>
+                        <Select value={field.value || ''} disabled={true}>
                           <FormControl>
-                            <SelectTrigger className="bg-background">
-                              <SelectValue placeholder={t('profile.selectGender')} />
+                            <SelectTrigger className="bg-muted">
+                              <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -284,28 +255,18 @@ const Profile = () => {
                             <SelectItem value="femme">{t('profile.femme')}</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          {t('profile.phone')} <span className="text-destructive">*</span>
-                        </FormLabel>
+                        <FormLabel>{t('profile.phone')} (Principal)</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder={t('profile.phonePlaceholder')} 
-                            {...field} 
-                            disabled={true}
-                            className="bg-background"
-                          />
+                          <Input {...field} disabled={true} className="bg-muted" />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -313,137 +274,198 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Additional Details */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-primary" />
-                  {t('profile.personalDetails')}
-                </CardTitle>
-                <CardDescription>
-                  {t('profile.personalDetailsDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="date_of_birth"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('profile.dateOfBirth')}</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="date" 
-                            {...field} 
-                            disabled={!isEditing}
-                            className="bg-background"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            {/* 3. Informations Modifiables */}
+            {isEditing && (
+              <>
+                <Card className="border-0 shadow-lg bg-card/50 backdrop-blur">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Briefcase className="h-5 w-5 text-primary" />
+                      Informations Publiques & Contact
+                    </CardTitle>
+                    <CardDescription>Ces informations sont visibles sur votre profil public</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    
+                    {/* Surnom & Date de naissance */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="display_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.displayName')} (Surnom)</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Votre surnom public" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="date_of_birth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.dateOfBirth')}</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('profile.location')}</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder={t('profile.locationPlaceholder')} 
-                            {...field} 
-                            disabled={!isEditing}
-                            className="bg-background"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                    {/* Profession */}
+                    <FormField
+                      control={form.control}
+                      name="profession"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('profile.profession')}</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Ex: Commerçant, Étudiant..." />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="profession"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('profile.profession')}</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder={t('profile.professionPlaceholder')} 
-                          {...field} 
-                          disabled={!isEditing}
-                          className="bg-background"
+                    {/* Téléphones Secondaires */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="phone_secondary"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Téléphone Secondaire</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="+213..." />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone_tertiary"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Téléphone Tertiaire</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="+213..." />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Localisation Complète */}
+                    <div className="space-y-4 pt-4 border-t">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <MapPin className="h-4 w-4" /> Localisation
+                      </h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="wilaya"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Wilaya <span className="text-destructive">*</span></FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Votre Wilaya" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="bio"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('profile.bio')}</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder={t('profile.bioPlaceholder')}
-                          className="resize-none bg-background"
-                          rows={4}
-                          {...field}
-                          disabled={!isEditing}
+                        <FormField
+                          control={form.control}
+                          name="commune"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Commune <span className="text-destructive">*</span></FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Votre Commune" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormDescription>
-                        {field.value?.length || 0}/500 {t('profile.characters')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Adresse précise</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Rue, Bâtiment, Étage..." />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-            {/* Action Buttons */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur">
-              <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-3 justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setIsEditing(false);
-                      form.reset();
-                    }}
-                    disabled={saving}
-                  >
-                    {t('profile.cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    disabled={saving || !form.formState.isDirty}
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('profile.saving')}
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        {t('profile.save')}
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                    {/* Bio */}
+                    <FormField
+                      control={form.control}
+                      name="bio"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('profile.bio')}</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              {...field} 
+                              placeholder="Parlez-nous de vous..." 
+                              rows={4}
+                              className="resize-none"
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {field.value?.length || 0}/500 caractères
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                  
+                  <CardContent className="pt-6 border-t flex justify-end gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setIsEditing(false);
+                        form.reset();
+                      }}
+                      disabled={saving}
+                    >
+                      {t('profile.cancel')}
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={saving || !form.formState.isDirty}
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('profile.saving')}
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          {t('profile.save')}
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </form>
         </Form>
       </div>

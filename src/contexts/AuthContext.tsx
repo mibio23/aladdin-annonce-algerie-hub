@@ -69,6 +69,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                       full_name: currentSession.user.user_metadata?.full_name || currentSession.user.email,
                       first_name: currentSession.user.user_metadata?.first_name || null,
                       last_name: currentSession.user.user_metadata?.last_name || null,
+                      phone: currentSession.user.user_metadata?.phone || null,
+                      gender: currentSession.user.user_metadata?.gender || null,
+                      display_name: currentSession.user.user_metadata?.full_name || null,
                     },
                     { onConflict: 'user_id' }
                   );
