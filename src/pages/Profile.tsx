@@ -51,10 +51,16 @@ const Profile = () => {
   // Helper function to safely convert gender string to expected enum or null
   const normalizeGender = (gender: string | null): "homme" | "femme" | null => {
     if (!gender) return null;
-    const lowerGender = gender.toLowerCase();
-    if (lowerGender === 'homme' || lowerGender === 'femme') {
-      return lowerGender as "homme" | "femme";
+    const lower = gender.toLowerCase();
+    
+    // Gestion des différentes variantes possibles
+    if (lower === 'homme' || lower === 'male' || lower === 'm') {
+      return 'homme';
     }
+    if (lower === 'femme' || lower === 'female' || lower === 'f') {
+      return 'femme';
+    }
+    
     return null;
   };
 

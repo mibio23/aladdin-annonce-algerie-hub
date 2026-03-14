@@ -104,4 +104,12 @@ export const frenchAuth = {
   "auth.required.description": "Connectez-vous à votre compte ou s'inscrire pour effectuer cette action et soutenir la Boutique !",
   "auth.signin": "Connexion",
   "auth.signup": "S'inscrire",
+
+  // Captcha
+  "captcha.title": "Vérification de sécurité",
+  "captcha.instruction": "Veuillez résoudre ce calcul simple :",
+  "captcha.placeholder": "Résultat",
+  "captcha.error": "Réponse incorrecte, réessayez.",
+  "captcha.refresh": "Nouveau calcul",
+  "auth.success.validAnswer": "Correct !",
 };
