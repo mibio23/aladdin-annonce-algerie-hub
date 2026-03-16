@@ -22,7 +22,7 @@ import { MenuCategory } from '@/data/categoryTypes';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { logger } from '@/utils/silentLogger';
-import { useCategories } from '@/services/supabaseCategoriesService';
+import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
 import { educationLoisirsFr } from '@/data/categories/megaMenuStructures/educationLoisirs/fr';
 import { immobilierMaisonFr } from '@/data/categories/megaMenuStructures/immobilierMaison/fr';
 
@@ -300,15 +300,13 @@ const DeposerAnnonce = () => {
     }
   }, [user]);
 
-  const { data: fetchedCategories } = useCategories(language);
   useEffect(() => {
-    if (fetchedCategories && fetchedCategories.length) {
-      setMenuCategories(fetchedCategories as MenuCategory[]);
-      setCategories(
-        (fetchedCategories as MenuCategory[]).map((c) => ({ id: c.id, name: c.name, slug: c.slug }))
-      );
-    }
-  }, [fetchedCategories]);
+    const navCategories = getCategoryMenu(language) as MenuCategory[];
+    setMenuCategories(navCategories);
+    setCategories(
+      navCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))
+    );
+  }, [language]);
 
   // Derived state for lists - guarantees sync with selection
   const subcategories = useMemo(() => {
@@ -690,6 +688,7 @@ const DeposerAnnonce = () => {
         currency: formData.currency,
         condition: formData.condition,
         category_id: formData.category_id,
+        subcategory_id: formData.subcategory_id || selectedSubcategoryL2 || null,
         wilaya: formData.wilaya,
         commune: formData.commune || null,
         address: formData.location, // Mapping location to address
@@ -850,31 +849,31 @@ const DeposerAnnonce = () => {
                       </Select>
                     </div>
 
-                    {/* Sous-catégorie */}
-                    <div className="space-y-2">
-                      <Select
-                        value={selectedSubcategoryL2}
-                        onValueChange={handleSubcategoryL2Change}
-                        disabled={!formData.category_id || subcategories.length === 0}
-                      >
-                        <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
-                          <SelectValue placeholder={
-                            !formData.category_id
-                              ? t('search.advanced.selectCategory')
-                              : subcategories.length === 0
+                    {/* Sous-catégorie (apparition automatique après sélection de catégorie) */}
+                    {formData.category_id && (
+                      <div className="space-y-2">
+                        <Select
+                          value={selectedSubcategoryL2}
+                          onValueChange={handleSubcategoryL2Change}
+                          disabled={subcategories.length === 0}
+                        >
+                          <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
+                            <SelectValue placeholder={
+                              subcategories.length === 0
                                 ? t('announcements.noResultsInSubcategory')
                                 : t('search.advanced.selectSubCategory')
-                          } />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {subcategories.map((subcategory) => (
-                            <SelectItem key={subcategory.id} value={subcategory.id}>
-                              {subcategory.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                            } />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {subcategories.map((subcategory) => (
+                              <SelectItem key={subcategory.id} value={subcategory.id}>
+                                {subcategory.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
 
                     {subSubcategories.length > 0 && (
                       <div className="space-y-2">

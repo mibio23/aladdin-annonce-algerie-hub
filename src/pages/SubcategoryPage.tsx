@@ -5,6 +5,7 @@ import { LocalizedLink } from "@/utils/linkUtils";
 import { Grid } from "lucide-react";
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
 import { useCategories } from "@/services/supabaseCategoriesService";
+import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory, SubCategory } from "@/data/categoryTypes";
 import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,30 +31,37 @@ const SubcategoryPage = () => {
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(false);
 
   useEffect(() => {
-    if (slug && categories.length > 0) {
-      const foundCategory = categories.find(cat => cat.slug === slug);
+    if (slug && subslug) {
+      // 1. Chercher dans les catégories de Supabase
+      let foundCategory = categories.find(cat => cat.slug === slug);
+      let foundSub: SubCategory | undefined;
+
       if (foundCategory) {
-        setCategory(foundCategory);
-        const foundSubcategory = foundCategory.subcategories.find(sub => sub.slug === subslug);
-        setSubcategory(foundSubcategory || null);
+        foundSub = foundCategory.subcategories?.find(sub => sub.slug === subslug);
       }
+
+      // 2. Fallback sur les catégories locales si non trouvé ou sans la sous-catégorie
+      if (!foundCategory || !foundSub) {
+        const localMenu = getCategoryMenu(language);
+        const localCategory = localMenu.find(cat => cat.slug === slug);
+        if (localCategory) {
+          foundCategory = localCategory;
+          foundSub = localCategory.subcategories?.find(sub => sub.slug === subslug);
+        }
+      }
+
+      setCategory(foundCategory || null);
+      setSubcategory(foundSub || null);
     }
-  }, [slug, subslug, categories]);
+  }, [slug, subslug, categories, language]);
 
   // Fetch announcements dynamically from Supabase
   useEffect(() => {
     const fetchAnnouncements = async () => {
       if (!subslug) return;
       
-      // Resolve subcategory ID from slug if possible, otherwise assume subslug is ID
-      let subcategoryId = subslug;
-      if (slug && categories.length > 0) {
-        const foundCategory = categories.find(cat => cat.slug === slug);
-        if (foundCategory) {
-            const foundSub = foundCategory.subcategories?.find(s => s.slug === subslug);
-            if (foundSub) subcategoryId = foundSub.id;
-        }
-      }
+      // subcategory_id est le slug (texte) dans la vue announcements_public
+      const subcategoryId = subslug;
 
       setLoadingAnnouncements(true);
       try {
@@ -183,7 +191,13 @@ const SubcategoryPage = () => {
            </div>
         ) : (
           <>
-            {filteredAnnouncements.length > 0 ? (
+            {filteredAnnouncements.length === 0 ? (
+              <div className="text-center py-20 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800">
+                <p className="text-gray-500 dark:text-gray-400">
+                  {t('categories.noAnnouncements')}
+                </p>
+              </div>
+            ) : (
               <div className={`grid gap-6 ${
                 viewMode === 'grid' 
                   ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
@@ -207,24 +221,6 @@ const SubcategoryPage = () => {
                     isProfessional={announcement.isProfessional}
                   />
                 ))}
-              </div>
-            ) : (
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-12 !text-center shadow-sm">
-                <div className="text-gray-400 mb-4">
-                  <Grid className="h-16 w-16 mx-auto" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-                  {t('announcements.noResults')}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  {t('announcements.noResultsDesc')}
-                </p>
-                <LocalizedLink 
-                  to={`/category/${category.slug}`}
-                  className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  {t('announcements.browseCategory')}
-                </LocalizedLink>
               </div>
             )}
           </>

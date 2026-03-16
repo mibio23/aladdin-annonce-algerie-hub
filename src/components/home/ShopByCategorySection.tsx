@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { LocalizedLink } from "@/utils/linkUtils";
 import { 
   Carousel,
   CarouselContent,
@@ -115,7 +115,7 @@ const ShopByCategorySection = ({ totalCount, categoryCounts }: ShopByCategorySec
             
             return (
               <CarouselItem key={category.id} className={`${isRTL ? "pr-2" : "pl-2"} basis-1/4 sm:basis-1/5 md:basis-1/7 lg:basis-1/9 xl:basis-1/10 2xl:basis-1/12`}>
-                <Link 
+                <LocalizedLink 
                   to={`/category/${category.slug}`} 
                   className="block group h-full"
                 >
@@ -189,7 +189,7 @@ const ShopByCategorySection = ({ totalCount, categoryCounts }: ShopByCategorySec
                       </div>
                     </div>
                   </div>
-                </Link>
+                </LocalizedLink>
               </CarouselItem>
             );
           })}

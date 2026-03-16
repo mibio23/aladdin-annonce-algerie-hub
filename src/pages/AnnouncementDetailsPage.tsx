@@ -336,14 +336,35 @@ const AnnouncementDetailsPage: React.FC = () => {
         const translated = t(translationKey);
         const categoryName = translated !== translationKey ? translated : (categoryObj?.name || announcementData.category_id || t('createAd.category'));
         
+        const subcategoryNameFromTree = (() => {
+          const subcategoryId = announcementData.subcategory_id;
+          if (!subcategoryId) return '';
+
+          for (const category of CATEGORIES) {
+            const direct = category.subcategories?.find((s: any) => s.id === subcategoryId || s.slug === subcategoryId);
+            if (direct) return direct.name;
+
+            for (const sub of category.subcategories || []) {
+              const nested = (sub.subcategories || []).find((child: any) => child.id === subcategoryId || child.slug === subcategoryId);
+              if (nested) return nested.name;
+            }
+          }
+          return '';
+        })();
+
+        const legacySubcategoryFromDescription = (() => {
+          const source = announcementData.description || '';
+          const match = source.match(/(?:^|\n)Type:\s*(.+)\s*$/m);
+          return match?.[1]?.trim() || '';
+        })();
+
         const mergedData: DetailedAnnouncement = {
           ...announcementData,
           ...realEstateDetails,
           ...vehicleDetails,
           views_count: (announcementData as any).views_count ?? (announcementData as any).view_count ?? 0,
-          // Map legacy fields if needed
           category: categoryName,
-          subcategory: announcementData.subcategory_id || '', // ID as fallback since we don't have easy name lookup yet
+          subcategory: subcategoryNameFromTree || legacySubcategoryFromDescription || announcementData.subcategory_id || '',
           imageUrl: announcementData.image_url,
           imageUrls: announcementData.image_urls || (announcementData.image_url ? [announcementData.image_url] : []),
           isOnline: announcementData.status === 'active',

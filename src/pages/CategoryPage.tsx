@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { useCategories } from "@/services/supabaseCategoriesService";
+import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory } from "@/data/categoryTypes";
 import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,125 +27,77 @@ const CategoryPage = () => {
   const { data: categories = [], isLoading } = useCategories(language);
   const [viewMode, _setViewMode] = useState<'grid' | 'list'>('grid');
   const [category, setCategory] = useState<MenuCategory | null>(null);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [filteredAnnouncements, setFilteredAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [filteredAnnouncements, setFilteredAnnouncements] = useState<any[]>([]);
   const [_showFilters, _setShowFilters] = useState(false);
-  const [loadingAnnouncements, setLoadingAnnouncements] = useState(false);
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
 
   useEffect(() => {
-    if (slug && categories.length > 0) {
-      const foundCategory = categories.find(cat => cat.slug === slug);
+    if (slug) {
+      // 1. Chercher dans les catégories de Supabase
+      let foundCategory = categories.find(cat => cat.slug === slug);
+      
+      // 2. Fallback sur les catégories locales si non trouvé ou sans sous-catégories
+      if (!foundCategory || !foundCategory.subcategories || foundCategory.subcategories.length === 0) {
+        const localMenu = getCategoryMenu(language);
+        const localCategory = localMenu.find(cat => cat.slug === slug);
+        if (localCategory) {
+          foundCategory = localCategory;
+        }
+      }
+      
       setCategory(foundCategory || null);
     }
-  }, [slug, categories]);
+  }, [slug, categories, language]);
 
-  // Fetch announcements dynamically from Supabase
   useEffect(() => {
     const fetchAnnouncements = async () => {
       if (!slug) return;
       
-      // Resolve category ID from slug if possible, otherwise assume slug is ID
-      const categoryId = categories.find(c => c.slug === slug)?.id || slug;
-
       setLoadingAnnouncements(true);
       try {
-        // Fetch from announcements_public view
-        // category_id is now the slug (TEXT)
+        // Dans announcements_public, category_id contient généralement le slug
         const { data, error } = await supabase
           .from('announcements_public')
           .select('*')
-          .eq('category_id', categoryId)
+          .eq('category_id', slug)
           .eq('status', 'active')
           .order('created_at', { ascending: false });
 
-        if (error) {
-          console.error('Error fetching announcements:', error);
-          // Still try to show mock data if category matches
-          if (slug === 'vehicules' || slug === 'vehicules-camions-motos' || slug === 'vehicules-equipements') {
-             const mockData = mockVehicleAnnouncements.map(item => ({
-              id: item.id,
-              title: item.title,
-              price: item.price,
-              location: item.location,
-              imageUrl: item.images[0],
-              imageUrls: item.images,
-              date: new Date().toISOString(),
-              category: "Véhicules",
-              categorySlug: "vehicules",
-              phoneNumber: item.contact_phone,
-              isActive: true,
-              isFeatured: item.is_featured,
-              isUrgent: item.is_urgent,
-              description: item.description,
-              user_id: "mock_user",
-              wilaya: item.wilaya,
-              currency: "DZD"
-            }));
-            setAnnouncements(mockData);
-            setFilteredAnnouncements(mockData);
-          } else {
-            setAnnouncements([]);
-            setFilteredAnnouncements([]);
-          }
-        } else if (data) {
-          // Map to legacy format
-          const mappedAnnouncements = data.map((a: any) => ({
-            id: a.id,
-            title: a.title,
-            price: a.price,
-            location: a.location,
-            imageUrl: a.image_url || (a.images && a.images[0]) || (a.image_urls && a.image_urls[0]) || '',
-            imageUrls: a.images || a.image_urls || [],
-            date: a.created_at,
-            category: a.category_id,
-            categorySlug: slug,
-            phoneNumber: a.phone_number,
-            isActive: a.status === 'active',
-            isFeatured: a.is_featured,
-            isUrgent: a.is_urgent,
-            description: a.description,
-            user_id: a.user_id,
-            wilaya: a.wilaya,
-            currency: a.currency
-          }));
-          
-          // Merge with mock data if category matches
-          let finalAnnouncements = mappedAnnouncements;
-          if (slug === 'vehicules' || slug === 'vehicules-camions-motos' || slug === 'vehicules-equipements') {
-             const mockData = mockVehicleAnnouncements.map(item => ({
-              id: item.id,
-              title: item.title,
-              price: item.price,
-              location: item.location,
-              imageUrl: item.images[0],
-              imageUrls: item.images,
-              date: new Date().toISOString(),
-              category: "Véhicules",
-              categorySlug: "vehicules",
-              phoneNumber: item.contact_phone,
-              isActive: true,
-              isFeatured: item.is_featured,
-              isUrgent: item.is_urgent,
-              description: item.description,
-              user_id: "mock_user",
-              wilaya: item.wilaya,
-              currency: "DZD"
-            }));
-            finalAnnouncements = [...mockData, ...mappedAnnouncements];
-          }
+        if (error) throw error;
+        
+        // Map to legacy format for LegacyAnnouncementCard
+        const mappedData = (data || []).map((a: any) => ({
+          id: a.id,
+          title: a.title,
+          price: a.price,
+          location: a.location,
+          imageUrl: a.image_url || (a.images && a.images[0]) || (a.image_urls && a.image_urls[0]) || '',
+          imageUrls: a.images || a.image_urls || [],
+          date: a.created_at,
+          category: a.category_id,
+          categorySlug: slug,
+          phoneNumber: a.phone_number,
+          isActive: a.status === 'active',
+          isFeatured: a.is_featured,
+          isUrgent: a.is_urgent,
+          description: a.description,
+          user_id: a.user_id,
+          wilaya: a.wilaya,
+          currency: a.currency
+        }));
 
-          setAnnouncements(finalAnnouncements);
-          setFilteredAnnouncements(finalAnnouncements);
-        }
+        setAnnouncements(mappedData);
+        setFilteredAnnouncements(mappedData);
       } catch (err) {
-        console.error('Exception fetching announcements:', err);
+        console.error('Error fetching category announcements:', err);
       } finally {
         setLoadingAnnouncements(false);
       }
     };
 
     fetchAnnouncements();
-  }, [slug, categories]);
+  }, [slug]);
 
   const _handleFilterChange = (filters: Filters) => {
     // Apply filters to announcements
@@ -242,25 +195,25 @@ const CategoryPage = () => {
                 </div>
               ) : (
                 <>
-                  <div className={`grid gap-6 ${viewMode === 'grid' 
-                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-                    : 'grid-cols-1'
-                  }`}>
-                    {filteredAnnouncements.map((announcement, index) => (
-                      <LegacyAnnouncementCard
-                        key={announcement.id}
-                        announcement={announcement}
-                        viewMode={viewMode}
-                        index={index}
-                      />
-                    ))}
-                  </div>
-                  
-                  {filteredAnnouncements.length === 0 && (
-                    <div className="text-center py-12">
+                  {filteredAnnouncements.length === 0 ? (
+                    <div className="text-center py-20 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800">
                       <p className="text-gray-500 dark:text-gray-400">
-                        {t('category.noAnnouncements')}
+                        {t('categories.noAnnouncements')}
                       </p>
+                    </div>
+                  ) : (
+                    <div className={`grid gap-6 ${viewMode === 'grid' 
+                      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+                      : 'grid-cols-1'
+                    }`}>
+                      {filteredAnnouncements.map((announcement, index) => (
+                        <LegacyAnnouncementCard
+                          key={announcement.id}
+                          announcement={announcement}
+                          viewMode={viewMode}
+                          index={index}
+                        />
+                      ))}
                     </div>
                   )}
                 </>

@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { LocalizedLink } from "@/utils/linkUtils";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
@@ -326,14 +325,16 @@ const ModernMegaMenuCategories: React.FC = () => {
                       </h3>
                       <div className="space-y-2">
                         {category.subcategories?.map((subcategory) => (
-                          <div
+                          <LocalizedLink
                             key={subcategory.id}
-                            className={`relative py-2 px-3 rounded-md cursor-pointer transition-colors ${
+                            to={`/category/${category.slug}/${subcategory.slug}`}
+                            className={`relative py-2 px-3 rounded-md cursor-pointer transition-colors block ${
                               hoveredSubcategory === subcategory.id
                                 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
                                 : 'hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-300'
                             }`}
                             onMouseEnter={() => handleSubcategoryHover(subcategory.id)}
+                            role="menuitem"
                           >
                             <div className="flex items-center gap-2">
                               {subcategory.icon && React.isValidElement(subcategory.icon) ? (
@@ -352,7 +353,7 @@ const ModernMegaMenuCategories: React.FC = () => {
                                 hoveredSubcategory === subcategory.id ? 'text-orange-500' : 'text-gray-400'
                               }`} />
                             )}
-                          </div>
+                          </LocalizedLink>
                         ))}
                       </div>
                     </div>
@@ -377,7 +378,7 @@ const ModernMegaMenuCategories: React.FC = () => {
                               {subcategory.subcategories.map((subSubcategory) => (
                                 <LocalizedLink
                                   key={subSubcategory.id}
-                                  to={`/categories/${category.slug}/${subcategory.slug}/${subSubcategory.slug}`}
+                                  to={`/category/${category.slug}/${subcategory.slug}`}
                                   className="flex flex-col items-center p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-orange-300 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-all duration-200 group"
                                   role="menuitem"
                                 >
@@ -438,8 +439,8 @@ const ModernMegaMenuCategories: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredCategories.map((category) => (
                   <div key={category.id} className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 p-4 hover:shadow-md transition-shadow">
-                    <Link
-                      to={category.href || `/categories/${category.slug}`}
+                    <LocalizedLink
+                      to={category.href || `/category/${category.slug}`}
                       className="flex items-center gap-3 group"
                     >
                       {category.icon && React.isValidElement(category.icon) ? (
@@ -454,7 +455,7 @@ const ModernMegaMenuCategories: React.FC = () => {
                       <h4 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
                         {getCategoryTranslation(category, language, t)}
                       </h4>
-                    </Link>
+                    </LocalizedLink>
                     {category.subcategories?.filter(sub =>
                       sub.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                       sub.subcategories?.some(subSub =>

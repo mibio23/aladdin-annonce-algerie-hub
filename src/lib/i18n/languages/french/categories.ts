@@ -10,6 +10,9 @@ export const frenchCategories = {
   "categories.featured": "En vedette",
   "categories.count": "{{count}} annonce",
   "categories.count_plural": "{{count}} annonces",
+  "categories.noAnnouncements": "Aucune annonce trouvée dans cette catégorie",
+  "categories.notFound": "Catégorie non trouvée",
+  "categories.backToHome": "Retour à l'accueil",
   
   // Specific category translations
   "categories.immobilier": "Immobilier",

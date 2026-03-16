@@ -55,7 +55,7 @@ export const useCategoryPrefetch = () => {
           icon: category.icon ? createIcon(String(category.icon)) : undefined,
           description: '',
           subcategories: [],
-          href: `/categories/${String(category.slug)}`,
+          href: `/category/${String(category.slug)}`,
         }));
       },
       staleTime: 1000 * 60 * 60 * 12, // 12 heures
@@ -131,7 +131,7 @@ export const useCategoryPrefetch = () => {
               icon: category.icon ? createIcon(String(category.icon)) : undefined,
               description: '',
               subcategories: [],
-              href: `/categories/${String(category.slug)}`,
+              href: `/category/${String(category.slug)}`,
             }));
           },
           staleTime: 1000 * 60 * 60 * 12,

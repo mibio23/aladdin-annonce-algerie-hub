@@ -49,7 +49,7 @@ const transformSupabaseCategory = (category: SupabaseCategoryView): MenuCategory
     icon: category.icon ? createIcon(category.icon) : undefined,
     description: category.translated_description || category.description || undefined,
     subcategories: [], // Sera rempli plus tard dans la construction hiérarchique
-    href: `/categories/${category.slug}`,
+    href: `/category/${category.slug}`,
   };
 };
 
