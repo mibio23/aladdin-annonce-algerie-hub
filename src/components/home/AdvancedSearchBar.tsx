@@ -7,6 +7,7 @@ import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { useCategories } from "@/services/supabaseCategoriesService";
 import { MenuCategory } from "@/data/categoryTypes";
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
+import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { logger } from "@/utils/silentLogger";
 import { detectVehicleIntent } from "@/utils/vehicleIntentDetector";
 import { coerceWilayaCode, extractWilayaFromText } from "@/utils/distanceUtils";
@@ -38,18 +39,25 @@ const AdvancedSearchBar = React.memo(() => {
   const [timeoutRef, setTimeoutRef] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Utiliser le hook useCategories pour récupérer les catégories
-  const { data: categoryMenu = [], isLoading: categoriesLoading, error: categoriesError } = useCategories(language);
+  const { data: categoryMenuFromSupabase = [], isLoading: categoriesLoading, error: categoriesError } = useCategories(language);
   
-  // Catégories uniques avec memoization simple
+  // Catégories uniques synchronisées avec l'ordre du menu de navigation
   const uniqueCategories = useMemo(() => {
-    if (!categoryMenu || categoryMenu.length === 0) return [];
-    return categoryMenu.reduce((acc, category) => {
-      if (!acc.find(cat => cat.slug === category.slug)) {
-        acc.push(category);
-      }
-      return acc;
-    }, [] as MenuCategory[]);
-  }, [categoryMenu]);
+    // 1. Récupérer l'ordre officiel depuis getCategoryMenu
+    const officialMenu = getCategoryMenu(language);
+    
+    // 2. Fusionner avec les données de Supabase si nécessaire, tout en respectant l'ordre de officialMenu
+    return officialMenu.map(officialCat => {
+      const supabaseCat = categoryMenuFromSupabase.find(c => c.slug === officialCat.slug);
+      // On privilégie les sous-catégories de Supabase si elles existent, sinon on garde celles du menu local
+      return {
+        ...officialCat,
+        subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
+          ? supabaseCat.subcategories 
+          : officialCat.subcategories
+      };
+    });
+  }, [categoryMenuFromSupabase, language]);
 
   const selectedCategoryData = useMemo(() => 
     uniqueCategories.find(cat => cat.slug === selectedCategory), 

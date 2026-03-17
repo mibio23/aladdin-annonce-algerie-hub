@@ -23,6 +23,7 @@ import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { logger } from '@/utils/silentLogger';
 import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
+import { useCategories } from '@/services/supabaseCategoriesService';
 import { educationLoisirsFr } from '@/data/categories/megaMenuStructures/educationLoisirs/fr';
 import { immobilierMaisonFr } from '@/data/categories/megaMenuStructures/immobilierMaison/fr';
 
@@ -238,12 +239,10 @@ const DeposerAnnonce = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
   // Removed explicit state for lists to avoid sync issues
   // const [subcategories, setSubcategories] = useState<SimpleSubCategory[]>([]);
   // const [subSubcategories, setSubSubcategories] = useState<SimpleSubSubCategory[]>([]);
   const [selectedSubcategoryL2, setSelectedSubcategoryL2] = useState<string>('');
-  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<GeolocationCoords | null>(null);
   
@@ -269,20 +268,13 @@ const DeposerAnnonce = () => {
   });
 
   // Définir les conditions avec des clés de traduction appropriées
-  const getConditions = useCallback(() => [
+  const conditions = useMemo(() => [
     { value: 'neuf', label: t('search.advanced.new') },
     { value: 'tres_bon_etat', label: t('announcements.condition.tresBon') },
     { value: 'bon_etat', label: t('announcements.condition.bon') },
     { value: 'etat_correct', label: t('announcements.condition.correct') },
     { value: 'pour_pieces', label: t('search.advanced.forParts') },
   ], [t]);
-
-  const [conditions, setConditions] = useState(getConditions());
-
-  // Mettre à jour les conditions lorsque la langue change
-  useEffect(() => {
-    setConditions(getConditions());
-  }, [language, getConditions]);
 
   // Gestionnaire d'erreurs pour capturer les erreurs de rendu
   useEffect(() => {
@@ -300,13 +292,28 @@ const DeposerAnnonce = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const navCategories = getCategoryMenu(language) as MenuCategory[];
-    setMenuCategories(navCategories);
-    setCategories(
-      navCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))
-    );
-  }, [language]);
+  // Utiliser le hook useCategories pour récupérer les catégories de Supabase
+  const { data: categoryMenuFromSupabase, isLoading: categoriesLoading } = useCategories(language);
+
+  // Synchronisation de l'ordre des catégories avec le menu de navigation
+  const menuCategories = useMemo(() => {
+    const officialMenu = getCategoryMenu(language);
+    const supabaseData = categoryMenuFromSupabase || [];
+    
+    return officialMenu.map(officialCat => {
+      const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
+      return {
+        ...officialCat,
+        subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
+          ? supabaseCat.subcategories 
+          : officialCat.subcategories
+      };
+    });
+  }, [categoryMenuFromSupabase, language]);
+
+  const categories = useMemo(() => {
+    return menuCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
+  }, [menuCategories]);
 
   // Derived state for lists - guarantees sync with selection
   const subcategories = useMemo(() => {
@@ -867,7 +874,7 @@ const DeposerAnnonce = () => {
                           <SelectContent>
                             {subcategories.map((subcategory) => (
                               <SelectItem key={subcategory.id} value={subcategory.id}>
-                                {subcategory.name}
+                                {t(`categories.${subcategory.slug}`) === `categories.${subcategory.slug}` ? subcategory.name : t(`categories.${subcategory.slug}`)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -887,7 +894,7 @@ const DeposerAnnonce = () => {
                           <SelectContent>
                             {subSubcategories.map((subsubcategory) => (
                               <SelectItem key={subsubcategory.id} value={subsubcategory.id}>
-                                {subsubcategory.name}
+                                {t(`categories.${subsubcategory.slug}`) === `categories.${subsubcategory.slug}` ? subsubcategory.name : t(`categories.${subsubcategory.slug}`)}
                               </SelectItem>
                             ))}
                           </SelectContent>

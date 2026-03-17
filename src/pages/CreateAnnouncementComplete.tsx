@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ import { SimpleSubCategory, getSubcategoriesByCategoryId } from '@/data/subcateg
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { logger } from '@/utils/silentLogger';
+import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
 import { useCategories } from '@/services/supabaseCategoriesService';
 import { MenuCategory } from '@/data/categoryTypes';
 import { CATEGORY_REFERENCE_IMAGES } from '@/data/categoryReferenceImages';
@@ -545,29 +546,39 @@ const CreateAnnouncementPage: React.FC = () => {
     fetchSettings();
   }, []);
 
-  const [categories, setCategories] = useState<Category[]>([]);
   const [hoveredCategoryId, setHoveredCategoryId] = useState<string | null>(null);
-  const [subcategories, setSubcategories] = useState<SimpleSubCategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [_createdAnnouncementId, _setCreatedAnnouncementId] = useState<string | null>(null);
-  const { data: fetchedCategories } = useCategories(language);
-  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [referralPoints, setReferralPoints] = useState<number>(0);
   
-  const [isSubcategoriesInitialized, setIsSubcategoriesInitialized] = useState(false);
+  // Utiliser le hook useCategories pour récupérer les catégories de Supabase
+  const { data: fetchedCategoriesFromSupabase, isLoading: categoriesLoading } = useCategories(language);
 
-  useEffect(() => {
-    if (id) setIsSubcategoriesInitialized(false);
-  }, [id]);
+  // Synchronisation de l'ordre des catégories avec le menu de navigation
+  const menuCategories = useMemo(() => {
+    const officialMenu = getCategoryMenu(language);
+    const supabaseData = fetchedCategoriesFromSupabase || [];
+    
+    return officialMenu.map(officialCat => {
+      const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
+      return {
+        ...officialCat,
+        subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
+          ? supabaseCat.subcategories 
+          : officialCat.subcategories
+      };
+    });
+  }, [fetchedCategoriesFromSupabase, language]);
 
-  // Effect to populate subcategories when editing an existing announcement
-  useEffect(() => {
-    if (isEditing && !isSubcategoriesInitialized && menuCategories.length > 0 && formData.category_id) {
-      const categorySubcategories = getSubcategoriesByCategoryId(formData.category_id, menuCategories);
-      setSubcategories(categorySubcategories);
-      setIsSubcategoriesInitialized(true);
-    }
-  }, [isEditing, isSubcategoriesInitialized, menuCategories, formData.category_id]);
+  const categories = useMemo(() => {
+    return menuCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
+  }, [menuCategories]);
+
+  const subcategories = useMemo(() => {
+    return formData.category_id 
+      ? getSubcategoriesByCategoryId(formData.category_id, menuCategories)
+      : [];
+  }, [formData.category_id, menuCategories]);
 
   const [_errors, setErrors] = useState<Record<string, string>>({});
   const [showPreview, setShowPreview] = useState(false);
@@ -762,22 +773,6 @@ const CreateAnnouncementPage: React.FC = () => {
     };
     load();
   }, [user, navigate, loadDraft]);
-
-  useEffect(() => {
-    if (fetchedCategories && fetchedCategories.length) {
-      const mc = fetchedCategories as MenuCategory[];
-      setMenuCategories(mc);
-      setCategories(mc.map(c => ({ id: c.id, name: c.name, slug: c.slug })));
-    }
-  }, [fetchedCategories]);
-
-  // Mettre à jour les sous-catégories lorsque les données de menu changent (changement de langue)
-  useEffect(() => {
-    if (menuCategories.length > 0 && formData.category_id) {
-      const categorySubcategories = getSubcategoriesByCategoryId(formData.category_id, menuCategories);
-      setSubcategories(categorySubcategories);
-    }
-  }, [menuCategories, formData.category_id]);
 
   useEffect(() => {
     // Note: referral_points and referral_count columns don't exist in profiles table yet
@@ -1001,8 +996,6 @@ const CreateAnnouncementPage: React.FC = () => {
 
   const _handleCategoryChange = (categoryId: string) => {
     setFormData(prev => ({ ...prev, category_id: categoryId, subcategory_id: '' }));
-    const categorySubcategories = getSubcategoriesByCategoryId(categoryId, menuCategories);
-    setSubcategories(categorySubcategories);
   };
 
   const _handleSubcategoryChange = (subcategoryId: string) => {
@@ -2946,7 +2939,7 @@ const CreateAnnouncementPage: React.FC = () => {
                                 onMouseEnter={() => setHoveredCategoryId(category.id)}
                                 onMouseLeave={() => setHoveredCategoryId(null)}
                               >
-                                {category.slug === 'education-loisirs' ? t('categories.education-loisirs') : category.name}
+                                {category.slug === 'education-loisirs' ? t('categories.education-loisirs') : (t(`categories.${category.slug}`) !== `categories.${category.slug}` ? t(`categories.${category.slug}`) : category.name)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -2970,7 +2963,7 @@ const CreateAnnouncementPage: React.FC = () => {
                             <SelectContent className="rounded-xl shadow-2xl border-slate-100">
                               {subcategories.map((subcategory) => (
                                 <SelectItem key={subcategory.id} value={subcategory.id} className="h-10 cursor-pointer">
-                                  {subcategory.name}
+                                  {t(`categories.${subcategory.slug}`) !== `categories.${subcategory.slug}` ? t(`categories.${subcategory.slug}`) : subcategory.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>

@@ -55,28 +55,31 @@ const MegaMenuCategories = () => {
             <ul className="py-2">
               {categoryMenu.map((cat, idx) => (
                 <li key={cat.id}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveIndex(idx)}
+                  <div
+                    className={`w-full flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 category-hover-enter ${idx === activeIndex ? 'bg-gray-100 dark:bg-slate-800 font-semibold' : ''}`}
                     onMouseEnter={() => setActiveIndex(idx)}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-slate-800 category-hover-enter ${idx === activeIndex ? 'bg-gray-100 dark:bg-slate-800 font-semibold' : ''}`}
                   >
-                    <span className="shrink-0">
-                      {cat.icon ? (
-                        cat.icon
-                      ) : (
-                        (() => {
-                          const Icon = getIconForSlug(cat.slug);
-                          return <Icon className="h-4 w-4 text-gray-500" />;
-                        })()
-                      )}
-                    </span>
-                    <span className="truncate category-link">
-                      {cat.slug === 'education-loisirs' ? t('categories.education-loisirs') : (t(`categories.${cat.slug}`) !== `categories.${cat.slug}`
-                        ? t(`categories.${cat.slug}`)
-                        : cat.name)}
-                    </span>
-                  </button>
+                    <LocalizedLink
+                      to={`/category/${cat.slug}`}
+                      className="flex-grow flex items-center gap-2 px-3 py-2 text-left"
+                    >
+                      <span className="shrink-0">
+                        {cat.icon ? (
+                          cat.icon
+                        ) : (
+                          (() => {
+                            const Icon = getIconForSlug(cat.slug);
+                            return <Icon className="h-4 w-4 text-gray-500" />;
+                          })()
+                        )}
+                      </span>
+                      <span className="truncate category-link">
+                        {cat.slug === 'education-loisirs' ? t('categories.education-loisirs') : (t(`categories.${cat.slug}`) !== `categories.${cat.slug}`
+                          ? t(`categories.${cat.slug}`)
+                          : cat.name)}
+                      </span>
+                    </LocalizedLink>
+                  </div>
                 </li>
               ))}
             </ul>

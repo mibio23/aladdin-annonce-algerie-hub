@@ -57,10 +57,15 @@ const SubcategoryGrid: React.FC<SubcategoryGridProps> = ({
     if (effectiveSlug.includes('telephonie')) return '/images/categories/main/telephonie.webp';
     if (effectiveSlug.includes('informatique')) return '/images/categories/main/informatique-electronique.webp';
     if (effectiveSlug.includes('vehicule')) return '/images/categories/main/vehicules-equipements.webp';
+    if (effectiveSlug.includes('velo')) return '/images/categories/main/velo-cyclisme-equipements.webp';
+    if (effectiveSlug.includes('nautisme')) return '/images/categories/main/nautisme.webp';
+    if (effectiveSlug.includes('btp')) return '/images/categories/main/btp-engins-construction.webp';
     if (effectiveSlug.includes('mode')) return '/images/categories/main/mode-accessoires.webp';
     if (effectiveSlug.includes('bebe')) return '/images/categories/main/bebe-puericulture.webp';
     if (effectiveSlug.includes('electromenager')) return '/images/categories/main/electromenager.webp';
     if (effectiveSlug.includes('mobilier')) return '/images/categories/main/mobilier-et-decoration.webp';
+    if (effectiveSlug.includes('image-son')) return '/images/categories/main/image-son-equipement-musique.webp';
+    if (effectiveSlug.includes('jeux-video')) return '/images/categories/main/jeux-video-consoles.webp';
     
     return '/images/categories/main/immobilier-maison.webp'; // Fallback par défaut
   };
@@ -96,10 +101,6 @@ const SubcategoryGrid: React.FC<SubcategoryGridProps> = ({
                   <h3 className="text-slate-800 dark:text-slate-100 font-extrabold text-sm leading-tight uppercase tracking-tight group-hover:text-red-600 transition-colors line-clamp-2">
                     {translatedName}
                   </h3>
-                  <div className="mt-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 uppercase">
-                    <span>à</span>
-                    <span className="text-slate-900 dark:text-slate-200">ALGER</span>
-                  </div>
                 </div>
               </div>
             </LocalizedLink>

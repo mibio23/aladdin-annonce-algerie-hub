@@ -169,12 +169,12 @@ const CategoryPage = () => {
           {/* Subcategories Grid */}
           {category.subcategories && category.subcategories.length > 0 && (
             <div className="mb-12">
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white uppercase tracking-tight">
                 {t('categories.subcategories')}
               </h2>
               <SubcategoryGrid 
                 subcategories={category.subcategories} 
-                parentSlug={category.slug}
+                categorySlug={category.slug}
               />
             </div>
           )}

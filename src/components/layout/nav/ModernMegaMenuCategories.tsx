@@ -258,8 +258,9 @@ const ModernMegaMenuCategories: React.FC = () => {
                   onMouseEnter={() => handleCategoryHover(category.id)}
                   style={{ minWidth: '150px' }}
                 >
-                  <button
-                    className={`flex items-center gap-2 px-6 py-4 font-medium transition-all duration-200 ${
+                  <LocalizedLink
+                    to={`/category/${category.slug}`}
+                    className={`flex items-center gap-2 px-6 py-4 font-medium transition-all duration-200 w-full ${
                       hoveredCategory === category.id || index === currentCategoryIndex
                         ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'
@@ -284,7 +285,7 @@ const ModernMegaMenuCategories: React.FC = () => {
                         hoveredCategory === category.id ? 'rotate-90' : ''
                       }`} aria-hidden="true" />
                     )}
-                  </button>
+                  </LocalizedLink>
                 </div>
               ))}
             </div>
