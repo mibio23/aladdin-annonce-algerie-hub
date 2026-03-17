@@ -71,7 +71,8 @@ const SubcategoryPage = () => {
         const result = await supabase
           .from('announcements_public')
           .select('*')
-          .eq('subcategory_id', subcategoryId)
+          .eq('category_id', slug) // Filtrer par la catégorie parente
+          .eq('subcategory_id', subcategoryId) // Filtrer par la sous-catégorie
           .eq('status', 'active')
           .order('created_at', { ascending: false });
         
