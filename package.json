@@ -11,6 +11,7 @@
     "migrate:rpc": "node supabase_migration.js rpc",
     "verify": "node verify_migration.js",
     "test": "node test-supabase-migration.js",
+    "generate:sitemap": "node generate-sitemap.js",
     "build:dev": "vite build --mode development",
     "to-webp": "node scripts/media_to_webp.cjs"
   },
