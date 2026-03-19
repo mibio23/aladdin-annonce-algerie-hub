@@ -695,6 +695,7 @@ const DeposerAnnonce = () => {
         currency: formData.currency,
         condition: formData.condition,
         category_id: formData.category_id,
+        category_slug: menuCategories.find(c => c.id === formData.category_id)?.slug || null,
         subcategory_id: formData.subcategory_id || selectedSubcategoryL2 || null,
         wilaya: formData.wilaya,
         commune: formData.commune || null,
@@ -873,7 +874,7 @@ const DeposerAnnonce = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {subcategories.map((subcategory) => (
-                              <SelectItem key={subcategory.id} value={subcategory.id}>
+                              <SelectItem key={subcategory.id} value={subcategory.slug}>
                                 {t(`categories.${subcategory.slug}`) === `categories.${subcategory.slug}` ? subcategory.name : t(`categories.${subcategory.slug}`)}
                               </SelectItem>
                             ))}
@@ -893,7 +894,7 @@ const DeposerAnnonce = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {subSubcategories.map((subsubcategory) => (
-                              <SelectItem key={subsubcategory.id} value={subsubcategory.id}>
+                              <SelectItem key={subsubcategory.id} value={subsubcategory.slug}>
                                 {t(`categories.${subsubcategory.slug}`) === `categories.${subsubcategory.slug}` ? subsubcategory.name : t(`categories.${subsubcategory.slug}`)}
                               </SelectItem>
                             ))}

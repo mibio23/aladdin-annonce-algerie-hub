@@ -7,6 +7,7 @@ import { MenuCategory } from "@/data/categoryTypes";
 import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { mockVehicleAnnouncements } from "@/data/mock/vehicleAnnouncements";
+import { CategoryPageSEO } from "@/components/SEO";
 
 import Footer from "@/components/layout/Footer";
 import BackToTopButton from "@/components/shared/BackToTopButton";
@@ -147,6 +148,13 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      {/* SEO Components */}
+      <CategoryPageSEO 
+        categoryName={category.name}
+        categorySlug={category.slug}
+        categoryDescription={category.description}
+        announcementCount={announcements.length}
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-6">
           <CategoryBreadcrumbs 

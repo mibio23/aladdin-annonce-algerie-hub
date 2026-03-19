@@ -19,80 +19,55 @@ const DynamicCategorySection = ({ category }: DynamicCategorySectionProps) => {
     const fetchAnnouncements = async () => {
       setLoading(true);
       try {
-        const vehicleMockRows = mockVehicleAnnouncements
-          .slice()
-          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          .slice(0, 50)
-          .map(item => ({
-          id: item.id,
-          title: item.title,
-          price: item.price,
-          location: item.location,
-          images: item.images,
-          image_urls: item.images,
-          image_url: item.images?.[0] || null,
-          created_at: item.created_at,
-          category_id: category.slug,
-          status: 'active',
-          phone_number: item.contact_phone,
-          is_featured: item.is_featured,
-          is_urgent: item.is_urgent,
-          description: item.description,
-          vehicleDetails: item.vehicleDetails,
-          user_id: item.user_id,
-          wilaya: item.wilaya,
-          currency: item.currency
-        }));
-
-        if (category.slug === 'vehicules-equipements') {
-          setAnnouncements(vehicleMockRows);
-          return;
-        }
-
-        // Filter general announcements by category slug
-        const filteredAnnouncements = generalAnnouncements.filter(
-          ann => ann.categorySlug === category.slug
-        );
-
-        if (filteredAnnouncements.length > 0) {
-          const generalMockRows = filteredAnnouncements
-            .slice()
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 50)
-            .map(item => ({
-              ...item,
-              storage: item.storage,
-              ram: item.ram,
-              battery_health: item.battery_health,
-              image_urls: item.imageUrls,
-              image_url: item.imageUrls?.[0] || null,
-              status: 'active',
-              phone_number: item.phoneNumber,
-              created_at: item.date,
-              category_id: item.categorySlug,
-            }));
-          setAnnouncements(generalMockRows);
-          return;
-        }
-
-        // Fetch from announcements_public view which is safer and faster
-        // category_id should be the slug now
-        const { data, error } = await supabase
+        // 1. ALWAYS fetch from Supabase first to get real user data
+        const { data: realData, error } = await supabase
           .from('announcements_public')
           .select('*')
           .eq('category_id', category.slug)
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(8);
+          .limit(12);
+
+        let finalAnnouncements = realData || [];
+
+        // 2. If we have less than 8 announcements, supplement with mock data
+        if (finalAnnouncements.length < 8) {
+          const needed = 8 - finalAnnouncements.length;
+          let mockData: any[] = [];
+
+          if (category.slug === 'vehicules-equipements') {
+            mockData = mockVehicleAnnouncements
+              .slice(0, needed)
+              .map(item => ({
+                ...item,
+                image_url: item.images?.[0] || null,
+                category_id: category.slug,
+                status: 'active',
+                phone_number: item.contact_phone,
+                created_at: item.created_at
+              }));
+          } else {
+            mockData = generalAnnouncements
+              .filter(ann => ann.categorySlug === category.slug)
+              .slice(0, needed)
+              .map(item => ({
+                ...item,
+                image_url: item.imageUrls?.[0] || null,
+                status: 'active',
+                phone_number: item.phoneNumber,
+                created_at: item.date,
+                category_id: item.categorySlug,
+              }));
+          }
+          
+          finalAnnouncements = [...finalAnnouncements, ...mockData];
+        }
 
         if (error) {
           console.error('Error fetching announcements for category', category.slug, error);
-          setAnnouncements([]);
-        } else {
-          // announcements_public view doesn't expose user_id for security
-          // so we set announcements directly without profile enrichment
-          setAnnouncements(data || []);
         }
+        
+        setAnnouncements(finalAnnouncements);
       } catch (err) {
         console.error('Exception fetching announcements', err);
         setAnnouncements([]);

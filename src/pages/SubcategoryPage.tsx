@@ -9,6 +9,7 @@ import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory, SubCategory } from "@/data/categoryTypes";
 import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
+import { SubcategoryPageSEO } from "@/components/SEO";
 
 import Footer from "@/components/layout/Footer";
 import BackToTopButton from "@/components/shared/BackToTopButton";
@@ -162,7 +163,14 @@ const SubcategoryPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      
+      {/* SEO Components */}
+      <SubcategoryPageSEO 
+        categoryName={translatedCategoryName}
+        categorySlug={category.slug}
+        subcategoryName={translatedSubcategoryName}
+        subcategorySlug={subcategory.slug}
+        announcementCount={announcements.length}
+      />
       
       <main className="flex-grow container mx-auto px-4 py-6">
         <CategoryBreadcrumbs

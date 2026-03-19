@@ -2,6 +2,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
  
 import { I18nProviderWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -32,30 +33,32 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children: _children }) => {
   return (
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-            <I18nProviderWithRouter>
-              <AuthProvider>
-                <AdvertisingProvider>
-                  <TooltipProvider>
-                    <SystemInitializer>
-                      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-                        <Routes>
-                          {publicRoutes}
-                          {authRoutes}
-                          {userRoutes}
-                          {adminRoutes}
-                          {notFoundRoute}
-                        </Routes>
-                        
-                      </div>
-                      <Toaster />
-                      <Sonner />
-                    </SystemInitializer>
-                  </TooltipProvider>
-                </AdvertisingProvider>
-              </AuthProvider>
-            </I18nProviderWithRouter>
-        </BrowserRouter>
+        <HelmetProvider>
+          <BrowserRouter>
+              <I18nProviderWithRouter>
+                <AuthProvider>
+                  <AdvertisingProvider>
+                    <TooltipProvider>
+                      <SystemInitializer>
+                        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+                          <Routes>
+                            {publicRoutes}
+                            {authRoutes}
+                            {userRoutes}
+                            {adminRoutes}
+                            {notFoundRoute}
+                          </Routes>
+                          
+                        </div>
+                        <Toaster />
+                        <Sonner />
+                      </SystemInitializer>
+                    </TooltipProvider>
+                  </AdvertisingProvider>
+                </AuthProvider>
+              </I18nProviderWithRouter>
+          </BrowserRouter>
+        </HelmetProvider>
       </QueryClientProvider>
     </AppErrorBoundary>
   );

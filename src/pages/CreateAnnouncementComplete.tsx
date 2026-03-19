@@ -1373,7 +1373,6 @@ const CreateAnnouncementPage: React.FC = () => {
         if (formData.bikeType && formData.bikeType.trim()) obj.bike_type = formData.bikeType.trim();
         if (typeof formData.bikeElectric === 'boolean') obj.electric = formData.bikeElectric;
         if (typeof formData.bikeMotorized === 'boolean') obj.motorized = formData.bikeMotorized;
-        if (formData.weight && formData.weight.trim()) obj.weight = formData.weight.trim();
         return Object.keys(obj).length ? obj : undefined;
       })();
       const announcementData = {
@@ -1383,6 +1382,7 @@ const CreateAnnouncementPage: React.FC = () => {
         currency: formData.currency,
         condition: mapConditionToDB(formData.condition),
         category_id: formData.category_id,
+        category_slug: menuCategories.find(c => c.id === formData.category_id)?.slug || null,
         subcategory_id: formData.subcategory_id || null,
         user_id: user.id, 
         wilaya: formData.wilaya,
@@ -1410,7 +1410,6 @@ const CreateAnnouncementPage: React.FC = () => {
         model: formData.model || null,
         color: formData.color || null,
         dimensions: formData.dimensions || null,
-        weight: formData.weight || null,
         purchase_year: formData.purchaseYear ? parseInt(formData.purchaseYear) || null : null,
         
         // Nouveaux champs - Historique et état
@@ -2962,7 +2961,7 @@ const CreateAnnouncementPage: React.FC = () => {
                             </SelectTrigger>
                             <SelectContent className="rounded-xl shadow-2xl border-slate-100">
                               {subcategories.map((subcategory) => (
-                                <SelectItem key={subcategory.id} value={subcategory.id} className="h-10 cursor-pointer">
+                                <SelectItem key={subcategory.id} value={subcategory.slug} className="h-10 cursor-pointer">
                                   {t(`categories.${subcategory.slug}`) !== `categories.${subcategory.slug}` ? t(`categories.${subcategory.slug}`) : subcategory.name}
                                 </SelectItem>
                               ))}

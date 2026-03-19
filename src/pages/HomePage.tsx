@@ -2,6 +2,7 @@ import React, { Suspense, useMemo } from 'react';
 import { Loader2, Briefcase } from 'lucide-react';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import LazySection from '@/components/common/LazySection';
+import { HomePageSEO } from '@/components/SEO';
 import {
   LazySearchBar,
   LazyInteractiveCarousel,
@@ -41,6 +42,8 @@ const HomePage = React.memo(() => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* SEO et Breadcrumb */}
+      <HomePageSEO />
       {/* Section Hero avec carousel publicitaire - Priorité haute */}
       <section className="relative">
         <Suspense fallback={<OptimizedLoadingSpinner />}>
