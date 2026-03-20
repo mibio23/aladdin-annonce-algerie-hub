@@ -233,6 +233,40 @@ const buildVehicleDetailsInsert = (selectedAttributes: Record<string, string | s
   return payload;
 };
 
+const buildAnnouncementColumnsFromAttributes = (selectedAttributes: Record<string, string | string[]>) => {
+  const brand = pickAttributeValue(selectedAttributes, ["brand", "marque"]);
+  const model = pickAttributeValue(selectedAttributes, ["model", "modele", "modèle"]);
+  const color = pickAttributeValue(selectedAttributes, ["color", "couleur"]);
+  const purchaseYear = toNumberOrUndefined(
+    pickAttributeValue(selectedAttributes, ["purchase_year", "annee", "année", "annee_achat", "année_achat"]),
+  );
+  const hasInvoice = toBooleanOrUndefined(pickAttributeValue(selectedAttributes, ["has_invoice", "facture", "avec_facture"]));
+  const warrantyDuration = pickAttributeValue(selectedAttributes, ["warranty_duration", "garantie", "duree_garantie", "durée_garantie"]);
+  const originalPrice = toNumberOrUndefined(pickAttributeValue(selectedAttributes, ["original_price", "prix_achat", "prix_dachat", "prix_initial"]));
+  const cashDiscount = toNumberOrUndefined(pickAttributeValue(selectedAttributes, ["cash_discount", "remise_especes", "remise_espèces", "remise"]));
+  const exchangePossible = toBooleanOrUndefined(pickAttributeValue(selectedAttributes, ["exchange_possible", "echange", "échange", "troc"]));
+  const deliveryAvailable = toBooleanOrUndefined(pickAttributeValue(selectedAttributes, ["delivery_available", "livraison", "disponible_livraison"]));
+  const deliveryFees = toNumberOrUndefined(pickAttributeValue(selectedAttributes, ["delivery_fees", "frais_livraison", "prix_livraison"]));
+  const sellingReason = pickAttributeValue(selectedAttributes, ["selling_reason", "raison_vente", "raison"]);
+  const packagingInfo = pickAttributeValue(selectedAttributes, ["packaging_info", "emballage", "boite", "boîte"]);
+
+  const payload: Record<string, any> = {};
+  if (typeof brand === "string" && brand.trim()) payload.brand = brand.trim();
+  if (typeof model === "string" && model.trim()) payload.model = model.trim();
+  if (typeof color === "string" && color.trim()) payload.color = color.trim();
+  if (typeof purchaseYear === "number") payload.purchase_year = purchaseYear;
+  if (typeof hasInvoice === "boolean") payload.has_invoice = hasInvoice;
+  if (typeof warrantyDuration === "string" && warrantyDuration.trim()) payload.warranty_duration = warrantyDuration.trim();
+  if (typeof originalPrice === "number") payload.original_price = originalPrice;
+  if (typeof cashDiscount === "number") payload.cash_discount = cashDiscount;
+  if (typeof exchangePossible === "boolean") payload.exchange_possible = exchangePossible;
+  if (typeof deliveryAvailable === "boolean") payload.delivery_available = deliveryAvailable;
+  if (typeof deliveryFees === "number") payload.delivery_fees = deliveryFees;
+  if (typeof sellingReason === "string" && sellingReason.trim()) payload.selling_reason = sellingReason.trim();
+  if (typeof packagingInfo === "string" && packagingInfo.trim()) payload.packaging_info = packagingInfo.trim();
+  return payload;
+};
+
 const DeposerAnnonce = () => {
   const { t, language, isRTL } = useSafeI18nWithRouter();
   const { user, loading: authLoading } = useAuth();
@@ -688,6 +722,27 @@ const DeposerAnnonce = () => {
       }
 
       // Prepare the announcement data
+      const derivedColumns = buildAnnouncementColumnsFromAttributes(selectedAttributeValues);
+      const selectedSubcategory = formData.subcategory_id || selectedSubcategoryL2;
+      let subcategorySlug: string | null = null;
+      if (selectedSubcategory) {
+        for (const category of menuCategories) {
+          for (const sub of category.subcategories ?? []) {
+            if (sub.id === selectedSubcategory || sub.slug === selectedSubcategory) {
+              subcategorySlug = sub.slug;
+              break;
+            }
+            for (const child of sub.subcategories ?? []) {
+              if (child.id === selectedSubcategory || child.slug === selectedSubcategory) {
+                subcategorySlug = child.slug;
+                break;
+              }
+            }
+            if (subcategorySlug) break;
+          }
+          if (subcategorySlug) break;
+        }
+      }
       const announcementData = {
         title: formData.title,
         description: descriptionWithAttributes,
@@ -696,7 +751,7 @@ const DeposerAnnonce = () => {
         condition: formData.condition,
         category_id: formData.category_id,
         category_slug: menuCategories.find(c => c.id === formData.category_id)?.slug || null,
-        subcategory_id: formData.subcategory_id || selectedSubcategoryL2 || null,
+        subcategory_id: subcategorySlug ?? selectedSubcategory ?? null,
         wilaya: formData.wilaya,
         commune: formData.commune || null,
         address: formData.location, // Mapping location to address
@@ -706,7 +761,8 @@ const DeposerAnnonce = () => {
         is_urgent: formData.is_urgent,
         attributes: selectedAttributeValues,
         user_id: user.id,
-        status: 'active'
+        status: 'active',
+        ...derivedColumns,
       };
 
       const { data, error } = await supabase
@@ -874,7 +930,7 @@ const DeposerAnnonce = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {subcategories.map((subcategory) => (
-                              <SelectItem key={subcategory.id} value={subcategory.slug}>
+                              <SelectItem key={subcategory.id} value={subcategory.id}>
                                 {t(`categories.${subcategory.slug}`) === `categories.${subcategory.slug}` ? subcategory.name : t(`categories.${subcategory.slug}`)}
                               </SelectItem>
                             ))}
@@ -894,7 +950,7 @@ const DeposerAnnonce = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {subSubcategories.map((subsubcategory) => (
-                              <SelectItem key={subsubcategory.id} value={subsubcategory.slug}>
+                              <SelectItem key={subsubcategory.id} value={subsubcategory.id}>
                                 {t(`categories.${subsubcategory.slug}`) === `categories.${subsubcategory.slug}` ? subsubcategory.name : t(`categories.${subsubcategory.slug}`)}
                               </SelectItem>
                             ))}
