@@ -1,12 +1,12 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import './modern-menu.css';
 @import './rtl.css';
 @import './components.css';
 @import './utilities.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Styles globaux additionnels */
 @layer base {

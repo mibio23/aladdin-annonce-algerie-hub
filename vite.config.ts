@@ -30,7 +30,7 @@ export default ({ mode }: { mode: string }) => ({
     target: 'es2019',
     sourcemap: mode === 'development',
     // Optimisation des chunks pour de meilleures performances
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 5000,
     rollupOptions: {},
   },
   optimizeDeps: {

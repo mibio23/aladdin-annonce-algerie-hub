@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
-import { categoriesKeys } from '@/services/supabaseCategoriesService';
+import { categoriesKeys, fetchCategoriesFromSupabase } from '@/services/supabaseCategoriesService';
 
 interface SystemInitializerProps {
   children: React.ReactNode;
@@ -40,11 +40,7 @@ const SystemInitializer: React.FC<SystemInitializerProps> = ({ children }) => {
             // Précharger en arrière-plan sans bloquer le rendu
             queryClient.prefetchQuery({
               queryKey: categoriesKeys.list(lang),
-              queryFn: async () => {
-                // Import dynamique pour éviter les dépendances circulaires
-                const { fetchCategoriesFromSupabase } = await import('@/services/supabaseCategoriesService');
-                return fetchCategoriesFromSupabase(lang);
-              },
+              queryFn: () => fetchCategoriesFromSupabase(lang),
               staleTime: 1000 * 60 * 60 * 24, // 24 heures
               gcTime: 1000 * 60 * 60 * 24 * 7, // 7 jours
             });
