@@ -200,6 +200,115 @@ export type Database = {
         }
         Relationships: []
       }
+      animal_details: {
+        Row: {
+          adoption_terms: string | null
+          age: string | null
+          announcement_id: string | null
+          availability_status: string | null
+          birth_certificate: boolean | null
+          breed: string | null
+          created_at: string | null
+          delivery_areas: string[] | null
+          delivery_fees: number | null
+          delivery_possible: boolean | null
+          dewormed: boolean | null
+          gender: string | null
+          good_with_kids: boolean | null
+          good_with_pets: boolean | null
+          health_status: string | null
+          id: string
+          insurance: boolean | null
+          microchip: boolean | null
+          pedigree: boolean | null
+          photos: string[] | null
+          price_range: string | null
+          species: string | null
+          sterilized: boolean | null
+          trained: boolean | null
+          updated_at: string | null
+          vaccinated: boolean | null
+        }
+        Insert: {
+          adoption_terms?: string | null
+          age?: string | null
+          announcement_id?: string | null
+          availability_status?: string | null
+          birth_certificate?: boolean | null
+          breed?: string | null
+          created_at?: string | null
+          delivery_areas?: string[] | null
+          delivery_fees?: number | null
+          delivery_possible?: boolean | null
+          dewormed?: boolean | null
+          gender?: string | null
+          good_with_kids?: boolean | null
+          good_with_pets?: boolean | null
+          health_status?: string | null
+          id?: string
+          insurance?: boolean | null
+          microchip?: boolean | null
+          pedigree?: boolean | null
+          photos?: string[] | null
+          price_range?: string | null
+          species?: string | null
+          sterilized?: boolean | null
+          trained?: boolean | null
+          updated_at?: string | null
+          vaccinated?: boolean | null
+        }
+        Update: {
+          adoption_terms?: string | null
+          age?: string | null
+          announcement_id?: string | null
+          availability_status?: string | null
+          birth_certificate?: boolean | null
+          breed?: string | null
+          created_at?: string | null
+          delivery_areas?: string[] | null
+          delivery_fees?: number | null
+          delivery_possible?: boolean | null
+          dewormed?: boolean | null
+          gender?: string | null
+          good_with_kids?: boolean | null
+          good_with_pets?: boolean | null
+          health_status?: string | null
+          id?: string
+          insurance?: boolean | null
+          microchip?: boolean | null
+          pedigree?: boolean | null
+          photos?: string[] | null
+          price_range?: string | null
+          species?: string | null
+          sterilized?: boolean | null
+          trained?: boolean | null
+          updated_at?: string | null
+          vaccinated?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "animal_details_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animal_details_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animal_details_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       animals_details: {
         Row: {
           age: string | null
@@ -3191,6 +3300,7 @@ export type Database = {
           country: string | null
           created_at: string
           date_of_birth: string | null
+          display_name: string | null
           email: string | null
           first_name: string | null
           full_name: string | null
@@ -3221,6 +3331,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           date_of_birth?: string | null
+          display_name?: string | null
           email?: string | null
           first_name?: string | null
           full_name?: string | null
@@ -3251,6 +3362,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           date_of_birth?: string | null
+          display_name?: string | null
           email?: string | null
           first_name?: string | null
           full_name?: string | null
