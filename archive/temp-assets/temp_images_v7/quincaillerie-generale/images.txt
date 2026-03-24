@@ -1,0 +1,9 @@
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/quincaillerie-generale/image_0.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/quincaillerie-generale/image_1.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/quincaillerie-generale/image_2.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/quincaillerie-generale/image_3.jpg'
+duration 1.5
+file 'C:/Users/PROGSM/Desktop/Aladdin correction avec GEMINI vs code/aladdin-annonce-algerie-hub-master/temp_images_v7/quincaillerie-generale/image_3.jpg'

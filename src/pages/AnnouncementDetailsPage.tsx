@@ -340,7 +340,7 @@ const AnnouncementDetailsPage: React.FC = () => {
           const subcategoryId = announcementData.subcategory_id;
           if (!subcategoryId) return '';
 
-          for (const category of CATEGORIES) {
+          for (const category of menuCategories) {
             const direct = category.subcategories?.find((s: any) => s.id === subcategoryId || s.slug === subcategoryId);
             if (direct) return direct.name;
 
