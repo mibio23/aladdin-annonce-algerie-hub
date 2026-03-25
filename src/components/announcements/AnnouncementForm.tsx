@@ -53,6 +53,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     description: '',
     price: 0,
     category_id: '',
+    subcategory_id: '',
     condition: 'good',
     images: [],
     location: '',
@@ -102,9 +103,11 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     // Si la catégorie n'a pas de sous-catégories, on la sélectionne directement
     if (!category?.subcategories || category.subcategories.length === 0) {
       handleInputChange('category_id', categoryId);
+      handleInputChange('subcategory_id', '');
     } else {
       // Sinon on attend la sélection de la sous-catégorie
-      handleInputChange('category_id', '');
+      handleInputChange('category_id', categoryId);
+      handleInputChange('subcategory_id', '');
     }
     
     // Réinitialiser les attributs car ils dépendent de la catégorie
@@ -114,7 +117,14 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
   // Gestion du changement de sous-catégorie
   const handleSubCategoryChange = (subCategoryId: string) => {
     setSelectedSubCategoryId(subCategoryId);
-    handleInputChange('category_id', subCategoryId);
+    
+    const subcategory = currentRootCategory?.subcategories?.find(s => s.id === subCategoryId);
+    
+    // category_id reste le UUID de la catégorie parente
+    handleInputChange('category_id', selectedRootCategoryId);
+    // subcategory_id devient le slug de la sous-catégorie
+    handleInputChange('subcategory_id', subcategory?.slug || subCategoryId);
+    
     // Réinitialiser les attributs lors du changement de sous-catégorie
     setFormData(prev => ({ ...prev, attributes: {} }));
   };

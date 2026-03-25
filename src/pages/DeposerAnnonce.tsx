@@ -338,6 +338,7 @@ const DeposerAnnonce = () => {
       const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
       return {
         ...officialCat,
+        id: supabaseCat?.id || officialCat.id, // Ensure UUID is used for backend insertion
         subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
           ? supabaseCat.subcategories 
           : officialCat.subcategories
