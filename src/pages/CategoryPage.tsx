@@ -61,7 +61,7 @@ const CategoryPage = () => {
         const { data, error } = await supabase
           .from('announcements_public')
           .select('*')
-          .eq('category_id', slug)
+          .eq('category_slug', slug)
           .eq('status', 'active')
           .order('created_at', { ascending: false });
 
