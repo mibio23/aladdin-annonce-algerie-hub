@@ -46,7 +46,7 @@ const Index = () => {
         supabase.from("shops").select("id", { count: "exact", head: true }),
         (supabase as any)
           .from("announcements_public")
-          .select("category_id, count:id")
+          .select("category_slug, count:id")
           .eq("status", "active"),
         (supabase as any).rpc("get_global_listing_total"),
       ]);

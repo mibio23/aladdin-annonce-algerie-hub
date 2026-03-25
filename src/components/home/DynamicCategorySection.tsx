@@ -23,7 +23,7 @@ const DynamicCategorySection = ({ category }: DynamicCategorySectionProps) => {
         const { data: realData, error } = await supabase
           .from('announcements_public')
           .select('*')
-          .eq('category_id', category.slug)
+          .eq('category_slug', category.slug)
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(12);
