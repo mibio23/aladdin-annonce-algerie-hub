@@ -54,19 +54,33 @@ interface AppErrorBoundaryProps {
   children: React.ReactNode;
 }
 
+const isDOMManipulationError = (error: Error): boolean => {
+  const msg = error.message || '';
+  return (
+    msg.includes('removeChild') ||
+    msg.includes('insertBefore') ||
+    msg.includes('appendChild') ||
+    msg.includes('not a child of this node')
+  );
+};
+
 const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({ children }) => {
   return (
     <ErrorBoundary
       FallbackComponent={ErrorFallback}
       onError={(error, errorInfo) => {
+        // DOM manipulation errors (browser extensions, Google Translate, etc.)
+        // are non-critical — just reload silently
+        if (isDOMManipulationError(error)) {
+          logger.warn('DOM manipulation conflict (likely browser extension), reloading...');
+          window.location.reload();
+          return;
+        }
+
         logger.error('Application Error:', error);
         logger.error('Error Info:', errorInfo);
-        
-        // Here you could send error reports to a service like Sentry
-        // reportError(error, errorInfo);
       }}
       onReset={() => {
-        // Optional: Clear any state, reload data, etc.
         window.location.hash = '';
       }}
     >
