@@ -73,7 +73,7 @@ const Index = () => {
       if (!aggregatedError && Array.isArray(aggregatedRows)) {
         const next: Record<string, number> = {};
         for (const row of aggregatedRows) {
-          const key = row?.category_id;
+          const key = row?.category_slug;
           const value = Number(row?.count ?? row?.count_id ?? row?.countId);
           if (typeof key === "string" && Number.isFinite(value)) next[key] = value;
         }
@@ -88,7 +88,7 @@ const Index = () => {
             .from("announcements_public")
             .select("id", { count: "exact", head: true })
             .eq("status", "active")
-            .eq("category_id", categoryId);
+            .eq("category_slug", categoryId);
           return [categoryId, res.count ?? 0] as const;
         })
       );
