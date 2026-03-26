@@ -1516,7 +1516,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Create logic continues here...
-      // L'ID est maintenant le slug (TEXT), on l'utilise directement
+      // L'ID de catégorie est maintenant un UUID provenant de Supabase
       console.log('Traitement de l\'ID de catégorie:', formData.category_id);
       const categoryId = formData.category_id;
       
