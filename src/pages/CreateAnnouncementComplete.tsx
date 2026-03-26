@@ -563,6 +563,8 @@ const CreateAnnouncementPage: React.FC = () => {
       const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
       return {
         ...officialCat,
+        // Use the Supabase UUID as id when available, otherwise keep the slug
+        id: supabaseCat?.id || officialCat.id,
         subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
           ? supabaseCat.subcategories 
           : officialCat.subcategories
