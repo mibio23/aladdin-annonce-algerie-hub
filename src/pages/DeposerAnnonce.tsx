@@ -336,9 +336,12 @@ const DeposerAnnonce = () => {
     
     return officialMenu.map(officialCat => {
       const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
+      
+      // If we found a Supabase category, use its UUID. 
+      // Otherwise, keep the officialCat.id (which might be a slug) but we'll try to resolve it later.
       return {
         ...officialCat,
-        id: supabaseCat?.id || officialCat.id, // Ensure UUID is used for backend insertion
+        id: supabaseCat?.id || officialCat.id,
         subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
           ? supabaseCat.subcategories 
           : officialCat.subcategories
@@ -347,8 +350,12 @@ const DeposerAnnonce = () => {
   }, [categoryMenuFromSupabase, language]);
 
   const categories = useMemo(() => {
+    // Only return categories that have a potential ID (UUID or slug)
     return menuCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
   }, [menuCategories]);
+
+  // Utility to check if a string is a valid UUID
+  const isUUID = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
   // Derived state for lists - guarantees sync with selection
   const subcategories = useMemo(() => {
@@ -744,14 +751,43 @@ const DeposerAnnonce = () => {
           if (subcategorySlug) break;
         }
       }
+
+      // Final UUID resolution for category_id
+      let finalCategoryId = formData.category_id;
+      if (!isUUID(finalCategoryId)) {
+        // Try to find the UUID in supabaseData by slug or name
+        const supabaseData = categoryMenuFromSupabase || [];
+        const resolvedCat = supabaseData.find(c => c.slug === finalCategoryId || c.id === finalCategoryId);
+        if (resolvedCat?.id && isUUID(resolvedCat.id)) {
+          finalCategoryId = resolvedCat.id;
+        } else {
+          // One last attempt: find by slug in menuCategories then resolve UUID
+          const menuCat = menuCategories.find(c => c.slug === finalCategoryId || c.id === finalCategoryId);
+          if (menuCat?.id && isUUID(menuCat.id)) {
+            finalCategoryId = menuCat.id;
+          }
+        }
+      }
+
+      // If still not a UUID, we can't proceed as it will fail at DB level
+      if (!isUUID(finalCategoryId)) {
+        toast({
+          title: t('common.error') || "Erreur",
+          description: "Erreur de configuration de catégorie. Veuillez patienter pendant le chargement des données ou réessayer.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
       const announcementData = {
         title: formData.title,
         description: descriptionWithAttributes,
         price: parseFloat(formData.price),
         currency: formData.currency,
         condition: formData.condition,
-        category_id: formData.category_id,
-        category_slug: menuCategories.find(c => c.id === formData.category_id)?.slug || null,
+        category_id: finalCategoryId,
+        category_slug: menuCategories.find(c => c.id === finalCategoryId || c.slug === finalCategoryId)?.slug || null,
         subcategory_id: subcategorySlug ?? selectedSubcategory ?? null,
         wilaya: formData.wilaya,
         commune: formData.commune || null,
@@ -900,9 +936,13 @@ const DeposerAnnonce = () => {
                         <Plus className="h-5 w-5 text-green-600" />
                         <span className="text-red-600">{t('createAd.category')} *</span>
                       </Label>
-                      <Select value={formData.category_id} onValueChange={handleCategoryChange}>
+                      <Select 
+                        value={formData.category_id} 
+                        onValueChange={handleCategoryChange}
+                        disabled={categoriesLoading}
+                      >
                         <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
-                          <SelectValue placeholder={t('createAd.selectCategory')} />
+                          <SelectValue placeholder={categoriesLoading ? t('common.loading') : t('createAd.selectCategory')} />
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map((category) => (
