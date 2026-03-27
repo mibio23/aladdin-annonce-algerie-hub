@@ -24,7 +24,7 @@ const LegacyAnnouncementCard: React.FC<any> = (props) => {
     description: props.description || '',
     price: props.price,
     category_id: props.category || 'unknown',
-    condition: 'good',
+    condition: 'bon_etat',
     images: props.imageUrl ? [props.imageUrl] : (props.imageUrls || []),
     location: props.location || '',
     wilaya: props.wilaya || '',

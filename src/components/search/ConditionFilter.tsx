@@ -18,11 +18,11 @@ const ConditionFilter: React.FC<ConditionFilterProps> = ({
 
   const conditionOptions = [
     { value: "all", label: t('search.all') },
-    { value: "new", label: t('search.new') },
-    { value: "used", label: t('search.used') },
-    { value: "refurbished", label: t('search.refurbished') },
-    { value: "defective", label: t('search.defective') },
-    { value: "parts", label: t('search.parts') }
+    { value: "neuf", label: t('search.new') },
+    { value: "tres_bon_etat", label: t('search.refurbished') || "Très bon état" },
+    { value: "bon_etat", label: t('search.used') || "Bon état" },
+    { value: "acceptable", label: t('search.defective') || "État correct" },
+    { value: "usage", label: t('search.parts') || "Usage / Pour pièces" }
   ];
 
   const selectedOption = conditionOptions.find(option => option.value === value);

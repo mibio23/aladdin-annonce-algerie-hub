@@ -189,7 +189,7 @@ const INITIAL_FORM_DATA = {
     description: '',
     price: '',
     currency: 'DZD',
-    condition: '',
+    condition: 'bon_etat',
     location: '',
     addressLine2: '',
     commune: '',
@@ -586,7 +586,15 @@ const CreateAnnouncementPage: React.FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [missingRequired, setMissingRequired] = useState({ wilaya: false, phone: false });
+  const [missingRequired, setMissingRequired] = useState({ 
+    wilaya: false, 
+    phone: false,
+    title: false,
+    description: false,
+    category_id: false,
+    price: false,
+    subcategory_id: false
+  });
   const [lockedPrimaryPhone, setLockedPrimaryPhone] = useState('');
 
   const handleLocationSelect = (coords: GeolocationCoords) => {
@@ -698,11 +706,11 @@ const CreateAnnouncementPage: React.FC = () => {
   
   // Définir les conditions avec des clés de traduction appropriées
   const getConditions = useCallback(() => [
-    { value: 'new', label: t('search.advanced.new') },
-    { value: 'like_new', label: t('announcements.condition.likeNew') || 'Comme neuf' },
-    { value: 'good', label: t('announcements.condition.bon') },
-    { value: 'fair', label: t('announcements.condition.correct') },
-    { value: 'poor', label: t('announcements.condition.poor') || 'À rénover' },
+    { value: 'neuf', label: t('search.advanced.new') },
+    { value: 'tres_bon_etat', label: t('announcements.condition.likeNew') || 'Comme neuf' },
+    { value: 'bon_etat', label: t('announcements.condition.bon') },
+    { value: 'acceptable', label: t('announcements.condition.correct') },
+    { value: 'usage', label: t('announcements.condition.poor') || 'À rénover' },
   ], [t]);
 
   const [conditions, setConditions] = useState(getConditions());
@@ -784,12 +792,22 @@ const CreateAnnouncementPage: React.FC = () => {
 
   const mapDBToCondition = (c: string | null) => {
     switch (c) {
-      case 'neuf': return 'new';
-      case 'tres-bon-etat': return 'like_new';
-      case 'bon-etat': return 'good';
-      case 'etat-moyen': return 'fair';
-      case 'pour-pieces': return 'poor';
-      default: return '';
+      case 'neuf': return 'neuf';
+      case 'tres_bon_etat': return 'tres_bon_etat';
+      case 'bon_etat': return 'bon_etat';
+      case 'acceptable': return 'acceptable';
+      case 'usage': return 'usage';
+      // Fallback for legacy data
+      case 'new': return 'neuf';
+      case 'like_new': return 'tres_bon_etat';
+      case 'good': return 'bon_etat';
+      case 'fair': return 'acceptable';
+      case 'poor': return 'usage';
+      case 'tres-bon-etat': return 'tres_bon_etat';
+      case 'bon-etat': return 'bon_etat';
+      case 'etat-moyen': return 'acceptable';
+      case 'pour-pieces': return 'usage';
+      default: return 'bon_etat';
     }
   };
 
@@ -809,7 +827,6 @@ const CreateAnnouncementPage: React.FC = () => {
         toast({
           title: "Erreur",
           description: "Impossible de charger l'annonce",
-          variant: "destructive"
         });
         setLoading(false);
         return;
@@ -819,7 +836,6 @@ const CreateAnnouncementPage: React.FC = () => {
         toast({
           title: "Accès refusé",
           description: "Vous n'avez pas la permission de modifier cette annonce",
-          variant: "destructive"
         });
         setLoading(false);
         navigateWithLanguage('/mes-annonces');
@@ -970,6 +986,11 @@ const CreateAnnouncementPage: React.FC = () => {
     // Validation temps réel
     const error = validateField(name, value);
     setErrors(prev => ({ ...prev, [name]: error }));
+
+    // Clear missing required error
+    if (value && missingRequired[name as keyof typeof missingRequired]) {
+      setMissingRequired(prev => ({ ...prev, [name]: false }));
+    }
     
     // Gérer les champs de type tableau
     if (name === 'includedAccessories' || name === 'deliveryAreas' || name === 'documentation') {
@@ -986,6 +1007,9 @@ const CreateAnnouncementPage: React.FC = () => {
           next[index] = value;
           return { ...prev, phones: next };
         });
+        if (value && index === 0 && missingRequired.phone) {
+          setMissingRequired(prev => ({ ...prev, phone: false }));
+        }
       }
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -994,14 +1018,23 @@ const CreateAnnouncementPage: React.FC = () => {
 
   const handleSelectChange = (name: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (value && missingRequired[name as keyof typeof missingRequired]) {
+      setMissingRequired(prev => ({ ...prev, [name]: false }));
+    }
   };
 
   const _handleCategoryChange = (categoryId: string) => {
     setFormData(prev => ({ ...prev, category_id: categoryId, subcategory_id: '' }));
+    if (categoryId && missingRequired.category_id) {
+      setMissingRequired(prev => ({ ...prev, category_id: false }));
+    }
   };
 
   const _handleSubcategoryChange = (subcategoryId: string) => {
     setFormData(prev => ({ ...prev, subcategory_id: subcategoryId }));
+    if (subcategoryId && missingRequired.subcategory_id) {
+      setMissingRequired(prev => ({ ...prev, subcategory_id: false }));
+    }
   };
 
   // Gestion des changements dans les champs imbriqués
@@ -1050,7 +1083,6 @@ const CreateAnnouncementPage: React.FC = () => {
         toast({
           title: t('createAd.images'),
           description: t('createAd.maxImagesReached') || "Vous avez atteint la limite de 10 photos",
-          variant: "destructive"
         });
         return;
       }
@@ -1099,7 +1131,6 @@ const CreateAnnouncementPage: React.FC = () => {
          toast({
           title: t('createAd.videos'),
           description: t('createAd.maxVideosReached') || "Vous avez atteint la limite de 2 vidéos",
-          variant: "destructive"
         });
         return;
       }
@@ -1249,19 +1280,29 @@ const CreateAnnouncementPage: React.FC = () => {
   };
 
   const mapConditionToDB = (c: string | undefined) => {
+    if (!c) return 'bon_etat';
     switch (c) {
+      case 'neuf':
       case 'new':
         return 'neuf';
+      case 'tres_bon_etat':
+      case 'tres-bon-etat':
       case 'like_new':
-        return 'tres-bon-etat';
+        return 'tres_bon_etat';
+      case 'bon_etat':
+      case 'bon-etat':
       case 'good':
-        return 'bon-etat';
+        return 'bon_etat';
+      case 'acceptable':
+      case 'etat-moyen':
       case 'fair':
-        return 'etat-moyen';
+        return 'acceptable';
+      case 'usage':
+      case 'pour-pieces':
       case 'poor':
-        return 'pour-pieces';
+        return 'usage';
       default:
-        return null;
+        return 'bon_etat';
     }
   };
 
@@ -1272,7 +1313,6 @@ const CreateAnnouncementPage: React.FC = () => {
       toast({
         title: t('auth.errors.loginFailed') || "Erreur",
         description: t('auth.errors.loginRequired') || "Vous devez être connecté",
-        variant: "destructive"
       });
       return;
     }
@@ -1281,7 +1321,6 @@ const CreateAnnouncementPage: React.FC = () => {
       toast({
         title: t('createAd.phoneRequired') || "Numéro de téléphone requis",
         description: "Le premier numéro de téléphone ne peut pas être modifié.",
-        variant: "destructive"
       });
       setFormData(prev => ({
         ...prev,
@@ -1292,33 +1331,42 @@ const CreateAnnouncementPage: React.FC = () => {
 
     const isFirstPhoneMissing = !formData.phones[0] || formData.phones[0].trim() === '';
     const isWilayaMissing = !formData.wilaya;
-    setMissingRequired({ phone: isFirstPhoneMissing, wilaya: isWilayaMissing });
+    const isTitleMissing = !formData.title.trim();
+    const isDescriptionMissing = !formData.description.trim();
+    const isCategoryIdMissing = !formData.category_id;
+    
+    // Si la catégorie a des sous-catégories, la sélection devient obligatoire
+    const currentCat = menuCategories.find(c => c.id === formData.category_id);
+    const hasSubcategories = currentCat && currentCat.subcategories && currentCat.subcategories.length > 0;
+    const isSubcategoryMissing = hasSubcategories && !formData.subcategory_id;
 
-    // Validation du premier numéro de téléphone
-    if (!formData.phones[0] || formData.phones[0].trim() === '') {
-      toast({
-        title: t('createAd.phoneRequired') || "Numéro de téléphone requis",
-        description: t('createAd.phoneRequiredDesc') || "Veuillez saisir au moins un numéro de téléphone",
-        variant: "destructive"
-      });
-      return;
-    }
+    setMissingRequired({ 
+      phone: isFirstPhoneMissing, 
+      wilaya: isWilayaMissing,
+      title: isTitleMissing,
+      description: isDescriptionMissing,
+      category_id: isCategoryIdMissing,
+      price: false,
+      subcategory_id: isSubcategoryMissing
+    });
 
-    if (!formData.title || !formData.description || !formData.category_id) {
+    if (isFirstPhoneMissing || isWilayaMissing || isTitleMissing || isDescriptionMissing || isCategoryIdMissing || isSubcategoryMissing) {
       toast({
         title: t('createAd.errors.createFailed') || "Erreur",
         description: t('createAd.errors.createFailedDesc') || "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive"
       });
-      return;
-    }
-
-    if (!formData.wilaya) {
-      toast({
-        title: t('createAd.errors.createFailed') || "Erreur",
-        description: "Veuillez sélectionner une wilaya",
-        variant: "destructive"
-      });
+      
+      // Scroll to the first missing field
+      const firstMissingId = isTitleMissing ? 'title' : 
+                             isCategoryIdMissing ? 'category_id' : 
+                             isSubcategoryMissing ? 'subcategory_id' :
+                             isDescriptionMissing ? 'description' : 
+                             isWilayaMissing ? 'wilaya' : 'phones-0';
+      
+      const element = document.getElementById(firstMissingId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 
@@ -1333,7 +1381,6 @@ const CreateAnnouncementPage: React.FC = () => {
       toast({
         title: t('createAd.errors.createFailed') || "Erreur",
         description: t('createAd.delivery.agencyName') || "Nom de l'agence requis",
-        variant: "destructive"
       });
       return;
     }
@@ -1505,7 +1552,6 @@ const CreateAnnouncementPage: React.FC = () => {
             toast({
                title: t('common.error'), 
                description: `Erreur lors de la mise à jour: ${error.message || 'Erreur inconnue'}`,
-               variant: "destructive" 
             });
             throw error;
          }
@@ -1542,7 +1588,6 @@ const CreateAnnouncementPage: React.FC = () => {
         toast({
           title: "Erreur de catégorie",
           description: `La catégorie sélectionnée (${categoryId}) n'est pas synchronisée avec le serveur. Veuillez contacter le support.`,
-          variant: "destructive"
         });
         setLoading(false);
         return;
@@ -2352,7 +2397,6 @@ const CreateAnnouncementPage: React.FC = () => {
       toast({
         title: t('createAd.errors.createFailed') || "Erreur",
         description: errorMessage,
-        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -2443,7 +2487,7 @@ const CreateAnnouncementPage: React.FC = () => {
                       id="title"
                       name="title"
                       dir={isRTL ? 'rtl' : 'ltr'}
-                      className={`text-base h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 ${isRTL ? 'text-right' : ''}`}
+                      className={`text-base h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 ${isRTL ? 'text-right' : ''} ${missingRequired.title ? 'animate-blink-red border-red-500' : ''}`}
                       value={formData.title}
                       onChange={handleInputChange}
                       placeholder={t('createAd.titlePlaceholder')}
@@ -2468,7 +2512,7 @@ const CreateAnnouncementPage: React.FC = () => {
                     rows={6}
                     required
                     maxLength={3000}
-                    className="text-base rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 resize-none"
+                    className={`text-base rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 resize-none ${missingRequired.description ? 'animate-blink-red border-red-500' : ''}`}
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -2549,8 +2593,6 @@ const CreateAnnouncementPage: React.FC = () => {
                               value={formData.price}
                               onChange={handleInputChange}
                               placeholder="0"
-                              disabled={formData.isNegotiable}
-                              required={!formData.isNegotiable}
                               className="text-lg h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 font-bold text-slate-800 dark:text-slate-100"
                             />
                             {/* Switch Prix à négocier */}
@@ -2562,11 +2604,9 @@ const CreateAnnouncementPage: React.FC = () => {
                                 id="isNegotiable"
                                 checked={formData.isNegotiable}
                                 onCheckedChange={(checked) => {
-                                  const isNegotiable = checked === true;
                                   setFormData(prev => ({
                                     ...prev,
-                                    isNegotiable,
-                                    price: isNegotiable ? '' : prev.price
+                                    isNegotiable: checked === true
                                   }));
                                 }}
                                 className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-400"
@@ -2690,7 +2730,10 @@ const CreateAnnouncementPage: React.FC = () => {
                               setFormData(prev => ({ ...prev, commune: '' }));
                               setMissingRequired(prev => ({ ...prev, wilaya: false }));
                             }} value={formData.wilaya}>
-                              <SelectTrigger className={`text-base h-12 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 ${missingRequired.wilaya ? 'border-red-500 focus:border-red-600 focus:ring-red-500/30 ring-4 ring-red-500/20 animate-pulse' : ''}`}>
+                              <SelectTrigger 
+                                id="wilaya"
+                                className={`text-base h-12 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 ${missingRequired.wilaya ? 'animate-blink-red border-red-500' : ''}`}
+                              >
                                 <SelectValue placeholder={t('createAd.selectWilaya')} />
                               </SelectTrigger>
                               <SelectContent className="rounded-xl shadow-xl border-slate-100">
@@ -2809,7 +2852,7 @@ const CreateAnnouncementPage: React.FC = () => {
                                   }}
                                   placeholder={t('createAd.phonePlaceholder')}
                                   className={`pl-12 h-12 rounded-xl border-2 bg-slate-50 dark:bg-slate-900/50 transition-all duration-300 hover:shadow-md ${
-                                    index === 0 && missingRequired.phone ? 'border-red-500 focus:border-red-600 focus:ring-red-500/30 ring-4 ring-red-500/20 animate-pulse' : 'border-slate-100 dark:border-slate-700 focus:border-emerald-500 focus:ring-emerald-500/20 hover:border-emerald-300'
+                                    index === 0 && missingRequired.phone ? 'animate-blink-red border-red-500' : 'border-slate-100 dark:border-slate-700 focus:border-emerald-500 focus:ring-emerald-500/20 hover:border-emerald-300'
                                   }`}
                                   required={index === 0}
                                   readOnly={isEditing && index === 0}
@@ -2928,7 +2971,10 @@ const CreateAnnouncementPage: React.FC = () => {
                           handleSelectChange('category_id', value);
                           _handleCategoryChange(value);
                         }} value={formData.category_id}>
-                          <SelectTrigger className="text-base h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300">
+                          <SelectTrigger 
+                            id="category_id"
+                            className={`text-base h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 ${missingRequired.category_id ? 'animate-blink-red border-red-500' : ''}`}
+                          >
                             <SelectValue placeholder={t('createAd.selectCategory')} />
                           </SelectTrigger>
                           <SelectContent className="rounded-xl shadow-2xl border-slate-100 min-w-[240px]">
@@ -2951,14 +2997,18 @@ const CreateAnnouncementPage: React.FC = () => {
                         <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
                           <Label className="text-lg font-bold">
                             <span className="text-slate-700 dark:text-slate-200">{t('createAd.subcategory') || 'Sous-catégorie'}</span>
-                            <span className="ml-2 text-slate-500 dark:text-slate-400 font-bold text-sm uppercase tracking-wider">
-                              ({t('createAd.optional') || 'Facultatif'})
+                            <span className="ml-2 text-red-500 font-bold text-sm uppercase tracking-wider">
+                              *
                             </span>
                           </Label>
                           <Select onValueChange={(value) => {
                             handleSelectChange('subcategory_id', value);
+                            _handleSubcategoryChange(value);
                           }} value={formData.subcategory_id}>
-                            <SelectTrigger className="text-base h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300">
+                            <SelectTrigger 
+                              id="subcategory_id"
+                              className={`text-base h-14 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 ${missingRequired.subcategory_id ? 'animate-blink-red border-red-500' : ''}`}
+                            >
                               <SelectValue placeholder={t('createAd.selectSubcategory') || 'Sélectionner une sous-catégorie'} />
                             </SelectTrigger>
                             <SelectContent className="rounded-xl shadow-2xl border-slate-100">
@@ -5479,7 +5529,6 @@ const CreateAnnouncementPage: React.FC = () => {
                                       toast({
                                         title: 'Premium indisponible',
                                         description: 'Vous avez besoin de 100 points ou d’un paiement',
-                                        variant: 'destructive'
                                       });
                                       setFormData(prev => ({ ...prev, isPremium: false }));
                                     }

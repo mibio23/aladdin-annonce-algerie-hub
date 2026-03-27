@@ -652,7 +652,7 @@ const MetiersReparateurs: React.FC = () => {
                 const transformedAnnouncement = {
                   ...announcement,
                   category_id: 'metier-reparateur',
-                  condition: 'new',
+                  condition: 'neuf',
                   images: announcement.images || [],
                   wilaya: announcement.location || '',
                   contact_phone: announcement.contact_phone || '',

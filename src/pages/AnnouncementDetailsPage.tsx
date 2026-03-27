@@ -239,7 +239,7 @@ const AnnouncementDetailsPage: React.FC = () => {
             created_at: mockAnn.date,
             views_count: mockAnn.views_count || Math.floor(Math.random() * 500),
             currency: mockAnn.currency || "DZD",
-            condition: mockAnn.condition || "good",
+            condition: mockAnn.condition || "bon_etat",
             isProfessional: mockAnn.isProfessional || false,
             // Pass through all extra fields for characteristics
             brand: mockAnn.brand,
@@ -281,7 +281,7 @@ const AnnouncementDetailsPage: React.FC = () => {
               title: item.title,
               price: item.price,
               category_id: item.categorySlug,
-              condition: 'good',
+              condition: 'bon_etat',
               images: item.imageUrls,
               location: item.location,
               wilaya: item.location,
@@ -301,11 +301,17 @@ const AnnouncementDetailsPage: React.FC = () => {
           .eq('id', id)
           .maybeSingle();
 
-        if (error || !announcementData) {
+        if (error) {
+          logger.error("Database error:", error);
+          throw error;
+        }
+
+        if (!announcementData) {
           // Check vehicle mocks
           const vehicleMock = mockVehicleAnnouncements.find(a => a.id === id);
           if (vehicleMock) {
             applyVehicleMock(vehicleMock);
+            setLoading(false);
             return;
           }
           
@@ -313,11 +319,12 @@ const AnnouncementDetailsPage: React.FC = () => {
           const generalMock = generalAnnouncements.find(a => a.id === id);
           if (generalMock) {
             applyGeneralMock(generalMock);
+            setLoading(false);
             return;
           }
 
-          if (error) throw error;
           setAnnouncement(null);
+          setLoading(false);
           return;
         }
 
@@ -403,7 +410,7 @@ const AnnouncementDetailsPage: React.FC = () => {
             .from('profiles')
             .select('public_user_id, first_name, last_name, avatar_url, created_at, wilaya, commune')
             .eq('user_id', announcementData.user_id)
-            .single();
+            .maybeSingle();
             
           if (profileData) {
             setSellerProfile(profileData);
@@ -445,7 +452,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                 description: item.description || '',
                 price: item.price || 0,
                 category_id: item.category_id,
-                condition: item.condition || 'good',
+                condition: item.condition || 'bon_etat',
                 images: item.image_urls || (item.image_url ? [item.image_url] : []),
                 location: item.wilaya || '',
                 wilaya: item.wilaya || '',
@@ -485,7 +492,7 @@ const AnnouncementDetailsPage: React.FC = () => {
         toast({
           title: t('common.error'),
           description: "Impossible de charger les détails de l'annonce",
-          variant: "destructive"
+          // Style "en blanc" : on utilise le variant par défaut
         });
       } finally {
         setLoading(false);
@@ -863,31 +870,55 @@ const AnnouncementDetailsPage: React.FC = () => {
   }
 
   const menuCategories = getCategoryMenu(currentLanguage);
+  
+  // Logic to find category name and slug
   const rawCategoryId = typeof announcement.category_id === "string" ? announcement.category_id : "";
-  const canonicalCategoryId =
-    rawCategoryId === "vehicules" || rawCategoryId === "vehicules-camions-motos"
-      ? "vehicules-equipements"
-      : rawCategoryId;
-  const menuCategory =
-    menuCategories.find((c) => c.slug === canonicalCategoryId) ??
-    menuCategories.find((c) => c.id === canonicalCategoryId) ??
-    menuCategories.find((c) => c.slug === rawCategoryId) ??
-    menuCategories.find((c) => c.id === rawCategoryId);
-  const resolvedCategoryName = menuCategory?.name || announcement.category;
+  const categoryFromMenu = menuCategories.find(c => c.id === rawCategoryId || c.slug === rawCategoryId);
+  
+  const resolvedCategoryName = categoryFromMenu?.name || (() => {
+    const key = `categories.${rawCategoryId}`;
+    const translated = t(key);
+    return translated !== key ? translated : (announcement.category || rawCategoryId);
+  })();
+
+  const resolvedCategorySlug = categoryFromMenu?.slug || rawCategoryId;
+
   const resolvedSubcategoryName = (() => {
-    const subslug = announcement.subcategory_id || announcement.subcategory;
-    if (!subslug) return "";
-    const resolved =
-      menuCategory?.subcategories?.find((s) => s.slug === subslug) ||
-      menuCategory?.subcategories
-        ?.flatMap((s) => s.subcategories ?? [])
-        .find((s) => s.slug === subslug);
-    if (resolved?.name) return resolved.name;
-    return subslug
+    const subId = announcement.subcategory_id || announcement.subcategory;
+    if (!subId) return "";
+    
+    // Try to find in menu
+    if (categoryFromMenu) {
+      const direct = categoryFromMenu.subcategories?.find((s: any) => s.id === subId || s.slug === subId);
+      if (direct) return direct.name;
+
+      for (const sub of categoryFromMenu.subcategories || []) {
+        const nested = (sub.subcategories || []).find((child: any) => child.id === subId || child.slug === subId);
+        if (nested) return nested.name;
+      }
+    }
+    
+    return subId
       .split("-")
       .filter(Boolean)
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  })();
+
+  const resolvedSubcategorySlug = (() => {
+    const subId = announcement.subcategory_id || announcement.subcategory;
+    if (!subId) return "";
+    
+    if (categoryFromMenu) {
+      const direct = categoryFromMenu.subcategories?.find((s: any) => s.id === subId || s.slug === subId);
+      if (direct) return direct.slug || subId;
+
+      for (const sub of categoryFromMenu.subcategories || []) {
+        const nested = (sub.subcategories || []).find((child: any) => child.id === subId || child.slug === subId);
+        if (nested) return nested.slug || subId;
+      }
+    }
+    return subId;
   })();
 
   const vehicle = resolveVehicleDetails(announcement as any);
@@ -937,7 +968,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to={getLocalizedPath(`/category/${canonicalCategoryId || announcement.category_id}`)}>
+                    <Link to={getLocalizedPath(`/category/${resolvedCategorySlug}`)}>
                       {resolvedCategoryName}
                     </Link>
                   </BreadcrumbLink>
@@ -948,7 +979,11 @@ const AnnouncementDetailsPage: React.FC = () => {
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{resolvedSubcategoryName}</BreadcrumbPage>
+                  <BreadcrumbLink asChild>
+                    <Link to={getLocalizedPath(`/category/${resolvedCategorySlug}/${resolvedSubcategorySlug}`)}>
+                      {resolvedSubcategoryName}
+                    </Link>
+                  </BreadcrumbLink>
                 </BreadcrumbItem>
               </>
             ) : null}
@@ -1072,6 +1107,16 @@ const AnnouncementDetailsPage: React.FC = () => {
                      <Tag className="w-5 h-5 text-primary" /> {t('preview.features')}
                    </h3>
                    <dl className={`space-y-2 text-sm ${isRTL ? "text-right" : ""}`}>
+                      <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
+                        <dt className="text-gray-500">{t('createAd.category')}</dt>
+                        <dd className="font-medium">{resolvedCategoryName}</dd>
+                      </div>
+                      {resolvedSubcategoryName && (
+                        <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
+                          <dt className="text-gray-500">{t('createAd.subcategory') || 'Sous-catégorie'}</dt>
+                          <dd className="font-medium">{resolvedSubcategoryName}</dd>
+                        </div>
+                      )}
                       {/* Real Estate Fields */}
                       {announcement.property_type && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>

@@ -213,9 +213,10 @@ export const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
             </SelectTrigger>
             <SelectContent>
                <SelectItem value="neuf">{t('createAd.conditions.neuf') || 'Neuf'}</SelectItem>
+               <SelectItem value="tres_bon_etat">{t('createAd.conditions.tres_bon_etat') || 'Très bon état'}</SelectItem>
                <SelectItem value="bon_etat">{t('createAd.conditions.bon_etat') || 'Bon état'}</SelectItem>
-               <SelectItem value="etat_moyen">{t('createAd.conditions.etat_moyen') || 'État moyen'}</SelectItem>
-               <SelectItem value="bricoleur">{t('createAd.conditions.bricoleur') || 'À bricoler'}</SelectItem>
+               <SelectItem value="acceptable">{t('createAd.conditions.acceptable') || 'Acceptable'}</SelectItem>
+               <SelectItem value="usage">{t('createAd.conditions.usage') || 'Usage / Pour pièces'}</SelectItem>
             </SelectContent>
           </Select>
         </div>

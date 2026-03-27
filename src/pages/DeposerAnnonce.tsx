@@ -279,6 +279,7 @@ const DeposerAnnonce = () => {
   const [selectedSubcategoryL2, setSelectedSubcategoryL2] = useState<string>('');
   const [images, setImages] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<GeolocationCoords | null>(null);
+  const [missingFields, setMissingFields] = useState<string[]>([]);
   
   const [currentAttributes, setCurrentAttributes] = useState<Record<string, string[]>>({});
   const [selectedAttributeValues, setSelectedAttributeValues] = useState<Record<string, string | string[]>>({});
@@ -298,7 +299,9 @@ const DeposerAnnonce = () => {
     location: '',
     expires_at: '',
     is_urgent: false,
-    is_featured: false
+    is_featured: false,
+    is_negotiable: false,
+    exchange_possible: false
   });
 
   // Définir les conditions avec des clés de traduction appropriées
@@ -306,8 +309,8 @@ const DeposerAnnonce = () => {
     { value: 'neuf', label: t('search.advanced.new') },
     { value: 'tres_bon_etat', label: t('announcements.condition.tresBon') },
     { value: 'bon_etat', label: t('announcements.condition.bon') },
-    { value: 'etat_correct', label: t('announcements.condition.correct') },
-    { value: 'pour_pieces', label: t('search.advanced.forParts') },
+    { value: 'acceptable', label: t('announcements.condition.correct') },
+    { value: 'usage', label: t('search.advanced.forParts') },
   ], [t]);
 
   // Gestionnaire d'erreurs pour capturer les erreurs de rendu
@@ -383,11 +386,17 @@ const DeposerAnnonce = () => {
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (value && missingFields.includes(field)) {
+      setMissingFields(prev => prev.filter(f => f !== field));
+    }
   };
 
   const handleCategoryChange = (categoryId: string) => {
     if (categoryId === formData.category_id) return;
     setFormData(prev => ({ ...prev, category_id: categoryId, subcategory_id: '' }));
+    if (categoryId && missingFields.includes('category_id')) {
+      setMissingFields(prev => prev.filter(f => f !== 'category_id'));
+    }
     setSelectedSubcategoryL2('');
 
     const rootCat = menuCategories.find(c => c.id === categoryId);
@@ -458,6 +467,12 @@ const DeposerAnnonce = () => {
     if (subcategoryId === selectedSubcategoryL2) return;
 
     setSelectedSubcategoryL2(subcategoryId);
+    
+    // Clear error for subcategory if it's filled
+    if (subcategoryId && missingFields.includes('subcategory_id')) {
+      setMissingFields(prev => prev.filter(f => f !== 'subcategory_id'));
+    }
+
     // Always set the subcategory_id to the selected L2 category immediately
     // This ensures attributes appear immediately as requested
     setFormData(prev => ({
@@ -676,18 +691,37 @@ const DeposerAnnonce = () => {
       toast({
         title: t('auth.errors.loginFailed') || "Connexion requise",
         description: t('auth.errors.loginRequired') || "Vous devez être connecté pour publier une annonce",
-        variant: 'destructive',
       });
       return;
     }
 
     // Validation
-    if (!formData.title.trim() || !formData.category_id || !formData.price || !formData.wilaya) {
+    const newMissingFields: string[] = [];
+    if (!formData.title.trim()) newMissingFields.push('title');
+    if (!formData.category_id) newMissingFields.push('category_id');
+    
+    // Si la catégorie a des sous-catégories, la sélection devient obligatoire
+    if (formData.category_id && subcategories.length > 0 && !selectedSubcategoryL2) {
+      newMissingFields.push('subcategory_id');
+    }
+    
+    if (!formData.wilaya) newMissingFields.push('wilaya');
+    if (!formData.description.trim()) newMissingFields.push('description');
+    
+    setMissingFields(newMissingFields);
+
+    if (newMissingFields.length > 0) {
       toast({
         title: t('createAd.errors.createFailed') || "Champs obligatoires",
         description: t('createAd.errors.createFailedDesc') || "Veuillez remplir tous les champs obligatoires",
-        variant: 'destructive',
       });
+      
+      // Scroll to the first missing field
+      const firstMissing = newMissingFields[0];
+      const element = document.getElementById(firstMissing);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 
@@ -774,7 +808,6 @@ const DeposerAnnonce = () => {
         toast({
           title: t('common.error') || "Erreur",
           description: "Erreur de configuration de catégorie. Veuillez patienter pendant le chargement des données ou réessayer.",
-          variant: "destructive"
         });
         setLoading(false);
         return;
@@ -783,7 +816,7 @@ const DeposerAnnonce = () => {
       const announcementData = {
         title: formData.title,
         description: descriptionWithAttributes,
-        price: parseFloat(formData.price),
+        price: formData.price ? parseFloat(formData.price) : null,
         currency: formData.currency,
         condition: formData.condition,
         category_id: finalCategoryId,
@@ -796,6 +829,8 @@ const DeposerAnnonce = () => {
         email: formData.email,
         images: images, // Array of image URLs
         is_urgent: formData.is_urgent,
+        is_negotiable: formData.is_negotiable,
+        exchange_possible: formData.exchange_possible,
         attributes: selectedAttributeValues,
         user_id: user.id,
         status: 'active',
@@ -856,7 +891,6 @@ const DeposerAnnonce = () => {
       toast({
         title: t('createAd.errors.createFailed') || "Erreur",
         description: t('createAd.errors.createFailedDesc') || "Impossible de publier l'annonce. Veuillez réessayer.",
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -926,7 +960,7 @@ const DeposerAnnonce = () => {
                         onChange={(event) => handleInputChange('title', event.target.value.slice(0, 100))}
                         placeholder={t('createAd.titlePlaceholder')}
                         required
-                        className={`text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors ${isRTL ? 'text-right' : ''}`}
+                        className={`text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors ${isRTL ? 'text-right' : ''} ${missingFields.includes('title') ? 'animate-blink-red border-red-500' : ''}`}
                       />
                     </div>
 
@@ -941,7 +975,10 @@ const DeposerAnnonce = () => {
                         onValueChange={handleCategoryChange}
                         disabled={categoriesLoading}
                       >
-                        <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
+                        <SelectTrigger 
+                          id="category_id"
+                          className={`text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors ${missingFields.includes('category_id') ? 'animate-blink-red border-red-500' : ''}`}
+                        >
                           <SelectValue placeholder={categoriesLoading ? t('common.loading') : t('createAd.selectCategory')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -955,19 +992,21 @@ const DeposerAnnonce = () => {
                     </div>
 
                     {/* Sous-catégorie (apparition automatique après sélection de catégorie) */}
-                    {formData.category_id && (
+                    {formData.category_id && subcategories.length > 0 && (
                       <div className="space-y-2">
+                        <Label htmlFor="subcategory_id" className="text-lg font-bold flex items-center gap-2">
+                          <Plus className="h-5 w-5 text-green-600" />
+                          <span className="text-red-600">{t('createAd.subcategory')} *</span>
+                        </Label>
                         <Select
                           value={selectedSubcategoryL2}
                           onValueChange={handleSubcategoryL2Change}
-                          disabled={subcategories.length === 0}
                         >
-                          <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
-                            <SelectValue placeholder={
-                              subcategories.length === 0
-                                ? t('announcements.noResultsInSubcategory')
-                                : t('search.advanced.selectSubCategory')
-                            } />
+                          <SelectTrigger 
+                            id="subcategory_id"
+                            className={`text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors ${missingFields.includes('subcategory_id') ? 'animate-blink-red border-red-500' : ''}`}
+                          >
+                            <SelectValue placeholder={t('search.advanced.selectSubCategory')} />
                           </SelectTrigger>
                           <SelectContent>
                             {subcategories.map((subcategory) => (
@@ -1026,7 +1065,7 @@ const DeposerAnnonce = () => {
                         placeholder={t('createAd.descriptionPlaceholder')}
                         rows={6}
                         required
-                        className="text-base rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors resize-none"
+                        className={`text-base rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors resize-none ${missingFields.includes('description') ? 'animate-blink-red border-red-500' : ''}`}
                       />
                     </div>
 
@@ -1060,9 +1099,12 @@ const DeposerAnnonce = () => {
                           </Label>
                           <Select
                             value={formData.wilaya}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, wilaya: value, commune: '' }))}
+                            onValueChange={(value) => handleInputChange('wilaya', value)}
                           >
-                            <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
+                            <SelectTrigger 
+                              id="wilaya"
+                              className={`text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors ${missingFields.includes('wilaya') ? 'animate-blink-red border-red-500' : ''}`}
+                            >
                               <SelectValue placeholder={t('createAd.selectWilaya')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -1109,36 +1151,64 @@ const DeposerAnnonce = () => {
                     <div className="bg-green-50 p-6 rounded-xl border border-green-500 border-opacity-0 hover:border-opacity-100 transition-colors">
                       <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                         <DollarSign className="h-5 w-5 text-green-600" />
-                        <span className="text-red-600">{t('createAd.price')}</span>
+                        <span className="text-slate-700 dark:text-slate-200">{t('createAd.price')}</span>
+                        <span className="text-xs font-normal text-slate-500 ml-1">({t('createAd.optional') || 'Facultatif'})</span>
                       </h3>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="col-span-2 space-y-2">
-                          <Input
-                            id="price"
-                            type="number"
-                            value={formData.price}
-                            onChange={(e) => handleInputChange('price', e.target.value)}
-                            placeholder="0"
-                            required
-                            min="0"
-                            step="0.01"
-                            className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors"
-                          />
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="col-span-2 space-y-2">
+                            <Input
+                              id="price"
+                              type="number"
+                              value={formData.price}
+                              onChange={(e) => handleInputChange('price', e.target.value)}
+                              placeholder="0"
+                              min="0"
+                              step="0.01"
+                              className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="currency" className="text-lg font-bold">
+                              <span className="text-slate-700 dark:text-slate-200">{t('createAd.currency')}</span>
+                            </Label>
+                            <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
+                              <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="DZD">DZD</SelectItem>
+                                <SelectItem value="EUR">EUR</SelectItem>
+                                <SelectItem value="USD">USD</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="currency" className="text-lg font-bold">
-                            <span className="text-red-600">{t('createAd.currency')}</span>
-                          </Label>
-                          <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
-                            <SelectTrigger className="text-base h-12 rounded-lg border-gray-200 hover:border-green-500 focus:border-green-500 focus:ring-green-500 focus-visible:border-green-500 focus-visible:ring-green-500 transition-colors">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="DZD">DZD</SelectItem>
-                              <SelectItem value="EUR">EUR</SelectItem>
-                              <SelectItem value="USD">USD</SelectItem>
-                            </SelectContent>
-                          </Select>
+
+                        {/* Options Prix à négocier et Échange possible */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                          <div className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-green-100 transition-all hover:border-green-300">
+                            <Label htmlFor="is_negotiable" className="text-sm font-semibold text-slate-700 cursor-pointer">
+                              {t('createAd.priceNegotiable') || 'Prix à négocier'}
+                            </Label>
+                            <Switch
+                              id="is_negotiable"
+                              checked={formData.is_negotiable}
+                              onCheckedChange={(checked) => handleInputChange('is_negotiable', checked)}
+                              className="data-[state=checked]:bg-green-600"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-green-100 transition-all hover:border-green-300">
+                            <Label htmlFor="exchange_possible" className="text-sm font-semibold text-slate-700 cursor-pointer">
+                              {t('createAd.exchangePossible') || 'Échange possible'}
+                            </Label>
+                            <Switch
+                              id="exchange_possible"
+                              checked={formData.exchange_possible}
+                              onCheckedChange={(checked) => handleInputChange('exchange_possible', checked)}
+                              className="data-[state=checked]:bg-green-600"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>

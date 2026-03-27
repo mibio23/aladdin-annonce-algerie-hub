@@ -100,7 +100,6 @@ export const useFavorites = () => {
       toast({
         title: t('common.error'),
         description: t('mesFavoris.loadError'),
-        variant: 'destructive',
       });
       favoritesStore.favorites = [];
       favoritesStore.loaded = false;

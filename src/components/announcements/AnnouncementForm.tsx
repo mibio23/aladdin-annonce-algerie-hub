@@ -32,11 +32,11 @@ interface AnnouncementFormProps {
 }
 
 const CONDITIONS = [
-  { value: 'new', label: 'Neuf' },
-  { value: 'like_new', label: 'Comme neuf' },
-  { value: 'good', label: 'Bon état' },
-  { value: 'fair', label: 'État correct' },
-  { value: 'poor', label: 'À rénover' },
+  { value: 'neuf', label: 'Neuf' },
+  { value: 'tres_bon_etat', label: 'Très bon état' },
+  { value: 'bon_etat', label: 'Bon état' },
+  { value: 'acceptable', label: 'État correct' },
+  { value: 'usage', label: 'Usage' },
 ] as const;
 
 const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
@@ -54,7 +54,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     price: 0,
     category_id: '',
     subcategory_id: '',
-    condition: 'good',
+    condition: 'bon_etat',
     images: [],
     location: '',
     wilaya: '',
@@ -62,6 +62,7 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     email: '',
     is_urgent: false,
     is_negotiable: false,
+    exchange_possible: false,
     currency: 'DZD',
     attributes: {},
   });
@@ -315,61 +316,52 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
               }}>
                 Section prix - Formulaire modifié par TRAE
               </div>
-              <Label htmlFor="price">{t('createAd.price')} (DZD) *</Label>
+              <Label htmlFor="price">{t('createAd.price')} (DZD) <span className="text-xs font-normal text-slate-500 ml-1">({t('createAd.optional') || 'Facultatif'})</span></Label>
               <div className="space-y-2">
                 <Input
                   id="price"
-              name="price"
-              type="number"
-              autoComplete="off"
-              value={formData.price || ''}
-              onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
-              placeholder="0"
-              min="0"
-              disabled={formData.is_negotiable}
-              required={!formData.is_negotiable}
+                  name="price"
+                  type="number"
+                  autoComplete="off"
+                  value={formData.price || ''}
+                  onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  min="0"
                 />
-                {/* Case à cocher Prix à négocier */}
-                <div className="flex items-center space-x-2 mt-2">
-                    {/* Checkbox HTML simple et visible */}
-                    <input
-                      type="checkbox"
-                      id="negotiable-native"
-                      name="negotiable-native"
-                      checked={formData.is_negotiable || false}
-                      onChange={(e) => {
-                        const isNegotiable = e.target.checked;
-                        console.log('Native checkbox changed to:', isNegotiable);
-                        handleInputChange('is_negotiable', isNegotiable);
-                        if (isNegotiable) {
-                          handleInputChange('price', 0);
-                        }
-                      }}
-                    />
-                    
-                    {/* Checkbox React - alternative */}
-                    <div style={{display: 'none'}}>
-                      <Checkbox
-                        id="negotiable"
-                        name="negotiable"
+                <div className="flex flex-col space-y-2 mt-2">
+                  {/* Case à cocher Prix à négocier */}
+                  <div className="flex items-center space-x-2">
+                      {/* Checkbox HTML simple et visible */}
+                      <input
+                        type="checkbox"
+                        id="negotiable-native"
+                        name="negotiable-native"
                         checked={formData.is_negotiable || false}
-                        onCheckedChange={(checked) => {
-                          const isNegotiable = checked === true;
-                          console.log('Checkbox changed to:', isNegotiable);
-                          handleInputChange('is_negotiable', isNegotiable);
-                          if (isNegotiable) {
-                            handleInputChange('price', 0);
-                          }
+                        onChange={(e) => {
+                          handleInputChange('is_negotiable', e.target.checked);
                         }}
-                        style={{width: '20px', height: '20px', border: '3px solid blue', backgroundColor: 'white'}}
-                        className="forced-checkbox"
                       />
-                    </div>
-                    
-                    <Label htmlFor="negotiable-native" className="text-sm font-normal cursor-pointer">
-                      {t('createAd.priceNegotiable') || 'Prix à négocier'}
-                    </Label>
+                      <label htmlFor="negotiable-native" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                        {t('createAd.priceNegotiable') || 'Prix à négocier'}
+                      </label>
                   </div>
+                  
+                  {/* Case à cocher Échange possible */}
+                  <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="exchange-native"
+                        name="exchange-native"
+                        checked={formData.exchange_possible || false}
+                        onChange={(e) => {
+                          handleInputChange('exchange_possible', e.target.checked);
+                        }}
+                      />
+                      <label htmlFor="exchange-native" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                        {t('createAd.exchangePossible') || 'Échange possible'}
+                      </label>
+                  </div>
+                </div>
               </div>
             </div>
 

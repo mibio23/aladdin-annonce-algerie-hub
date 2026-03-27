@@ -113,9 +113,19 @@
   }
 }
 
+@layer utilities {
+  @keyframes blink-red {
+    0%, 100% { border-color: rgba(239, 68, 68, 0.2); border-width: 1px; }
+    50% { border-color: rgba(239, 68, 68, 1); border-width: 1px; box-shadow: 0 0 4px rgba(239, 68, 68, 0.5); }
+  }
+  .animate-blink-red {
+    animation: blink-red 1s infinite;
+  }
+}
+
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
 
   body {

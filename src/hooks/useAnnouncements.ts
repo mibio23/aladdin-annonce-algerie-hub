@@ -91,6 +91,7 @@ export interface CreateAnnouncementData {
   email?: string;
   is_urgent?: boolean;
   is_negotiable?: boolean;
+  exchange_possible?: boolean;
   currency?: string;
 }
 
@@ -192,7 +193,7 @@ export const useAnnouncements = () => {
     description: banner.description || '',
     price: 0,
     category_id: '',
-    condition: 'new',
+    condition: 'neuf',
     attributes: {},
     images: banner.image_url ? [banner.image_url] : [],
     location: '',
@@ -463,6 +464,7 @@ export const useAnnouncements = () => {
         email: announcementData.email,
         is_urgent: announcementData.is_urgent || false,
         is_negotiable: announcementData.is_negotiable || false,
+        exchange_possible: announcementData.exchange_possible || false,
         attributes: announcementData.attributes || {},
         user_id: user.id,
         status: 'active',
