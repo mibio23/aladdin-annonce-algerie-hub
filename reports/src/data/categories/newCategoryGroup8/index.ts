@@ -1,2 +1,0 @@
-
-export { sportEtPleinAir } from "./sportEtPleinAir";

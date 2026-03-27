@@ -1,2 +1,0 @@
-ALTER TABLE public.bike_details
-ADD COLUMN IF NOT EXISTS motorized BOOLEAN DEFAULT FALSE;

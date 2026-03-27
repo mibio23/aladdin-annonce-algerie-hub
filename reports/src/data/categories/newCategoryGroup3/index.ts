@@ -1,2 +1,0 @@
-
-export { loisirsCollectionsCategories } from "./loisirsCollections";
