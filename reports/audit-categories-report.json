@@ -1,0 +1,912 @@
+{
+  "timestamp": "2025-11-29T13:01:27.890Z",
+  "statistics": {
+    "total": 29,
+    "perfect": 29,
+    "menuCompletSqlPartiel": 0,
+    "incomplet": 0,
+    "probleme": 0
+  },
+  "completionRate": "100.0",
+  "detailedResults": [
+    {
+      "category": "agricultureAgroalimentaire",
+      "sqlFile": "migrate-agriculture-agroalimentaire-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/agricultureAgroalimentaire/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/agricultureAgroalimentaire/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/agricultureAgroalimentaire/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/agricultureAgroalimentaire/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/agricultureAgroalimentaire/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/agricultureAgroalimentaire/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "animauxAccessoires",
+      "sqlFile": "migrate-animaux-accessoires-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/animauxAccessoires/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/animauxAccessoires/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/animauxAccessoires/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/animauxAccessoires/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/animauxAccessoires/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/animauxAccessoires/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "artisanatTraditionnelAlgerien",
+      "sqlFile": "migrate-artisanat-traditionnel-algerien-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/artisanatTraditionnelAlgerien/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/artisanatTraditionnelAlgerien/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/artisanatTraditionnelAlgerien/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/artisanatTraditionnelAlgerien/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/artisanatTraditionnelAlgerien/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/artisanatTraditionnelAlgerien/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "bebePuericulture",
+      "sqlFile": "migrate-bebe-puericulture-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/bebePuericulture/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/bebePuericulture/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/bebePuericulture/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/bebePuericulture/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/bebePuericulture/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/bebePuericulture/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "btpEnginsConstruction",
+      "sqlFile": "migrate-btp-engins-construction-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/btpEnginsConstruction/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/btpEnginsConstruction/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/btpEnginsConstruction/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/btpEnginsConstruction/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/btpEnginsConstruction/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/btpEnginsConstruction/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "echangesPartage",
+      "sqlFile": "migrate-echanges-partage-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/echangesPartage/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/echangesPartage/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/echangesPartage/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/echangesPartage/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/echangesPartage/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/echangesPartage/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "educationLoisirs",
+      "sqlFile": "migrate-education-loisirs-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/educationLoisirs/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/educationLoisirs/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/educationLoisirs/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/educationLoisirs/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/educationLoisirs/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/educationLoisirs/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "electromenager",
+      "sqlFile": "migrate-electromenager-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/electromenager/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/electromenager/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/electromenager/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/electromenager/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/electromenager/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/electromenager/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "emploiCarriere",
+      "sqlFile": "migrate-emploi-carriere-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/emploiCarriere/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/emploiCarriere/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/emploiCarriere/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/emploiCarriere/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/emploiCarriere/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/emploiCarriere/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "evenementsBilletterie",
+      "sqlFile": "migrate-evenements-billetterie-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/evenementsBilletterie/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/evenementsBilletterie/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/evenementsBilletterie/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/evenementsBilletterie/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/evenementsBilletterie/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/evenementsBilletterie/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "finance",
+      "sqlFile": "migrate-finance-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/finance/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/finance/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/finance/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/finance/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/finance/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/finance/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "gastronomieAlimentation",
+      "sqlFile": "migrate-gastronomie-alimentation-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/gastronomieAlimentation/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/gastronomieAlimentation/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/gastronomieAlimentation/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/gastronomieAlimentation/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/gastronomieAlimentation/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/gastronomieAlimentation/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "imageSonEquipementMusique",
+      "sqlFile": "migrate-image-son-equipement-musique-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/imageSonEquipementMusique/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/imageSonEquipementMusique/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/imageSonEquipementMusique/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/imageSonEquipementMusique/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/imageSonEquipementMusique/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/imageSonEquipementMusique/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "immobilierMaison",
+      "sqlFile": "migrate-immobilier-maison-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/immobilierMaison/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/immobilierMaison/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/immobilierMaison/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/immobilierMaison/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/immobilierMaison/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/immobilierMaison/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "informatiqueElectronique",
+      "sqlFile": "migrate-informatique-electronique-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/informatiqueElectronique/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/informatiqueElectronique/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/informatiqueElectronique/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/informatiqueElectronique/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/informatiqueElectronique/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/informatiqueElectronique/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "jeuxVideoConsoles",
+      "sqlFile": "migrate-jeux-video-consoles-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/jeuxVideoConsoles/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/jeuxVideoConsoles/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/jeuxVideoConsoles/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/jeuxVideoConsoles/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/jeuxVideoConsoles/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/jeuxVideoConsoles/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "mobilierEtDecoration",
+      "sqlFile": "migrate-mobilier-et-decoration-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/mobilierEtDecoration/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/mobilierEtDecoration/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/mobilierEtDecoration/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/mobilierEtDecoration/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/mobilierEtDecoration/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/mobilierEtDecoration/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "modeEtAccessoires",
+      "sqlFile": "migrate-mode-et-accessoires-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/modeEtAccessoires/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/modeEtAccessoires/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/modeEtAccessoires/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/modeEtAccessoires/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/modeEtAccessoires/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/modeEtAccessoires/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "nautisme",
+      "sqlFile": "migrate-nautisme-bateaux-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/nautisme/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/nautisme/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/nautisme/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/nautisme/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/nautisme/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/nautisme/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "parapharmacieProduitChimique",
+      "sqlFile": "migrate-parapharmacie-produits-chimiques-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/parapharmacieProduitChimique/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/parapharmacieProduitChimique/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/parapharmacieProduitChimique/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/parapharmacieProduitChimique/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/parapharmacieProduitChimique/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/parapharmacieProduitChimique/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "quincaillerieGenerale",
+      "sqlFile": "migrate-quincaillerie-generale-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/quincaillerieGenerale/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/quincaillerieGenerale/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/quincaillerieGenerale/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/quincaillerieGenerale/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/quincaillerieGenerale/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/quincaillerieGenerale/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "sacsEtBagages",
+      "sqlFile": "migrate-sacs-et-bagages-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/sacsEtBagages/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/sacsEtBagages/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/sacsEtBagages/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/sacsEtBagages/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/sacsEtBagages/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/sacsEtBagages/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "santeBeaute",
+      "sqlFile": "migrate-sante-beaute-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/santeBeaute/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/santeBeaute/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/santeBeaute/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/santeBeaute/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/santeBeaute/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/santeBeaute/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "servicesSupport",
+      "sqlFile": "migrate-services-support-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/servicesSupport/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/servicesSupport/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/servicesSupport/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/servicesSupport/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/servicesSupport/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/servicesSupport/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "telephonie",
+      "sqlFile": "migrate-telephonie-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/telephonie/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/telephonie/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/telephonie/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/telephonie/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/telephonie/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/telephonie/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "vehiculesEquipements",
+      "sqlFile": "migrate-vehicules-equipements-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/vehiculesEquipements/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/vehiculesEquipements/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/vehiculesEquipements/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/vehiculesEquipements/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/vehiculesEquipements/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/vehiculesEquipements/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "veloCyclismeEquipements",
+      "sqlFile": "migrate-velo-cyclisme-equipements-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/veloCyclismeEquipements/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/veloCyclismeEquipements/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/veloCyclismeEquipements/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/veloCyclismeEquipements/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/veloCyclismeEquipements/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/veloCyclismeEquipements/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "vetementHommeFemmeSousVetement",
+      "sqlFile": "migrate-vetement-homme-femme-sous-vetement-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/vetementHommeFemmeSousVetement/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/vetementHommeFemmeSousVetement/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/vetementHommeFemmeSousVetement/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/vetementHommeFemmeSousVetement/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/vetementHommeFemmeSousVetement/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/vetementHommeFemmeSousVetement/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    },
+    {
+      "category": "voyagesTourisme",
+      "sqlFile": "migrate-voyages-tourisme-all-langs.sql",
+      "menuFiles": {
+        "fr": "src/data/categories/megaMenuStructures/voyagesTourisme/fr.tsx",
+        "ar": "src/data/categories/megaMenuStructures/voyagesTourisme/ar.tsx",
+        "en": "src/data/categories/megaMenuStructures/voyagesTourisme/en.tsx",
+        "es": "src/data/categories/megaMenuStructures/voyagesTourisme/es.tsx",
+        "de": "src/data/categories/megaMenuStructures/voyagesTourisme/de.tsx",
+        "it": "src/data/categories/megaMenuStructures/voyagesTourisme/it.tsx"
+      },
+      "sqlFileExists": true,
+      "menuLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "sqlLanguagesFound": [
+        "fr",
+        "ar",
+        "en",
+        "es",
+        "de",
+        "it"
+      ],
+      "issues": [],
+      "status": "PERFECT"
+    }
+  ]
+}
