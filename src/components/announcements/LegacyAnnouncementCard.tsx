@@ -24,6 +24,7 @@ const LegacyAnnouncementCard: React.FC<any> = (props) => {
     description: props.description || '',
     price: props.price,
     category_id: props.category || 'unknown',
+    categorySlug: props.categorySlug,
     condition: 'bon_etat',
     images: props.imageUrl ? [props.imageUrl] : (props.imageUrls || []),
     location: props.location || '',
@@ -41,6 +42,10 @@ const LegacyAnnouncementCard: React.FC<any> = (props) => {
     expires_at: null,
     delivery_options: [],
     profiles: props.profiles,
+    categories: props.categoryName || props.categorySlug ? {
+      name: props.categoryName || props.categorySlug || props.category || 'Catégorie',
+      slug: props.categorySlug || props.category || 'unknown',
+    } : undefined,
   };
 
   return (

@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
 
 type Favorite = {
   id: string; // favorite id
@@ -19,6 +20,7 @@ type Favorite = {
     title: string;
     price: number;
     category_id: string;
+    category_slug?: string | null;
     wilaya: string;
     location: string | null;
     is_urgent: boolean;
@@ -32,13 +34,14 @@ type Favorite = {
 };
 
 const MesFavoris = () => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const menuCategories = getCategoryMenu(language);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -57,6 +60,7 @@ const MesFavoris = () => {
               title,
               price,
               category_id,
+              category_slug,
               wilaya,
               location,
               is_urgent,
@@ -124,6 +128,15 @@ const MesFavoris = () => {
     const ann = favorite.announcement;
     const imageUrl = ann.images && ann.images.length > 0 ? ann.images[0] : '/placeholder.png';
     const location = ann.wilaya || ann.location || t('mesFavoris.locationNotSpecified');
+    const categoryLookupKey = ann.category_slug || ann.category_id;
+    const categoryFromMenu = menuCategories.find((cat) => cat.slug === categoryLookupKey || cat.id === categoryLookupKey);
+    const translationKey = `categories.${categoryLookupKey}`;
+    const translatedCategory = t(translationKey);
+    const categoryLabel =
+      categoryFromMenu?.name ||
+      (translatedCategory !== translationKey && !translatedCategory.startsWith('categories.') ? translatedCategory : '') ||
+      t('createAd.category') ||
+      'Catégorie';
 
     return (
     <Card className="hover:shadow-md transition-shadow">
@@ -158,7 +171,7 @@ const MesFavoris = () => {
               {ann.price ? `${ann.price.toLocaleString()} ${ann.currency || 'DA'}` : t('mesFavoris.priceNotSpecified')}
             </p>
             <div className="flex items-center gap-2 mb-3">
-              <Badge variant="outline">{ann.category_id}</Badge>
+              <Badge variant="outline">{categoryLabel}</Badge>
               <span className="text-sm text-muted-foreground">{location}</span>
             </div>
             <div className="flex items-center justify-between">

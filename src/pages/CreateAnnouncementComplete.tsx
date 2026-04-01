@@ -669,13 +669,36 @@ const CreateAnnouncementPage: React.FC = () => {
     return null;
   }, [user]);
 
-  const clearDraft = useCallback(() => {
+  const clearDraft = useCallback((silent = false) => {
     if (user) {
       localStorage.removeItem(`announcement_draft_${user.id}`);
       setLastSaved(null);
-      toast({ title: "Brouillon supprimé", description: "Le brouillon a été effacé." });
+      setDraftSaved(false);
+      if (!silent) {
+        toast({ title: "Brouillon supprimé", description: "Le brouillon a été effacé." });
+      }
     }
   }, [user, toast]);
+
+  const resetAnnouncementForm = useCallback(() => {
+    setFormData(INITIAL_FORM_DATA);
+    formDataRef.current = INITIAL_FORM_DATA;
+    setMissingRequired({
+      wilaya: false,
+      phone: false,
+      title: false,
+      description: false,
+      category_id: false,
+      price: false,
+      subcategory_id: false
+    });
+    setErrors({});
+    setHoveredCategoryId(null);
+    setShowPreview(false);
+    setDraftSaved(false);
+    setLockedPrimaryPhone('');
+    clearDraft(true);
+  }, [clearDraft]);
 
   const handleManualSave = useCallback(() => {
     if (user) {
@@ -695,12 +718,11 @@ const CreateAnnouncementPage: React.FC = () => {
 
   const handleReset = useCallback(() => {
     if (window.confirm(t('createAd.confirmReset') || "Êtes-vous sûr de vouloir réinitialiser tout le formulaire ?")) {
-        setFormData(INITIAL_FORM_DATA);
-        clearDraft();
+        resetAnnouncementForm();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         toast({ title: t('createAd.formReset') || "Formulaire réinitialisé", description: t('createAd.formResetDesc') || "Le formulaire a été réinitialisé." });
     }
-  }, [clearDraft, toast, t]);
+  }, [resetAnnouncementForm, toast, t]);
 
   const [_formIsValid, _setFormIsValid] = useState(false);
   
@@ -1451,7 +1473,7 @@ const CreateAnnouncementPage: React.FC = () => {
         image_url: imageUrls.length > 0 ? imageUrls[0] : null,
         is_urgent: formData.is_urgent,
         is_negotiable: formData.isNegotiable,
-        expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
+        expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
         attributes: attributesPayload,
         
         // Nouveaux champs - Détails du produit
@@ -2197,168 +2219,12 @@ const CreateAnnouncementPage: React.FC = () => {
         description: t('createAd.success.description'),
       });
 
-      // Reset form - use type assertion since we're resetting to initial values
-      setFormData(prev => ({
-        ...prev,
-        title: '',
-        description: '',
-        price: '',
-        currency: 'DZD',
-        condition: '',
-        location: '',
-        wilaya: '',
-        phones: [''],
-        email: '',
-        category_id: '',
-        subcategory_id: '',
-        images: [],
-        existingImages: [],
-        is_urgent: false,
-        isPremium: false,
-        expires_at: '',
-        
-        // Nouveaux champs
-        brand: '',
-        model: '',
-        color: '',
-        dimensions: '',
-        weight: '',
-        purchaseYear: '',
+      resetAnnouncementForm();
 
-        // Reset Vehicle fields
-        vehicleVersion: '',
-        vehicleRegistrationMonth: '',
-        vehicleRegistrationYear: '',
-        vehicleMileage: '',
-        vehicleFuelType: '',
-        vehicleFiscalPower: '',
-        vehicleGearbox: '',
-        vehicleEquipment: [],
-        vehicleTechnicalControl: '',
-        vehicleGreyCardCrossed: '',
-
-        // Reset New Categories
-        babyType: '',
-        babySize: '',
-        babyBrand: '',
-        babyConditionDetail: '',
-        
-        fashionClothingType: '',
-        fashionSize: '',
-        fashionGender: '',
-        fashionMaterial: '',
-        fashionBrand: '',
-        
-        bagType: '',
-        bagMaterial: '',
-        bagBrand: '',
-        
-        applianceType: '',
-        applianceBrand: '',
-        applianceEnergyClass: '',
-        applianceConditionDetail: '',
-        
-        multimediaDeviceType: '',
-        multimediaBrand: '',
-        multimediaTechnology: '',
-        
-        gamingProductType: '',
-        gamingPlatform: '',
-        gamingGenre: '',
-        
-        // Reset Hardware
-        hardwareType: '',
-        hardwareBrand: '',
-        
-        // Reset Agriculture
-        agricultureType: '',
-        agricultureOrigin: '',
-        
-        // Reset Parapharmacy
-        parapharmacyType: '',
-        parapharmacyBrand: '',
-        
-        // Reset Beauty
-        beautyType: '',
-        beautyBrand: '',
-        beautyGender: '',
-        
-        // Reset Gastronomy
-        gastronomyType: '',
-        gastronomyOrigin: '',
-        gastronomyDiet: '',
-        gastronomyUnit: '',
-        gastronomyOrder: '',
-        
-        // Reset Crafts
-        craftsType: '',
-        craftsMaterial: '',
-        craftsOrigin: '',
-
-        // Reset Real Estate fields
-        realEstateType: '',
-        realEstateSurface: '',
-        realEstateRooms: '',
-        realEstateBedrooms: '',
-        realEstateBathrooms: '',
-        realEstateFloor: '',
-        realEstateTotalFloors: '',
-        realEstateFurnished: false,
-        realEstateParking: false,
-        realEstateGarage: false,
-        realEstateGarden: false,
-        realEstatePool: false,
-        realEstateElevator: false,
-        realEstateBalcony: false,
-        realEstateTerrace: false,
-        realEstateView: '',
-        realEstateFacades: '',
-        realEstateZoning: '',
-        realEstateWithPermit: false,
-        realEstatePapers: [],
-        realEstatePaymentPeriod: '',
-        realEstateSpecifications: [],
-
-        hasInvoice: false,
-        warrantyDuration: '',
-        includedAccessories: [],
-        sellingReason: '',
-        isNegotiable: false,
-        cashDiscount: '',
-        exchangePossible: false,
-        originalPrice: '',
-        deliveryAvailable: false,
-        deliveryAreas: [],
-        deliveryFees: '',
-        deliveryLocationName: '',
-        packagingInfo: '',
-        availabilityDate: '',
-        productVideos: [],
-        productVideoFiles: [],
-        detailPhotos: [],
-        documentation: [],
-        
-        computerProcessor: '',
-        computerRam: '',
-        computerStorage: '',
-        computerScreenSize: '',
-        computerGraphicsCard: '',
-        computerOs: '',
-        
-        phoneBrand: '',
-        phoneModel: '',
-        phoneStorage: '',
-        phoneRam: '',
-        phoneScreenSize: '',
-        phoneOs: '',
-        phoneColor: '',
-        
-        furnitureMaterial: '',
-        furnitureType: '',
-        furnitureColor: '',
-        furnitureDimensions: '',
-        furnitureWeight: ''
-      }));
+      // Rediriger vers la page de détails de l'annonce publiée après un court délai
+      setTimeout(() => {
+        navigateWithLanguage('/mes-annonces');
+      }, 1500);
 
     } catch (error) {
       logger.error('Error creating announcement:', error);

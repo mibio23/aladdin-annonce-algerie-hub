@@ -136,6 +136,8 @@ const AnnouncementDetailsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
   const [similarAnnouncements, setSimilarAnnouncements] = useState<AnnouncementType[]>([]);
+  const menuCategories = getCategoryMenu(currentLanguage);
+
   const normalizePhone = (value?: string | null) => {
     if (!value) return '';
     const first = value.split(',')[0]?.trim() || '';
@@ -159,207 +161,176 @@ const AnnouncementDetailsPage: React.FC = () => {
   };
 
   useEffect(() => {
+    const applyVehicleMock = (mockAnnouncement: (typeof mockVehicleAnnouncements)[number]) => {
+      const mergedData: DetailedAnnouncement = {
+        ...mockAnnouncement,
+        ...mockAnnouncement.vehicleDetails,
+        papers: mockAnnouncement.vehicleDetails.paper ? [mockAnnouncement.vehicleDetails.paper] : [],
+        purchase_year: mockAnnouncement.vehicleDetails.year,
+        category: "Véhicules",
+        categorySlug: "vehicules-equipements",
+        imageUrl: mockAnnouncement.images[0],
+        imageUrls: mockAnnouncement.images,
+        isOnline: mockAnnouncement.is_active,
+        isFeatured: mockAnnouncement.is_featured,
+        isUrgent: mockAnnouncement.is_urgent,
+        isProfessional: false,
+        shopName: null,
+        phoneNumber: mockAnnouncement.contact_phone,
+        phone_number_masked: mockAnnouncement.contact_phone,
+        requires_auth_for_contact: false,
+        delivery_available: false,
+        delivery_areas: [],
+        delivery_fees: 0,
+        has_invoice: mockAnnouncement.vehicleDetails.paper === 'Facture',
+        condition: mockAnnouncement.condition,
+        currency: mockAnnouncement.currency,
+        views_count: 0,
+        wilaya: mockAnnouncement.wilaya,
+        commune: mockAnnouncement.location,
+        created_at: mockAnnouncement.created_at,
+      } as unknown as DetailedAnnouncement;
+
+      setAnnouncement(mergedData);
+      setSellerProfile({
+        public_user_id: 12345,
+        first_name: "Vendeur",
+        last_name: "Test",
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        wilaya: mockAnnouncement.wilaya,
+        commune: mockAnnouncement.location,
+      });
+    };
+
+    const applyGeneralMock = (mockAnn: any) => {
+      const mergedData: DetailedAnnouncement = {
+        ...mockAnn,
+        id: mockAnn.id,
+        title: mockAnn.title,
+        price: mockAnn.price,
+        description: mockAnn.description,
+        category: mockAnn.category,
+        categorySlug: mockAnn.categorySlug,
+        imageUrl: mockAnn.imageUrls?.[0],
+        imageUrls: mockAnn.imageUrls,
+        phoneNumber: mockAnn.phoneNumber,
+        phone_number_masked: mockAnn.phoneNumber,
+        isFeatured: mockAnn.isFeatured,
+        isUrgent: mockAnn.isUrgent,
+        isOnline: mockAnn.isOnline ?? true,
+        wilaya: mockAnn.location,
+        commune: mockAnn.commune || "",
+        created_at: mockAnn.date,
+        views_count: mockAnn.views_count || 0,
+        currency: mockAnn.currency || "DZD",
+        condition: mockAnn.condition || "bon_etat",
+        isProfessional: mockAnn.isProfessional || false,
+      } as unknown as DetailedAnnouncement;
+
+      setAnnouncement(mergedData);
+      setSellerProfile({
+        public_user_id: 67890,
+        first_name: "Annonceur",
+        last_name: "Pro",
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        wilaya: mockAnn.location,
+        commune: "",
+      });
+    };
+
     const fetchAnnouncement = async () => {
       if (!id) return;
-      
       setLoading(true);
 
       try {
-        const applyVehicleMock = (mockAnnouncement: (typeof mockVehicleAnnouncements)[number]) => {
-          const mergedData: DetailedAnnouncement = {
-            ...mockAnnouncement,
-            ...mockAnnouncement.vehicleDetails,
-            papers: mockAnnouncement.vehicleDetails.paper ? [mockAnnouncement.vehicleDetails.paper] : [],
-            purchase_year: mockAnnouncement.vehicleDetails.year,
-            category: "Véhicules",
-            categorySlug: "vehicules-equipements",
-            imageUrl: mockAnnouncement.images[0],
-            imageUrls: mockAnnouncement.images,
-            isOnline: mockAnnouncement.is_active,
-            isFeatured: mockAnnouncement.is_featured,
-            isUrgent: mockAnnouncement.is_urgent,
-            isProfessional: false,
-            shopName: null,
-            phoneNumber: mockAnnouncement.contact_phone,
-            phone_number_masked: mockAnnouncement.contact_phone,
-            requires_auth_for_contact: false,
-            delivery_available: false,
-            delivery_areas: [],
-            delivery_fees: 0,
-            has_invoice: mockAnnouncement.vehicleDetails.paper === 'Facture',
-            condition: mockAnnouncement.condition,
-            currency: mockAnnouncement.currency,
-            views_count: 0,
-            wilaya: mockAnnouncement.wilaya,
-            commune: mockAnnouncement.location,
-            created_at: mockAnnouncement.created_at,
-          } as unknown as DetailedAnnouncement;
+        // Validation UUID
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const isUUID = uuidRegex.test(id);
 
-          setAnnouncement(mergedData);
-          setSellerProfile({
-            public_user_id: 12345,
-            first_name: "Vendeur",
-            last_name: "Test",
-            avatar_url: null,
-            created_at: new Date().toISOString(),
-            wilaya: mockAnnouncement.wilaya,
-            commune: mockAnnouncement.location,
-          });
-
-          const similar = mockVehicleAnnouncements
-            .filter((a) => a.id !== id && a.category_id === mockAnnouncement.category_id)
-            .slice(0, 3)
-            .map((item) => ({
-              ...item,
-              categories: { name: "Véhicules", slug: "vehicules" },
-              contact_phone: item.contact_phone || '',
-              contact_email: item.contact_email || ''
-            }));
-          setSimilarAnnouncements(similar);
-        };
-
-        const applyGeneralMock = (mockAnn: any) => {
-          const mergedData: DetailedAnnouncement = {
-            ...mockAnn,
-            id: mockAnn.id,
-            title: mockAnn.title,
-            price: mockAnn.price,
-            description: mockAnn.description,
-            category: mockAnn.category,
-            categorySlug: mockAnn.categorySlug,
-            imageUrl: mockAnn.imageUrls?.[0],
-            imageUrls: mockAnn.imageUrls,
-            phoneNumber: mockAnn.phoneNumber,
-            phone_number_masked: mockAnn.phoneNumber,
-            isFeatured: mockAnn.isFeatured,
-            isUrgent: mockAnn.isUrgent,
-            isOnline: mockAnn.isOnline ?? true,
-            wilaya: mockAnn.location,
-            commune: mockAnn.commune || "",
-            created_at: mockAnn.date,
-            views_count: mockAnn.views_count || Math.floor(Math.random() * 500),
-            currency: mockAnn.currency || "DZD",
-            condition: mockAnn.condition || "bon_etat",
-            isProfessional: mockAnn.isProfessional || false,
-            // Pass through all extra fields for characteristics
-            brand: mockAnn.brand,
-            model: mockAnn.model,
-            color: mockAnn.color,
-            purchase_year: mockAnn.purchase_year,
-            property_type: mockAnn.property_type,
-            surface: mockAnn.surface,
-            rooms: mockAnn.rooms,
-            bedrooms: mockAnn.bedrooms,
-            bathrooms: mockAnn.bathrooms,
-            floor: mockAnn.floor,
-            total_floors: mockAnn.total_floors,
-            furnished: mockAnn.furnished,
-            capacity: mockAnn.capacity,
-            zoning: mockAnn.zoning,
-            facades: mockAnn.facades,
-            view_type: mockAnn.view_type,
-            with_permit: mockAnn.with_permit,
-            payment_period: mockAnn.payment_period,
-          } as unknown as DetailedAnnouncement;
-
-          setAnnouncement(mergedData);
-          setSellerProfile({
-            public_user_id: 67890,
-            first_name: "Annonceur",
-            last_name: "Pro",
-            avatar_url: null,
-            created_at: new Date().toISOString(),
-            wilaya: mockAnn.location,
-            commune: "",
-          });
-
-          const similar = generalAnnouncements
-            .filter((a) => a.id !== mockAnn.id && a.categorySlug === mockAnn.categorySlug)
-            .slice(0, 3)
-            .map((item) => ({
-              id: item.id,
-              title: item.title,
-              price: item.price,
-              category_id: item.categorySlug,
-              condition: 'bon_etat',
-              images: item.imageUrls,
-              location: item.location,
-              wilaya: item.location,
-              created_at: item.date,
-              is_active: true,
-              is_featured: item.isFeatured,
-              is_urgent: item.isUrgent,
-              currency: 'DZD',
-              categories: { name: item.category, slug: item.categorySlug }
-            }));
-          setSimilarAnnouncements(similar as any);
-        };
-
-        const { data: announcementData, error } = await supabase
-          .from('announcements')
-          .select('*, real_estate_details(*), vehicle_details(*)')
-          .eq('id', id)
-          .maybeSingle();
-
-        if (error) {
-          logger.error("Database error:", error);
-          throw error;
-        }
-
-        if (!announcementData) {
-          // Check vehicle mocks
+        if (!isUUID) {
           const vehicleMock = mockVehicleAnnouncements.find(a => a.id === id);
           if (vehicleMock) {
             applyVehicleMock(vehicleMock);
             setLoading(false);
             return;
           }
-          
-          // Check general mocks
           const generalMock = generalAnnouncements.find(a => a.id === id);
           if (generalMock) {
             applyGeneralMock(generalMock);
             setLoading(false);
             return;
           }
-
           setAnnouncement(null);
           setLoading(false);
           return;
         }
 
-        // Extract details
-        const realEstateDetails = Array.isArray(announcementData.real_estate_details) 
-          ? announcementData.real_estate_details[0] 
-          : announcementData.real_estate_details;
-          
-        const vehicleDetails = Array.isArray(announcementData.vehicle_details)
-          ? announcementData.vehicle_details[0]
-          : announcementData.vehicle_details;
+        // 1. Fetch base announcement
+        const { data: announcementData, error: announcementError } = await supabase
+          .from('announcements')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
 
-        // Helper to get category name
-        const categoryObj = CATEGORIES.find(c => c.id === announcementData.category_id);
-        const translationKey = `categories.${announcementData.category_id}`;
-        const translated = t(translationKey);
-        const categoryName = translated !== translationKey ? translated : (categoryObj?.name || announcementData.category_id || t('createAd.category'));
+        if (announcementError) throw announcementError;
+        if (!announcementData) {
+          setAnnouncement(null);
+          setLoading(false);
+          return;
+        }
+
+        // 2. Fetch specialized details
+        let realEstateDetails = null;
+        let vehicleDetails = null;
+
+        try {
+          const { data: reData } = await supabase.from('real_estate_details').select('*').eq('announcement_id', id).maybeSingle();
+          realEstateDetails = reData;
+        } catch (e) { logger.warn("RE details fetch failed", e); }
+
+        try {
+          const { data: vData } = await supabase.from('vehicle_details').select('*').eq('announcement_id', id).maybeSingle();
+          vehicleDetails = vData;
+        } catch (e) { logger.warn("Vehicle details fetch failed", e); }
+
+        // 3. Resolve names
+        const categoryLookupKey =
+          typeof (announcementData as any).category_slug === 'string' && (announcementData as any).category_slug.trim()
+            ? (announcementData as any).category_slug
+            : announcementData.category_id;
+        const categoryFromMenu = menuCategories.find(c => c.id === categoryLookupKey || c.slug === categoryLookupKey);
+        const categoryTranslationKey = `categories.${categoryLookupKey}`;
+        const translatedCategoryName = t(categoryTranslationKey);
+        const categoryName =
+          categoryFromMenu?.name ||
+          (translatedCategoryName && translatedCategoryName !== categoryTranslationKey && !translatedCategoryName.startsWith('categories.')
+            ? translatedCategoryName
+            : '') ||
+          (typeof announcementData.category === 'string' && announcementData.category !== announcementData.category_id
+            ? announcementData.category
+            : '') ||
+          t('createAd.category');
         
-        const subcategoryNameFromTree = (() => {
-          const subcategoryId = announcementData.subcategory_id;
-          if (!subcategoryId) return '';
-
-          for (const category of menuCategories) {
-            const direct = category.subcategories?.find((s: any) => s.id === subcategoryId || s.slug === subcategoryId);
-            if (direct) return direct.name;
-
-            for (const sub of category.subcategories || []) {
-              const nested = (sub.subcategories || []).find((child: any) => child.id === subcategoryId || child.slug === subcategoryId);
-              if (nested) return nested.name;
+        const subId = announcementData.subcategory_id;
+        let subName = subId || '';
+        if (subId) {
+          const findInSubs = (subs: any[]): string => {
+            for (const s of subs) {
+              if (s.id === subId || s.slug === subId) return s.name;
+              if (s.subcategories) {
+                const found = findInSubs(s.subcategories);
+                if (found) return found;
+              }
             }
-          }
-          return '';
-        })();
+            return '';
+          };
+          subName = findInSubs(categoryFromMenu?.subcategories || []) || findInSubs(menuCategories.flatMap(c => c.subcategories || [])) || subId;
+        }
 
-        const legacySubcategoryFromDescription = (() => {
+        // 4. Merge
+        const legacySubId = (() => {
           const source = announcementData.description || '';
           const match = source.match(/(?:^|\n)Type:\s*(.+)\s*$/m);
           return match?.[1]?.trim() || '';
@@ -369,138 +340,85 @@ const AnnouncementDetailsPage: React.FC = () => {
           ...announcementData,
           ...realEstateDetails,
           ...vehicleDetails,
-          views_count: (announcementData as any).views_count ?? (announcementData as any).view_count ?? 0,
+          views_count: announcementData.view_count ?? (announcementData as any).views_count ?? 0,
           category: categoryName,
-          subcategory: subcategoryNameFromTree || legacySubcategoryFromDescription || announcementData.subcategory_id || '',
-          imageUrl: announcementData.image_url,
-          imageUrls: announcementData.image_urls || (announcementData.image_url ? [announcementData.image_url] : []),
+          categorySlug: typeof (announcementData as any).category_slug === 'string' ? (announcementData as any).category_slug : undefined,
+          subcategory: subName || legacySubId,
+          imageUrl: announcementData.image_url || (announcementData.images && announcementData.images[0]),
+          imageUrls: announcementData.image_urls || announcementData.images || (announcementData.image_url ? [announcementData.image_url] : []),
           isOnline: announcementData.status === 'active',
-          isFeatured: announcementData.is_featured,
-          isUrgent: announcementData.is_urgent,
-          isProfessional: false,
-          shopName: announcementData.shop_name,
+          isFeatured: announcementData.is_featured || (announcementData as any).isFeatured || false,
+          isUrgent: announcementData.is_urgent || (announcementData as any).isUrgent || false,
           phoneNumber: announcementData.phone_number,
           phone_number_masked: announcementData.phone_number,
-          requires_auth_for_contact: false
         } as unknown as DetailedAnnouncement;
 
         setAnnouncement(mergedData);
 
-        const viewKey = `viewed_announcement_${id}`;
+        // 5. Seller Profile
+        if (announcementData.user_id) {
+          const { data: profileData } = await supabase.from('profiles').select('public_user_id, first_name, last_name, avatar_url, created_at, wilaya, commune').eq('user_id', announcementData.user_id).maybeSingle();
+          if (profileData) setSellerProfile(profileData);
+        }
+
+        // 6. Similar
+        if (announcementData.category_id) {
+          const { data: similarData } = await supabase.from('announcements').select('*').eq('category_id', announcementData.category_id).neq('id', id).limit(3);
+          if (similarData) {
+            const userIds = [...new Set(similarData.map((item: any) => item.user_id).filter(Boolean))];
+            let profilesMap: Record<string, any> = {};
+            if (userIds.length > 0) {
+              const { data: pData } = await supabase.from('profiles').select('user_id, first_name, last_name, avatar_url').in('user_id', userIds);
+              if (pData) pData.forEach(p => { profilesMap[p.user_id] = p; });
+            }
+            setSimilarAnnouncements(similarData.map((item: any) => ({
+              ...item,
+              id: item.id,
+              title: item.title,
+              price: item.price || 0,
+              images: item.image_urls || (item.image_url ? [item.image_url] : []),
+              categories: {
+                name: (() => {
+                  const itemCategoryLookupKey =
+                    typeof item.category_slug === 'string' && item.category_slug.trim()
+                      ? item.category_slug
+                      : item.category_id;
+                  const cat = menuCategories.find(c => c.id === itemCategoryLookupKey || c.slug === itemCategoryLookupKey);
+                  const key = `categories.${itemCategoryLookupKey}`;
+                  const translated = t(key);
+                  return cat?.name || (translated !== key && !translated.startsWith('categories.') ? translated : '') || t('createAd.category');
+                })(),
+                slug:
+                  menuCategories.find(c => c.id === (item.category_slug || item.category_id) || c.slug === (item.category_slug || item.category_id))?.slug ||
+                  item.category_slug ||
+                  item.category_id
+              },
+              profiles: profilesMap[item.user_id] ? {
+                full_name: `${profilesMap[item.user_id].first_name} ${profilesMap[item.user_id].last_name || ''}`.trim(),
+                id: profilesMap[item.user_id].user_id,
+                avatar_url: profilesMap[item.user_id].avatar_url
+              } : undefined
+            })) as any);
+          }
+        }
+
+        // 7. View Count
+        const viewKey = `viewed_${id}`;
         if (!sessionStorage.getItem(viewKey)) {
           sessionStorage.setItem(viewKey, '1');
-          try {
-            await supabase.rpc('increment_view_count', { announcement_uuid: id });
-            setAnnouncement((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    views_count: (prev.views_count ?? 0) + 1,
-                  }
-                : prev
-            );
-          } catch (err) {
-            logger.error('Error incrementing announcement view count:', err);
-          }
-        }
-
-        // 3. Fetch Seller Public ID and Profile Info
-        if (announcementData.user_id) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('public_user_id, first_name, last_name, avatar_url, created_at, wilaya, commune')
-            .eq('user_id', announcementData.user_id)
-            .maybeSingle();
-            
-          if (profileData) {
-            setSellerProfile(profileData);
-          }
-        }
-
-        // 4. Fetch Similar Announcements
-        if (announcementData.category_id) {
-          const { data: similarData } = await supabase
-            .from('announcements')
-            .select('*')
-            .eq('category_id', announcementData.category_id)
-            .neq('id', id)
-            .limit(3);
-
-          if (similarData) {
-            // Fetch profiles for similar announcements
-            const userIds = [...new Set(similarData.map((item: any) => item.user_id).filter(Boolean))];
-            const profilesMap: Record<string, any> = {};
-            
-            if (userIds.length > 0) {
-              const { data: profilesData } = await supabase
-                .from('profiles')
-                .select('user_id, first_name, last_name, avatar_url')
-                .in('user_id', userIds);
-                
-              if (profilesData) {
-                profilesData.forEach(p => {
-                  profilesMap[p.user_id] = p;
-                });
-              }
-            }
-
-             const mappedSimilar: AnnouncementType[] = similarData.map((item: any) => {
-              const profile = profilesMap[item.user_id];
-              return {
-                id: item.id,
-                title: item.title,
-                description: item.description || '',
-                price: item.price || 0,
-                category_id: item.category_id,
-                condition: item.condition || 'bon_etat',
-                images: item.image_urls || (item.image_url ? [item.image_url] : []),
-                location: item.wilaya || '',
-                wilaya: item.wilaya || '',
-                contact_phone: '', // Protected
-                contact_email: '',
-                user_id: item.user_id,
-                created_at: item.created_at,
-                updated_at: item.updated_at,
-                is_active: item.status === 'active',
-                is_featured: item.is_featured,
-                is_urgent: item.is_urgent,
-                views_count: item.view_count || 0,
-                currency: item.currency || 'DZD',
-                expires_at: item.expires_at,
-                delivery_options: [],
-                categories: {
-                  name: (() => {
-                    const key = `categories.${item.category_id}`;
-                    const translated = t(key);
-                    return translated !== key ? translated : (CATEGORIES.find(c => c.id === item.category_id)?.name || t('createAd.category'));
-                  })(),
-                  slug: item.category_id
-                },
-                profiles: profile ? {
-                  full_name: profile.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : t('createAd.user'),
-                  id: profile.user_id,
-                  avatar_url: profile.avatar_url
-                } : undefined
-              };
-            });
-            setSimilarAnnouncements(mappedSimilar);
-          }
+          await supabase.rpc('increment_view_count', { announcement_uuid: id }).catch(() => {});
         }
 
       } catch (error) {
-        logger.error("Error fetching announcement details:", error);
-        toast({
-          title: t('common.error'),
-          description: "Impossible de charger les détails de l'annonce",
-          // Style "en blanc" : on utilise le variant par défaut
-        });
+        logger.error("Fetch Error:", error);
+        toast({ title: t('common.error'), description: "Impossible de charger les détails de l'annonce" });
       } finally {
         setLoading(false);
       }
     };
 
     fetchAnnouncement();
-  }, [id, getSecureAnnouncementDetails, t, toast]);
+  }, [id, t, toast, menuCategories]);
 
   if (loading) {
     return (
@@ -587,7 +505,13 @@ const AnnouncementDetailsPage: React.FC = () => {
   };
 
   const formatPrice = (price: number | null | undefined, currency: string = 'DZD') => {
-    if (price === null || price === undefined) return t('createAd.priceNegotiable');
+    if (price === null || price === undefined || price === 0) {
+      return (
+        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-200 px-3 py-1 text-sm font-semibold">
+          {t('createAd.priceByContact') || 'Prix par contact'}
+        </Badge>
+      );
+    }
     return new Intl.NumberFormat(currentLanguage || 'fr-DZ', {
       style: 'currency',
       currency: currency,
@@ -869,35 +793,84 @@ const AnnouncementDetailsPage: React.FC = () => {
     allImages.push(announcement.imageUrl);
   }
 
-  const menuCategories = getCategoryMenu(currentLanguage);
-  
   // Logic to find category name and slug
   const rawCategoryId = typeof announcement.category_id === "string" ? announcement.category_id : "";
-  const categoryFromMenu = menuCategories.find(c => c.id === rawCategoryId || c.slug === rawCategoryId);
+  const rawCategorySlug =
+    typeof announcement.categorySlug === "string" && announcement.categorySlug.trim()
+      ? announcement.categorySlug
+      : typeof (announcement as any).category_slug === "string" && (announcement as any).category_slug.trim()
+        ? (announcement as any).category_slug
+        : "";
+  const categoryLookupKey = rawCategorySlug || rawCategoryId;
   
-  const resolvedCategoryName = categoryFromMenu?.name || (() => {
-    const key = `categories.${rawCategoryId}`;
+  // Robust lookup: search in top-level AND subcategories if needed
+  const categoryFromMenu = (() => {
+    // 1. Try top-level
+    const topLevel = menuCategories.find(c => c.id === categoryLookupKey || c.slug === categoryLookupKey);
+    if (topLevel) return topLevel;
+
+    // 2. Search deep in case rawCategoryId is actually a subcategory ID
+    for (const cat of menuCategories) {
+      const sub = cat.subcategories?.find((s: any) => s.id === categoryLookupKey || s.slug === categoryLookupKey);
+      if (sub) return sub;
+      
+      for (const s of cat.subcategories || []) {
+        const nested = s.subcategories?.find((n: any) => n.id === categoryLookupKey || n.slug === categoryLookupKey);
+        if (nested) return nested;
+      }
+    }
+    return null;
+  })();
+  
+  const resolvedCategoryName = (() => {
+    if (categoryFromMenu?.name) return categoryFromMenu.name;
+    
+    const key = `categories.${categoryLookupKey}`;
     const translated = t(key);
-    return translated !== key ? translated : (announcement.category || rawCategoryId);
+    
+    // If translation exists and is not the key itself
+    if (translated && translated !== key && !translated.startsWith('categories.')) {
+      return translated;
+    }
+    
+    // If announcement has a category name string
+    if (announcement.category && announcement.category !== rawCategoryId && announcement.category !== categoryLookupKey) {
+      return announcement.category;
+    }
+
+    // Default fallback
+    return t('createAd.category') || 'Catégorie';
   })();
 
-  const resolvedCategorySlug = categoryFromMenu?.slug || rawCategoryId;
+  const resolvedCategorySlug = categoryFromMenu?.slug || rawCategorySlug || "";
 
   const resolvedSubcategoryName = (() => {
     const subId = announcement.subcategory_id || announcement.subcategory;
-    if (!subId) return "";
+    if (!subId || subId === rawCategoryId) return "";
     
     // Try to find in menu
-    if (categoryFromMenu) {
-      const direct = categoryFromMenu.subcategories?.find((s: any) => s.id === subId || s.slug === subId);
-      if (direct) return direct.name;
-
-      for (const sub of categoryFromMenu.subcategories || []) {
-        const nested = (sub.subcategories || []).find((child: any) => child.id === subId || child.slug === subId);
-        if (nested) return nested.name;
+    const findInMenu = (subs: any[]): any => {
+      for (const s of subs) {
+        if (s.id === subId || s.slug === subId) return s;
+        if (s.subcategories) {
+          const found = findInMenu(s.subcategories);
+          if (found) return found;
+        }
       }
+      return null;
+    };
+
+    const subFromMenu = findInMenu(menuCategories);
+    if (subFromMenu) return subFromMenu.name;
+    
+    // Fallback translation
+    const key = `categories.${subId}`;
+    const translated = t(key);
+    if (translated && translated !== key && !translated.startsWith('categories.')) {
+      return translated;
     }
     
+    // Fallback formatting
     return subId
       .split("-")
       .filter(Boolean)
@@ -1008,7 +981,7 @@ const AnnouncementDetailsPage: React.FC = () => {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                    {announcement.title}
+                    {announcement.title} {resolvedSubcategoryName && <span className="text-gray-400 font-normal">| {resolvedSubcategoryName}</span>}
                   </h1>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">

@@ -359,12 +359,15 @@ const FavoritesList: React.FC = () => {
                       (ann.image_urls && ann.image_urls.length > 0 ? ann.image_urls[0] : null) ??
                       '/placeholder.png';
 
+                    const categoryKey = ann.categories?.slug || ann.category_id || '';
+                    const translatedCategory =
+                      categoryKey && t(`categories.${categoryKey}`) !== `categories.${categoryKey}`
+                        ? t(`categories.${categoryKey}`)
+                        : '';
                     const categoryLabel =
                       ann.categories?.name ||
-                      (ann.category_id && t(`categories.${ann.category_id}`) !== `categories.${ann.category_id}`
-                        ? t(`categories.${ann.category_id}`)
-                        : ann.category_id) ||
-                      '';
+                      translatedCategory ||
+                      (categoryKey ? (t('createAd.category') || 'Catégorie') : '');
 
                     const locationLabel = ann.wilaya || ann.location || '';
 

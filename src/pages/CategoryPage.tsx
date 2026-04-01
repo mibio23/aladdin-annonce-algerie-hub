@@ -68,6 +68,11 @@ const CategoryPage = () => {
         if (error) throw error;
         
         // Map to legacy format for LegacyAnnouncementCard
+        const categoryDisplayName =
+          slug === 'education-loisirs'
+            ? t('categories.education-loisirs')
+            : (t(`categories.${slug}`) !== `categories.${slug}` ? t(`categories.${slug}`) : (category?.name || slug));
+
         const mappedData = (data || []).map((a: any) => ({
           id: a.id,
           title: a.title,
@@ -76,8 +81,9 @@ const CategoryPage = () => {
           imageUrl: a.image_url || (a.images && a.images[0]) || (a.image_urls && a.image_urls[0]) || '',
           imageUrls: a.images || a.image_urls || [],
           date: a.created_at,
-          category: a.category_id,
+          category: categoryDisplayName,
           categorySlug: slug,
+          categoryName: categoryDisplayName,
           phoneNumber: a.phone_number,
           isActive: a.status === 'active',
           isFeatured: a.is_featured,
@@ -98,7 +104,7 @@ const CategoryPage = () => {
     };
 
     fetchAnnouncements();
-  }, [slug]);
+  }, [slug, t, category]);
 
   const _handleFilterChange = (filters: Filters) => {
     // Apply filters to announcements

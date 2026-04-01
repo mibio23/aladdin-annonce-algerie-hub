@@ -86,6 +86,9 @@ const SubcategoryPage = () => {
           setFilteredAnnouncements([]);
         } else if (data) {
           // Map to legacy format
+          const translatedSubName =
+            t(`categories.${subslug}`) !== `categories.${subslug}` ? t(`categories.${subslug}`) : subslug;
+
           const mappedAnnouncements = data.map((a: any) => ({
             id: a.id,
             title: a.title,
@@ -94,8 +97,9 @@ const SubcategoryPage = () => {
             imageUrl: a.image_url || (a.images && a.images[0]) || (a.image_urls && a.image_urls[0]) || '',
             imageUrls: a.images || a.image_urls || [],
             date: a.created_at,
-            category: a.category_id,
+            category: translatedSubName,
             categorySlug: slug, // We know the category slug from params
+            categoryName: translatedSubName,
             phoneNumber: a.phone_number,
             isActive: a.status === 'active',
             isFeatured: a.is_featured,
@@ -117,7 +121,7 @@ const SubcategoryPage = () => {
     };
 
     fetchAnnouncements();
-  }, [subslug, slug, categories]);
+  }, [subslug, slug, categories, t]);
 
   if (isLoading) {
     return (

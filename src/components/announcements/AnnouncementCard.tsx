@@ -126,7 +126,13 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   };
 
   const formatPrice = (price: number | null) => {
-    if (!price) return t('announcements.priceNotSpecified') || 'Prix non spécifié';
+    if (!price || price === 0) {
+      return (
+        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+          {t('createAd.priceByContact') || 'Prix par contact'}
+        </Badge>
+      );
+    }
     
     // Conversion en millions de centimes (standard algérien)
     // 1 million de centimes = 10 000 DZD

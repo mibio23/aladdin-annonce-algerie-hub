@@ -31,7 +31,8 @@ import {
   Search,
   Plus,
   Calendar,
-  MapPin
+  MapPin,
+  RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,6 +59,7 @@ interface Announcement {
   created_at: string;
   expires_at: string | null;
   category_id: string;
+  status?: string;
   type?: string;
   premium_end_at?: string | null;
 }
@@ -75,6 +77,12 @@ const MyAnnouncementsPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [announcementToDelete, setAnnouncementToDelete] = useState<string | null>(null);
   const [selectedForPromotion, setSelectedForPromotion] = useState<string | null>(null);
+  const [relaunchingId, setRelaunchingId] = useState<string | null>(null);
+
+  const translateOrFallback = (key: string, fallback: string) => {
+    const translated = t(key);
+    return translated && translated !== key ? translated : fallback;
+  };
 
   const fetchAnnouncements = useCallback(async () => {
     if (!user) return;
@@ -96,6 +104,7 @@ const MyAnnouncementsPage: React.FC = () => {
         price: item.price || 0,
         currency: item.currency || 'DZD',
         category_id: item.category_id || 'general',
+        status: item.status || 'active',
         condition: item.condition || 'good',
         images: item.image_urls || (item.image_url ? [item.image_url] : []),
         location: item.commune || item.location || '',
@@ -168,6 +177,53 @@ const MyAnnouncementsPage: React.FC = () => {
     }
   };
 
+  const handleRelaunch = async (announcement: Announcement) => {
+    if (!user) return;
+    try {
+      setRelaunchingId(announcement.id);
+      const now = new Date();
+      const currentExpiry = announcement.expires_at ? new Date(announcement.expires_at) : null;
+      const baseDate =
+        currentExpiry && !Number.isNaN(currentExpiry.getTime()) && currentExpiry.getTime() > now.getTime()
+          ? currentExpiry
+          : now;
+      const expiresAt = new Date(baseDate.getTime() + 90 * 24 * 60 * 60 * 1000);
+      
+      const { error } = await supabase
+        .from('announcements')
+        .update({ 
+          created_at: now.toISOString(),
+          expires_at: expiresAt.toISOString(),
+          status: 'active'
+        })
+        .eq('id', announcement.id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: translateOrFallback('common.success', 'Succès'),
+        description: translateOrFallback(
+          'mesAnnonces.relaunchSuccess',
+          `L'annonce est maintenant valable jusqu'au ${expiresAt.toLocaleDateString()}.`
+        ),
+      });
+      fetchAnnouncements();
+    } catch (error) {
+      logger.error('Error relaunching announcement:', error);
+      toast({
+        title: translateOrFallback('common.error', 'Erreur'),
+        description: translateOrFallback(
+          'mesAnnonces.relaunchError',
+          "Erreur lors de la relance de l'annonce"
+        ),
+        variant: 'destructive'
+      });
+    } finally {
+      setRelaunchingId(null);
+    }
+  };
+
   const handleDelete = async () => {
     if (!announcementToDelete) return;
     if (!user) return;
@@ -228,6 +284,35 @@ const MyAnnouncementsPage: React.FC = () => {
       return <Badge className="bg-red-500"><Zap className="w-3 h-3 mr-1" />{t('mesAnnonces.urgent')}</Badge>;
     }
     return <Badge variant="outline">{t('mesAnnonces.active')}</Badge>;
+  };
+
+  const getRelaunchPresentation = (announcement: Announcement) => {
+    const expiresAt = announcement.expires_at ? new Date(announcement.expires_at) : null;
+    const remainingDays = expiresAt
+      ? Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      : null;
+
+    if (!announcement.is_active || announcement.status === 'expired') {
+      return {
+        label: translateOrFallback('mesAnnonces.relaunch', 'Relancer 90 jours'),
+        className: 'bg-green-600 hover:bg-green-700 text-white',
+        iconClassName: 'text-white',
+      };
+    }
+
+    if (remainingDays !== null && remainingDays <= 7) {
+      return {
+        label: translateOrFallback('mesAnnonces.renewSoon', 'Renouveler avant expiration'),
+        className: 'bg-amber-500 hover:bg-amber-600 text-white',
+        iconClassName: 'text-white',
+      };
+    }
+
+    return {
+      label: translateOrFallback('mesAnnonces.extend', 'Prolonger 90 jours'),
+      className: 'border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-300 dark:hover:bg-green-950/30',
+      iconClassName: 'text-green-600',
+    };
   };
 
   const filteredAnnouncements = announcements.filter(announcement =>
@@ -310,7 +395,9 @@ const MyAnnouncementsPage: React.FC = () => {
               {/* Announcements Grid */}
               <div className="lg:col-span-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredAnnouncements.map((announcement) => (
+                  {filteredAnnouncements.map((announcement) => {
+                    const relaunchPresentation = getRelaunchPresentation(announcement);
+                    return (
                     <div
                       key={announcement.id}
                       className="group flex flex-col transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 rounded-[24px] overflow-hidden relative h-full bg-slate-50 shadow-[0_10px_30px_-10px_rgba(22,163,74,0.25),0_6px_10px_-2px_rgba(22,163,74,0.15)] border border-[rgba(22,163,74,0.05)] dark:bg-[linear-gradient(145deg,#1e293b,#0f172a)] dark:shadow-[0_0_20px_rgba(255,255,255,0.25)] dark:border-none cursor-pointer"
@@ -348,6 +435,18 @@ const MyAnnouncementsPage: React.FC = () => {
                               <DropdownMenuItem onSelect={() => navigateWithLanguage(`/annonce/${announcement.id}`)}>
                                 <Eye className="w-4 h-4 mr-2" />
                                 {t('mesAnnonces.view')}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  handleRelaunch(announcement);
+                                }}
+                                disabled={relaunchingId === announcement.id}
+                              >
+                                <RefreshCw className={`w-4 h-4 mr-2 ${relaunchingId === announcement.id ? 'animate-spin' : relaunchPresentation.iconClassName}`} />
+                                {relaunchingId === announcement.id
+                                  ? translateOrFallback('common.loading', 'Chargement...')
+                                  : relaunchPresentation.label}
                               </DropdownMenuItem>
                               <DropdownMenuItem onSelect={(e) => {
                                 e.preventDefault();
@@ -434,9 +533,33 @@ const MyAnnouncementsPage: React.FC = () => {
                             {t('mesAnnonces.expiresOn')} {new Date(announcement.premium_end_at).toLocaleDateString()}
                           </div>
                         )}
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => navigateWithLanguage(`/annonce/${announcement.id}`)}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            {t('mesAnnonces.view')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={announcement.is_active && announcement.status === 'active' ? 'outline' : 'default'}
+                            className={`flex-1 ${relaunchPresentation.className}`}
+                            onClick={() => handleRelaunch(announcement)}
+                            disabled={relaunchingId === announcement.id}
+                          >
+                            <RefreshCw className={`w-4 h-4 mr-2 ${relaunchingId === announcement.id ? 'animate-spin' : relaunchPresentation.iconClassName}`} />
+                            {relaunchingId === announcement.id
+                              ? translateOrFallback('common.loading', 'Chargement...')
+                              : relaunchPresentation.label}
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

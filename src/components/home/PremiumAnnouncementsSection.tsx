@@ -113,7 +113,9 @@ const PremiumAnnouncementsSection = () => {
               isUrgent={announcement.is_urgent}
               urgentMessage={announcement.is_urgent ? "Urgent" : undefined}
               phoneNumber={announcement.phone_number}
-              category={announcement.category_id}
+              category={announcement.categories?.name || t('createAd.category')}
+              categorySlug={announcement.categories?.slug}
+              categoryName={announcement.categories?.name || t('createAd.category')}
               shopName={undefined} // Could fetch if linked to shop
               shopId={undefined}
               shopLogoUrl={undefined}

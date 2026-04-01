@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Plus, Loader2, FileText, MapPin, DollarSign, Camera, Check, Star, Phone, Mail, Clock } from 'lucide-react';
 import GeolocationPicker from '@/components/geolocation/GeolocationPicker';
 import ImageUpload from '@/components/ui/ImageUpload';
@@ -26,6 +26,7 @@ import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
 import { useCategories } from '@/services/supabaseCategoriesService';
 import { educationLoisirsFr } from '@/data/categories/megaMenuStructures/educationLoisirs/fr';
 import { immobilierMaisonFr } from '@/data/categories/megaMenuStructures/immobilierMaison/fr';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 import CategoryAttributesRenderer from '@/components/announcements/CategoryAttributesRenderer';
 
@@ -271,7 +272,7 @@ const DeposerAnnonce = () => {
   const { t, language, isRTL } = useSafeI18nWithRouter();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const { navigateWithLanguage } = useLanguageNavigation();
   const [loading, setLoading] = useState(false);
   // Removed explicit state for lists to avoid sync issues
   // const [subcategories, setSubcategories] = useState<SimpleSubCategory[]>([]);
@@ -684,6 +685,34 @@ const DeposerAnnonce = () => {
     setSelectedAttributeValues(prev => ({ ...prev, [key]: value }));
   };
 
+  const resetAnnouncementForm = useCallback(() => {
+    setFormData({
+      title: '',
+      description: '',
+      category_id: '',
+      subcategory_id: '',
+      price: '',
+      currency: 'DZD',
+      condition: 'neuf',
+      phone: '',
+      email: user?.email || '',
+      wilaya: '',
+      commune: '',
+      location: '',
+      expires_at: '',
+      is_urgent: false,
+      is_featured: false,
+      is_negotiable: false,
+      exchange_possible: false
+    });
+    setImages([]);
+    setSelectedSubcategoryL2('');
+    setSelectedAttributeValues({});
+    setCurrentAttributes({});
+    setSelectedLocation(null);
+    setMissingFields([]);
+  }, [user?.email]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -834,6 +863,7 @@ const DeposerAnnonce = () => {
         attributes: selectedAttributeValues,
         user_id: user.id,
         status: 'active',
+        expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
         ...derivedColumns,
       };
 
@@ -873,18 +903,24 @@ const DeposerAnnonce = () => {
                 ? `(${t('common.error')}: détails véhicule non enregistrés)`
                 : "(Erreur: détails véhicule non enregistrés)"),
           });
-          navigate(`/annonce/${data.id}`);
+          resetAnnouncementForm();
+          setTimeout(() => {
+            navigateWithLanguage('/mes-annonces');
+          }, 1500);
           return;
         }
       }
 
       toast({
-        title: t('createAd.success.title'),
-        description: t('createAd.success.description'),
+        title: t('createAd.success.title') || "Annonce publiée",
+        description: t('createAd.success.description') || "Votre annonce a été publiée avec succès !",
       });
 
-      // Redirect to the new announcement
-      navigate(`/annonce/${data.id}`);
+      resetAnnouncementForm();
+
+      setTimeout(() => {
+        navigateWithLanguage('/mes-annonces');
+      }, 1500);
       
     } catch (error) {
       logger.error('Error creating announcement:', error);

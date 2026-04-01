@@ -128,7 +128,9 @@ const DynamicSubcategoryAnnouncements: React.FC<DynamicSubcategoryAnnouncementsP
                   location={a.location}
                   imageUrl={a.image_url || (a.images && a.images[0]) || ''}
                   date={a.created_at}
-                  category={a.category_id}
+                  category={translatedName}
+                  categorySlug={categorySlug}
+                  categoryName={translatedName}
                   phoneNumber={a.phone_number}
                   isOnline={a.status === 'active'}
                   isProfessional={false} // Can be derived if we have user type
