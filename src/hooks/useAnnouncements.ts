@@ -81,6 +81,7 @@ export interface CreateAnnouncementData {
   description: string;
   price: number;
   category_id: string;
+  category_slug?: string;
   subcategory_id?: string;
   condition: string;
   attributes?: Record<string, unknown>;
@@ -457,6 +458,7 @@ export const useAnnouncements = () => {
         currency: announcementData.currency || 'DZD',
         condition: announcementData.condition,
         category_id: announcementData.category_id,
+        category_slug: announcementData.category_slug || null,
         subcategory_id: announcementData.subcategory_id || null,
         wilaya: announcementData.wilaya,
         address: announcementData.location,

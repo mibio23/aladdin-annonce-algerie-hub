@@ -1617,10 +1617,25 @@ const CreateAnnouncementPage: React.FC = () => {
 
       // Vérification de la sous-catégorie si elle existe
       if (subcategoryId) {
-        const { count: subCount, error: subCheckError } = await supabase
-          .from('categories')
-          .select('id', { count: 'exact', head: true })
-          .eq('id', subcategoryId);
+        const subcategoryIsUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(subcategoryId);
+        let subCount = 0;
+        let subCheckError = null;
+
+        if (subcategoryIsUuid) {
+          const { count, error } = await supabase
+            .from('categories')
+            .select('id', { count: 'exact', head: true })
+            .eq('id', subcategoryId);
+          subCount = count || 0;
+          subCheckError = error;
+        } else {
+          const { count, error } = await supabase
+            .from('categories')
+            .select('id', { count: 'exact', head: true })
+            .eq('slug', subcategoryId);
+          subCount = count || 0;
+          subCheckError = error;
+        }
           
         if (!subCheckError && subCount === 0) {
           console.warn(`Sous-catégorie introuvable dans la base de données: ${subcategoryId}. On l'ignore pour éviter l'erreur.`);
