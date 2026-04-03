@@ -13,6 +13,11 @@
     "test": "node scripts/ops/test-supabase-migration.js",
     "generate:sitemap": "node scripts/ops/generate-sitemap.js",
     "audit:form": "node scripts/ops/audit-form-supabase.js",
+    "audit:menu": "node scripts/ops/audit-menu-form-supabase.cjs",
+    "audit:subcategory-duplicates": "node scripts/ops/audit-subcategory-duplicates.cjs",
+    "generate:menu-sql": "node scripts/ops/generate-menu-sync-sql.cjs",
+    "generate:subcategory-migration": "node scripts/ops/generate-subcategory-migration.cjs",
+    "insert:categories": "node scripts/ops/insert-categories-direct.cjs",
     "verify:complete": "node scripts/ops/verify-complete.js",
     "build:dev": "vite build --mode development",
     "to-webp": "node scripts/media_to_webp.cjs"

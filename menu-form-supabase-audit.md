@@ -1,0 +1,907 @@
+# Audit Menu / Formulaire / Supabase
+
+- Catégories principales du MegaMenu: 29
+- Sous-catégories directes du MegaMenu: 417
+- Sous-catégories totales du MegaMenu: 4807
+- Catégories en base: 150
+- Sous-catégories en base: 7
+- Catégories principales manquantes en base: 0
+- Sous-catégories directes manquantes en base: 417
+- Sous-catégories totales manquantes en base: 4783
+
+## Tableau maître
+
+### Immobilier & Maison (immobilier-maison)
+- Ventes Immobilières (ventes-immobilieres)
+- Locations Immobilières (locations-immobilieres)
+- Immobilier Professionnel (immobilier-professionnel)
+- Investissement Immobilier (investissement-immobilier)
+- Maison & Mobilier Intérieur (maison-mobilier-interieur)
+- Décoration & Accessoires Maison (decoration-accessoires-maison)
+- Cuisine & Salle de Bain (cuisine-salle-de-bain)
+- Jardin & Extérieur (jardin-exterieur)
+- Bricolage & Amélioration Maison (bricolage-amelioration-maison)
+- Sécurité Maison (securite-maison)
+- Services Maison & Immobilier (services-maison-immobilier)
+- Marques & Matériel Populaire (marques-materiel-populaire)
+
+### Téléphonie (telephonie)
+- Smartphones (smartphones)
+- Téléphones Classiques & Fixes (telephones-classiques-fixes)
+- Tablettes & Appareils Mobiles (tablettes-appareils-mobiles)
+- Accessoires Téléphones (accessoires-telephones)
+- Batteries & Charge (batteries-charge)
+- Audio Mobile (audio-mobile)
+- Pièces & Réparation Téléphone (pieces-reparation-telephone)
+- Objets Connectés (Mobile) (objets-connectes-mobile)
+- Réseau & Communication Mobile (reseau-communication-mobile)
+- Sécurité & Protection (securite-protection)
+- Applications & Services (applications-services)
+- Marques Populaires (Mobiles) (marques-populaires-mobiles)
+- Opérateurs Mobiles en Algérie (operateurs-mobiles-algerie)
+
+### Informatique & Électronique (informatique-electronique)
+- Ordinateurs & PC (ordinateurs-pc)
+- Smartphones (smartphones)
+- Téléphones Classiques & Fixes (telephones-classiques-fixes)
+- Tablettes & Appareils Mobiles (tablettes-appareils-mobiles)
+- Accessoires Téléphones (accessoires-telephones)
+- Batteries & Charge (batteries-charge)
+- Audio Mobile (audio-mobile)
+- Pièces & Réparation Téléphone (pieces-reparation-telephone)
+- Objets Connectés (Mobile) (objets-connectes-mobile)
+- Réseau & Communication Mobile (reseau-communication-mobile)
+- Sécurité & Protection (securite-protection)
+- Applications & Services (applications-services)
+- Marques Populaires (Mobiles) (marques-populaires-mobiles)
+- Opérateurs Mobiles en Algérie (operateurs-mobiles-algerie)
+- Composants Informatiques (composants-informatiques)
+- Périphériques PC (peripheriques-pc)
+- Réseau & Internet (reseau-internet)
+- Équipement de Bureau (equipement-bureau)
+- Électronique & Gadgets (electronique-gadgets)
+- Maison Intelligente & Domotique (maison-intelligente)
+- TV & Divertissement (tv-divertissement)
+- Accessoires Mobiles (Électronique) (accessoires-mobiles)
+- Informatique Professionnelle (informatique-professionnelle)
+- Composants Électroniques & Outils de Réparation (composants-electroniques-outils)
+- Marques Populaires (marques-populaires)
+
+### Véhicules, Camions, Motos & Équipements (vehicules-equipements)
+- Voitures & Véhicules Légers (voitures-vehicules-legers)
+- Camions & Véhicules Professionnels (camions-vehicules-professionnels)
+- Motos & Cyclomoteurs (motos-cyclomoteurs)
+- Vélos Motorisés & Mobilité (velos-motorises-mobilite)
+- Équipement & Accessoires Auto (equipements-accessoires-auto)
+- Pièces & Accessoires Moto (pieces-accessoires-moto)
+- Remorques & Attelages (remorques-attelages)
+- Équipement de Diagnostic & Atelier (diagnostic-atelier)
+- Carburants & Énergie (carburants-energie)
+- Services & Assistance (services-assistance)
+- Marques Populaires (SEO Boost) (marques-populaires-vehicules)
+
+### Vélo, Cyclisme & Équipements (velo-cyclisme-equipements)
+- Types de vélos (types-de-velos)
+- Équipements cyclistes (equipements-cyclistes)
+- Composants & pièces détachées (composants-pieces-detachees)
+- Accessoires vélos (accessoires-velos)
+- Outils & entretien (outils-entretien)
+- Rangement & transport (rangement-transport)
+- Équipements sportifs liés au cyclisme (equipements-sportifs-cyclisme)
+
+### Nautisme & Bateaux (nautisme)
+- Types de bateaux (types-de-bateaux)
+- Moteurs & propulsion (moteurs-propulsion)
+- Équipements de navigation (equipements-de-navigation)
+- Sécurité & sauvetage (securite-sauvetage)
+- Accastillage & pièces détachées (accastillage-pieces-detachees)
+- Confort & aménagement intérieur (confort-amenagement-interieur)
+- Accessoires & entretien (accessoires-entretien)
+- Transport & stockage (transport-stockage)
+- Sports nautiques associés (sports-nautiques-associes)
+
+### BTP, Engins & Construction (btp-engins-construction)
+- Engins de chantier (engins-de-chantier)
+- Véhicules & transport de matériaux (vehicules-transport-materiaux)
+- Matériel de construction (materiel-de-construction)
+- Matériaux de construction (materiaux-de-construction)
+- Quincaillerie & fixations (quincaillerie-fixations)
+- Équipements électriques & plomberie (equipements-electriques-plomberie)
+- Outils & équipements professionnels (outils-equipements-professionnels)
+- Équipements de sécurité & protection (securite-protection)
+- Construction modulaire & structures (construction-modulaire-structures)
+- Location de matériel BTP (location-materiel-btp)
+- Services liés au BTP (services-lies-au-btp)
+
+### Vêtement Homme, Femme & sous-vêtement (mode-accessoires)
+- Vêtements Homme (vetements-homme)
+- Marques vêtements homme (marques-vetements-homme)
+- Accessoires Homme (accessoires-homme)
+- Vêtements Femme (vetements-femme)
+- Marques vêtements femme (marques-vetements-femme)
+- Accessoires Femme (accessoires-femme)
+- Sous‑vêtements Homme (sous-vetements-homme)
+- Lingerie Femme (lingerie-femme)
+- Nuit & intérieur (nuit-interieur)
+- Sous‑vêtements techniques (sous-vetements-techniques)
+- Chaussures (Homme & Femme) (chaussures-homme-femme)
+- Mode saisonnière (mode-saisonniere)
+
+### Bébé & Puériculture (bebe-puericulture)
+- Vêtements bébé (vetements-bebe)
+- Chaussures bébé (chaussures-bebe)
+- Poussettes & landaus (poussettes-landaus)
+- Sièges auto bébé (sieges-auto-bebe)
+- Lits & berceaux (lits-berceaux-bebe)
+- Chaises hautes & repas (chaises-hautes-repas)
+- Allaitement & biberons (allaitement-biberons)
+- Soins & hygiène (soins-hygiene-bebe)
+- Couches & change (couches-toilette)
+- Jouets & éveil (jouets-bebe-eveil)
+- Sécurité bébé (securite-bebe)
+- Chambre bébé & déco (chambre-bebe-deco)
+- Porte-bébés & écharpes (porte-bebes-echarpes)
+- Sacs à langer (sacs-a-langer)
+
+### Mode & Accessoires (mode-et-accessoires)
+- Chaussures (chaussures)
+- Bijoux & Montres (bijoux-montres)
+- Lunettes (lunettes)
+- Accessoires Cheveux (accessoires-cheveux)
+- Ceintures & Bretelles (ceintures-bretelles)
+- Chapeaux & Casquettes (chapeaux-casquettes)
+- Écharpes & Foulards (echarpes-foulards)
+- Gants (gants)
+- Cravates (cravates)
+- Divers (divers-mode-accessoires)
+- Intimes (intimes)
+- Entretien (entretien-accessoires)
+
+### Sacs & Bagages (sacs-et-bagages)
+- Sacs à main (femme & unisexe) (sacs-a-main)
+- Sacs à dos (sacs-a-dos)
+- Sacs Voyage & Week-end (sacs-voyage-week-end)
+- Valises & Bagages (valises-bagages)
+- Maroquinerie (maroquinerie)
+- Sacs Professionnels (sacs-professionnels)
+- Sacs Tech & Mobilité (sacs-tech-mobilite)
+- Sacs de Sport (sacs-de-sport)
+- Sacs Enfants (sacs-enfants)
+- Sacs Spécialisés (sacs-specialises)
+- Bagagerie Professionnelle & Voyage (bagagerie-professionnelle-voyage)
+- Housses & Protections (housses-protections)
+- Accessoires Bagagerie (accessoires-bagagerie)
+- Sacs Mode & Luxe (sacs-mode-luxe)
+- Sacs Artisanaux & Locaux (sacs-artisanaux-locaux)
+- Matériaux & Types de fabrication (materiaux-fabrication)
+- Segments & Usages (segments-usages)
+
+### Électroménager (electromenager)
+- Réfrigérateurs & Congélateurs (refrigerateurs-congelateurs)
+- Lavage & Séchage (lavage-sechage)
+- Cuisson & Cuisine (cuisson-cuisine)
+- Petits Appareils de Cuisine (petits-appareils-cuisine)
+- Entretien de la Maison (entretien-maison)
+- Climatisation & Chauffage (climatisation-chauffage)
+- Électroménager pour Salle de Bain (electromenager-salle-de-bain)
+- Traitement de l’Eau (traitement-eau)
+- Appareils Spécialisés (appareils-specialises)
+- Froid & Congélation Professionnel (froid-congelation-pro)
+- Cuisson Professionnelle (cuisson-professionnelle)
+- Accessoires & Pièces Détachées (accessoires-pieces-detachees)
+- Électroménager Nomade & Mini (electromenager-nomade-mini)
+- Sécurité & Énergie (securite-energie)
+- Marques Populaires (marques-populaires)
+- Segments d’Usage (segments-usage)
+
+### Mobilier & Décoration (mobilier-et-decoration)
+- Mobilier Salon & Séjour (mobilier-salon-sejour)
+- Mobilier Chambre (mobilier-chambre)
+- Mobilier Salle à Manger (mobilier-salle-a-manger)
+- Mobilier Cuisine (mobilier-cuisine)
+- Mobilier Bureau (mobilier-bureau)
+- Mobilier Salle de Bain (mobilier-salle-de-bain)
+- Mobilier Extérieur & Jardin (mobilier-exterieur-jardin)
+- Décoration Murale (decoration-murale)
+- Luminaires & Éclairage (luminaires-eclairage)
+- Tapis & Textiles Maison (tapis-textiles-maison)
+- Décoration & Art de Maison (decoration-art-maison)
+- Rangement & Organisation (rangement-organisation)
+- Maison Intelligente (Smart Home) (maison-intelligente)
+- Décoration Végétale & Plantes (decoration-vegetale-plantes)
+- Décoration Enfant & Bébé (decoration-enfant-bebe)
+- Styles Décoratifs (styles-decoratifs)
+- Matériaux (materiaux)
+- Accessoires de Maison (accessoires-maison)
+- Objets Artisanaux & Locaux (objets-artisanaux-locaux)
+
+### Image, Son & Équipement de Musique (image-son-equipement-musique)
+- Téléviseurs & Affichage (televiseurs-affichage)
+- Audio & Home Cinéma (audio-home-cinema)
+- Casques & Écouteurs (casques-ecouteurs)
+- Photo & Vidéo (photo-video)
+- Studios Audio & Enregistrement (studios-audio-enregistrement)
+- Sonorisation & Événementiel (sonorisation-evenementiel)
+- Équipement de Musique (equipement-musique)
+- Équipement DJ (equipement-dj)
+- Accessoires Instruments (accessoires-instruments)
+- Streaming, Création & Contenu (streaming-creation-contenu)
+- Radios & Multimédia (radios-multimedia)
+- Équipements Cinéma Maison (equipements-cinema-maison)
+- Électroniques Portables (electroniques-portables)
+- Accessoires Image & Son (accessoires-image-son)
+- Marques Populaires (marques-populaires)
+- Segments d’Usage (segments-usage)
+
+### Jeux Vidéo & Consoles (jeux-video-consoles)
+- Consoles de salon (consoles-de-salon)
+- Consoles portables (consoles-portables)
+- Jeux PlayStation (jeux-playstation)
+- Jeux Xbox (jeux-xbox)
+- Jeux Nintendo (jeux-nintendo)
+- Jeux PC & Mac (jeux-pc-mac)
+- Jeux rétro & collections (jeux-retro-collections)
+- Accessoires gaming (accessoires-gaming)
+- Équipements VR & AR (equipements-vr-ar)
+- Composants & équipements e‑sport (composants-e-sport)
+- Cartes & abonnements (cartes-abonnements)
+- Streaming & capture vidéo (streaming-capture-video)
+- Merchandising gaming (merchandising-gaming)
+
+### Quincaillerie Générale (quincaillerie-generale)
+- Outils manuels (outils-manuels)
+- Outils électriques & électroportatifs (outils-electriques-electroportatifs)
+- Matériel de fixation (materiel-de-fixation)
+- Quincaillerie de porte & fenêtre (quincaillerie-porte-fenetre)
+- Sécurité & protection (securite-protection)
+- Matériel de plomberie (materiel-de-plomberie)
+- Matériel électrique (materiel-electrique)
+- Colles & adhésifs (colles-adhesifs)
+- Produits de soudure & brasage (produits-soudure-brasage)
+- Outillage de mesure (outillage-de-mesure)
+- Rangements & organisation (rangements-organisation)
+- Matériaux métalliques & accessoires (materiaux-metalliques-accessoires)
+- Peinture & préparation (peinture-preparation)
+- Jardinerie & bricolage léger (jardinerie-bricolage-leger)
+- Accessoires divers (accessoires-divers)
+
+### Agriculture & Agroalimentaire (agriculture-agroalimentaire)
+- Matériel agricole (materiel-agricole)
+- Outils & équipements de culture (outils-equipements-de-culture)
+- Systèmes d’irrigation (systemes-irrigation)
+- Semences & plants (semences-plants)
+- Engrais & fertilisants (engrais-fertilisants)
+- Produits phytosanitaires (produits-phytosanitaires)
+- Élevage & soins des animaux (elevage-soins-animaux)
+- Matériel d’élevage (materiel-elevage)
+- Produits agricoles bruts (produits-agricoles-bruts)
+- Produits agroalimentaires transformés (produits-agroalimentaires-transformes)
+- Équipements agroalimentaires (equipements-agroalimentaires)
+- Serres & solutions de culture (serres-solutions-de-culture)
+- Aménagement agricole (amenagement-agricole)
+- Transport & logistique agricole (transport-logistique-agricole)
+- Équipement pour ruchers & apiculture (equipement-ruchers-apiculture)
+- Outils et produits de contrôle sanitaire (controle-sanitaire-outils-produits)
+- Accessoires & consommables (accessoires-consommables)
+
+### Parapharmacie & Produit Chimique (parapharmacie-produit-chimique)
+- Parapharmacie Générale (parapharmacie-generale)
+- Soins du Visage (soins-visage)
+- Soins du Corps (soins-corps)
+- Soins Capillaires (soins-capillaires)
+- Hygiène Corporelle (hygiene-corporelle)
+- Hygiène Féminine (hygiene-feminine)
+- Hygiène Masculine (hygiene-masculine)
+- Produits pour Bébé (produits-bebe)
+- Premiers Secours (premiers-secours)
+- Matériel Médical Léger (materiel-medical-leger)
+- Produits Solaires (produits-solaires)
+- Phytothérapie (phytotherapie)
+- Aromathérapie (aromatherapie)
+- Produits Diététiques (produits-dietetiques)
+- Désinfection & Antiseptiques (desinfection-antiseptiques)
+- Produits Ménagers Chimiques (produits-menagers-chimiques)
+- Produits d (produits-entretien-industriels)
+- Peintures & Solvants (peintures-solvants)
+- Produits pour Piscine (produits-piscine)
+- Produits Agricoles Chimiques (produits-agricoles-chimiques)
+- Produits pour Laboratoires (produits-laboratoires)
+- Équipements de Sécurité Chimique (equipements-securite-chimique)
+- Emballages Chimiques (emballages-chimiques)
+- Hygiène Professionnelle (hygiene-professionnelle)
+- Cosmétiques Spécialisés (cosmetiques-specialises)
+
+### Santé & Beauté (sante-beaute)
+- Soins du visage (soins-visage)
+- Soins du corps (soins-corps)
+- Hygiène corporelle (hygiene-corporelle)
+- Soins capillaires (soins-capillaires)
+- Coiffure & Styling (coiffure-styling)
+- Parfums & fragrances (parfums-fragrances)
+- Maquillage (maquillage)
+- Accessoires beauté (accessoires-beaute)
+- Manucure & pédicure (manucure-pedicure)
+- Produits solaires (produits-solaires)
+- Beauté naturelle & bio (beaute-naturelle-bio)
+- Aromathérapie (aromatherapie)
+- Phytothérapie (phytotherapie)
+- Santé générale (sante-generale)
+- Médicaments sans ordonnance (medicaments-sans-ordonnance)
+- Premiers secours (premiers-secours)
+- Matériel médical léger (materiel-medical-leger)
+- Hygiène bucco-dentaire (hygiene-bucco-dentaire)
+- Hygiène féminine (hygiene-feminine)
+- Hygiène masculine (hygiene-masculine)
+- Matériel esthétique professionnel (materiel-esthetique-pro)
+- Épilation (epilation)
+- Produits de massage & bien-être (massage-bien-etre)
+- Beauté du regard (beaute-du-regard)
+- Produits spa à domicile (produits-spa-domicile)
+- Produits dermatologiques spécialisés (dermatologie-specialisee)
+- Nutrition beauté (nutrition-beaute)
+- Accessoires salle de bain (accessoires-salle-de-bain)
+- Produits blanchiment dentaire (blanchiment-dentaire)
+
+### Gastronomie & Alimentation (gastronomie-alimentation)
+- Épicerie salée (epicerie-salee)
+- Épicerie sucrée (epicerie-sucree)
+- Conserves & produits en boîte (conserves-boites)
+- Produits frais (produits-frais)
+- Produits surgelés (produits-surgeles)
+- Viandes & volailles (viandes-volailles)
+- Poissons & fruits de mer (poissons-fruits-de-mer)
+- Fruits & légumes (fruits-legumes)
+- Boulangerie & pâtisserie (boulangerie-patisserie)
+- Produits laitiers (produits-laitiers)
+- Huiles & condiments (huiles-condiments)
+- Épices & assaisonnements (epices-assaisonnements)
+- Boissons (boissons)
+- Café & thé (cafe-the)
+- Produits bio & naturels (produits-bio-naturels)
+- Produits orientaux & traditionnels (produits-orientaux-traditionnels)
+- Snacks & apéritifs (snacks-aperitifs)
+- Produits pour cuisine internationale (cuisine-internationale)
+- Produits halal (produits-halal)
+- Nutrition sportive (nutrition-sportive)
+- Diététique & santé (dietetique-sante)
+- Produits pour pâtisserie (produits-patisserie)
+- Produits pour cuisine (produits-cuisine)
+- Gourmandises & douceurs (gourmandises-douceurs)
+- Produits pour bébé (produits-bebe)
+- Eaux & hydratation (eaux-hydratation)
+- Accessoires culinaires (accessoires-culinaires)
+
+### Artisanat Traditionnel Algérien (artisanat-traditionnel-algerien)
+- Poterie & céramique (poterie-ceramique)
+- Artisanats régionaux (artisanats-regionaux)
+- Tissage & tapis (tissage-tapis)
+- Bijoux & métaux (bijoux-metaux)
+- Broderie & vêtements traditionnels (broderie-vetements)
+- Cuir & maroquinerie (cuir-maroquinerie)
+- Bois & sculpture (bois-sculpture)
+- Vannerie & fibres naturelles (vannerie-fibres)
+- Décoration & objets berbères (decoration-berbere)
+- Instruments de musique artisanaux (instruments-musique)
+- Produits naturels artisanaux (produits-naturels)
+- Articles culturels & patrimoniaux (articles-culturels)
+- Services & coutumes traditionnelles (services-coutumes)
+- Produits locaux algériens (produits-locaux)
+- Plats traditionnels algériens (plats-traditionnels)
+- Pâtisseries traditionnelles algériennes (patisseries-traditionnelles)
+
+### Voyages & Tourisme (voyages-tourisme)
+- Voyages, Découvertes Touristiques (voyages-decouvertes)
+- Hébergement & Séjour (hebergement-sejour)
+- Transport Touristique (transport-touristique)
+- Activités & Loisirs Touristiques (activites-loisirs-touristiques)
+- Tourisme Culturel & Historique (tourisme-culturel-historique)
+- Services & Assistance aux Voyageurs (services-assistance-voyageurs)
+- Produits & Accessoires de Voyage (produits-accessoires-voyage)
+- Gastronomie & Découvertes Touristiques (gastronomie-decouvertes-touristiques)
+
+### Événements & Billetterie (evenements-billetterie)
+- Concerts & Spectacles (concerts-spectacles)
+- Événements Sportifs (evenements-sportifs)
+- Cinéma & Avant-premières (cinema-avant-premieres)
+- Théâtre & Arts Scéniques (theatre-arts-sceniques)
+- Conférences & Formations (conferences-formations)
+- Festivals & Fêtes (festivals-fetes)
+- Parcs & Loisirs (parcs-loisirs)
+- Événements Familiaux (evenements-familiaux)
+- Gala & Réceptions (gala-receptions)
+- Salons & Expositions (salons-expositions)
+- Billetterie de Transport (billetterie-transport)
+- Événements Religieux & Traditionnels (evenements-religieux-traditionnels)
+- Services Événementiels (services-evenementiels)
+- Packages & Offres Spéciales (packages-offres-speciales)
+
+### Emploi & Carrière (emploi-carriere)
+- Offres d’Emploi (offres-emploi)
+- Secteurs Professionnels (secteurs-professionnels)
+- Métiers Qualifiés & Techniques (metiers-qualifies-techniques)
+- Métiers du Digital (metiers-du-digital)
+- Métiers de la Santé (metiers-de-la-sante)
+- Métiers de l’Éducation (metiers-de-leducation)
+- Services & Aide à la Personne (services-aide-a-la-personne)
+- Hôtellerie & Restauration (hotellerie-restauration)
+- Transport & Logistique (transport-logistique)
+- Agriculture & Élevage (agriculture-elevage)
+- Appels d’Offres & Marchés Publics (appels-offres-marches-publics)
+- Formation & Développement Professionnel (formation-developpement-professionnel)
+- Entrepreneuriat & Business (entrepreneuriat-business)
+- CV & Services Recrutement (cv-services-recrutement)
+- Stages & Opportunités Jeunes (stages-opportunites-jeunes)
+- Job à Temps Partiel & Étudiant (job-temps-partiel-etudiant)
+
+### Sport, Éducation & Loisirs (education-loisirs)
+- Cours & Formations (cours-formations)
+- Livres & Supports Éducatifs (livres-supports-educatifs)
+- Arts & Musique (arts-musique)
+- Sports & Loisirs (sports-loisirs)
+- Enfance & Activités Familiales (enfance-activites-familiales)
+- Clubs & Associations (clubs-associations)
+
+### Animales & Accessoires (animaux-accessoires)
+- Animaux Domestiques (animaux-domestiques)
+- Animaux d (animaux-elevage)
+- Nourriture & Soins Animaliers (nourriture-soins)
+- Accessoires & Équipements (accessoires-equipements)
+- Élevage & Reproduction (elevage-reproduction)
+- Services Animaliers (services-animaliers)
+- Produits & Accessoires Extérieurs (produits-exterieurs)
+
+### Finance & Monnaie Fiduciaire (finance)
+- Monnaie Fiduciaire (monnaie-fiduciaire)
+- Services Financiers (services-financiers)
+- Monnaie Internationale (monnaie-internationale)
+- Or & Métaux Précieux (or-metaux-precieux)
+- Accessoires Numismatiques (accessoires-numismatiques)
+- Aide à la Collection (aide-collection)
+
+### Services & Support (services-support)
+- Services Informatiques (services-informatiques)
+- Services Télécom (services-telecom)
+- Services Électroménager (services-electromenager)
+- Services Maison (services-maison)
+- Services Artisanaux (services-artisanaux)
+- Transport & Livraison (transport-livraison)
+- Services Administratifs (services-administratifs)
+- Support Business (support-business)
+- Services Formation (services-formation)
+- Services Événementiels (services-evenementiels)
+- Services Santé & Bien-être (services-sante-bienetre)
+- Aide à la Personne (aide-personne)
+- Services Automobiles (services-automobiles)
+- Services Créatifs (services-creatifs)
+
+### Échanges & Partage (echanges-partage)
+- Troc d’Objets (troc-objets)
+- Don & Gratuit (don-gratuit)
+- Prêt d’Objets (pret-objets)
+- Partage de Compétences (partage-competences)
+- Carpooling & Déplacements (carpooling-deplacements)
+- Partage Habitat (partage-habitat)
+- Échange de Services (echange-services)
+- Communauté & Entraide (communaute-entraide)
+- Échange Culturel (echange-culturel)
+- Récupération & Réemploi (recuperation-reemploi)
+
+## Manques détectés côté base
+
+- Sous-catégorie manquante: immobilier-maison > ventes-immobilieres
+- Sous-catégorie manquante: immobilier-maison > locations-immobilieres
+- Sous-catégorie manquante: immobilier-maison > immobilier-professionnel
+- Sous-catégorie manquante: immobilier-maison > investissement-immobilier
+- Sous-catégorie manquante: immobilier-maison > maison-mobilier-interieur
+- Sous-catégorie manquante: immobilier-maison > decoration-accessoires-maison
+- Sous-catégorie manquante: immobilier-maison > cuisine-salle-de-bain
+- Sous-catégorie manquante: immobilier-maison > jardin-exterieur
+- Sous-catégorie manquante: immobilier-maison > bricolage-amelioration-maison
+- Sous-catégorie manquante: immobilier-maison > securite-maison
+- Sous-catégorie manquante: immobilier-maison > services-maison-immobilier
+- Sous-catégorie manquante: immobilier-maison > marques-materiel-populaire
+- Sous-catégorie manquante: telephonie > smartphones
+- Sous-catégorie manquante: telephonie > telephones-classiques-fixes
+- Sous-catégorie manquante: telephonie > tablettes-appareils-mobiles
+- Sous-catégorie manquante: telephonie > accessoires-telephones
+- Sous-catégorie manquante: telephonie > batteries-charge
+- Sous-catégorie manquante: telephonie > audio-mobile
+- Sous-catégorie manquante: telephonie > pieces-reparation-telephone
+- Sous-catégorie manquante: telephonie > objets-connectes-mobile
+- Sous-catégorie manquante: telephonie > reseau-communication-mobile
+- Sous-catégorie manquante: telephonie > securite-protection
+- Sous-catégorie manquante: telephonie > applications-services
+- Sous-catégorie manquante: telephonie > marques-populaires-mobiles
+- Sous-catégorie manquante: telephonie > operateurs-mobiles-algerie
+- Sous-catégorie manquante: informatique-electronique > ordinateurs-pc
+- Sous-catégorie manquante: informatique-electronique > smartphones
+- Sous-catégorie manquante: informatique-electronique > telephones-classiques-fixes
+- Sous-catégorie manquante: informatique-electronique > tablettes-appareils-mobiles
+- Sous-catégorie manquante: informatique-electronique > accessoires-telephones
+- Sous-catégorie manquante: informatique-electronique > batteries-charge
+- Sous-catégorie manquante: informatique-electronique > audio-mobile
+- Sous-catégorie manquante: informatique-electronique > pieces-reparation-telephone
+- Sous-catégorie manquante: informatique-electronique > objets-connectes-mobile
+- Sous-catégorie manquante: informatique-electronique > reseau-communication-mobile
+- Sous-catégorie manquante: informatique-electronique > securite-protection
+- Sous-catégorie manquante: informatique-electronique > applications-services
+- Sous-catégorie manquante: informatique-electronique > marques-populaires-mobiles
+- Sous-catégorie manquante: informatique-electronique > operateurs-mobiles-algerie
+- Sous-catégorie manquante: informatique-electronique > composants-informatiques
+- Sous-catégorie manquante: informatique-electronique > peripheriques-pc
+- Sous-catégorie manquante: informatique-electronique > reseau-internet
+- Sous-catégorie manquante: informatique-electronique > equipement-bureau
+- Sous-catégorie manquante: informatique-electronique > electronique-gadgets
+- Sous-catégorie manquante: informatique-electronique > maison-intelligente
+- Sous-catégorie manquante: informatique-electronique > tv-divertissement
+- Sous-catégorie manquante: informatique-electronique > accessoires-mobiles
+- Sous-catégorie manquante: informatique-electronique > informatique-professionnelle
+- Sous-catégorie manquante: informatique-electronique > composants-electroniques-outils
+- Sous-catégorie manquante: informatique-electronique > marques-populaires
+- Sous-catégorie manquante: vehicules-equipements > voitures-vehicules-legers
+- Sous-catégorie manquante: vehicules-equipements > camions-vehicules-professionnels
+- Sous-catégorie manquante: vehicules-equipements > motos-cyclomoteurs
+- Sous-catégorie manquante: vehicules-equipements > velos-motorises-mobilite
+- Sous-catégorie manquante: vehicules-equipements > equipements-accessoires-auto
+- Sous-catégorie manquante: vehicules-equipements > pieces-accessoires-moto
+- Sous-catégorie manquante: vehicules-equipements > remorques-attelages
+- Sous-catégorie manquante: vehicules-equipements > diagnostic-atelier
+- Sous-catégorie manquante: vehicules-equipements > carburants-energie
+- Sous-catégorie manquante: vehicules-equipements > services-assistance
+- Sous-catégorie manquante: vehicules-equipements > marques-populaires-vehicules
+- Sous-catégorie manquante: velo-cyclisme-equipements > types-de-velos
+- Sous-catégorie manquante: velo-cyclisme-equipements > equipements-cyclistes
+- Sous-catégorie manquante: velo-cyclisme-equipements > composants-pieces-detachees
+- Sous-catégorie manquante: velo-cyclisme-equipements > accessoires-velos
+- Sous-catégorie manquante: velo-cyclisme-equipements > outils-entretien
+- Sous-catégorie manquante: velo-cyclisme-equipements > rangement-transport
+- Sous-catégorie manquante: velo-cyclisme-equipements > equipements-sportifs-cyclisme
+- Sous-catégorie manquante: nautisme > types-de-bateaux
+- Sous-catégorie manquante: nautisme > moteurs-propulsion
+- Sous-catégorie manquante: nautisme > equipements-de-navigation
+- Sous-catégorie manquante: nautisme > securite-sauvetage
+- Sous-catégorie manquante: nautisme > accastillage-pieces-detachees
+- Sous-catégorie manquante: nautisme > confort-amenagement-interieur
+- Sous-catégorie manquante: nautisme > accessoires-entretien
+- Sous-catégorie manquante: nautisme > transport-stockage
+- Sous-catégorie manquante: nautisme > sports-nautiques-associes
+- Sous-catégorie manquante: btp-engins-construction > engins-de-chantier
+- Sous-catégorie manquante: btp-engins-construction > vehicules-transport-materiaux
+- Sous-catégorie manquante: btp-engins-construction > materiel-de-construction
+- Sous-catégorie manquante: btp-engins-construction > materiaux-de-construction
+- Sous-catégorie manquante: btp-engins-construction > quincaillerie-fixations
+- Sous-catégorie manquante: btp-engins-construction > equipements-electriques-plomberie
+- Sous-catégorie manquante: btp-engins-construction > outils-equipements-professionnels
+- Sous-catégorie manquante: btp-engins-construction > securite-protection
+- Sous-catégorie manquante: btp-engins-construction > construction-modulaire-structures
+- Sous-catégorie manquante: btp-engins-construction > location-materiel-btp
+- Sous-catégorie manquante: btp-engins-construction > services-lies-au-btp
+- Sous-catégorie manquante: mode-accessoires > vetements-homme
+- Sous-catégorie manquante: mode-accessoires > marques-vetements-homme
+- Sous-catégorie manquante: mode-accessoires > accessoires-homme
+- Sous-catégorie manquante: mode-accessoires > vetements-femme
+- Sous-catégorie manquante: mode-accessoires > marques-vetements-femme
+- Sous-catégorie manquante: mode-accessoires > accessoires-femme
+- Sous-catégorie manquante: mode-accessoires > sous-vetements-homme
+- Sous-catégorie manquante: mode-accessoires > lingerie-femme
+- Sous-catégorie manquante: mode-accessoires > nuit-interieur
+- Sous-catégorie manquante: mode-accessoires > sous-vetements-techniques
+- Sous-catégorie manquante: mode-accessoires > chaussures-homme-femme
+- Sous-catégorie manquante: mode-accessoires > mode-saisonniere
+- Sous-catégorie manquante: bebe-puericulture > vetements-bebe
+- Sous-catégorie manquante: bebe-puericulture > chaussures-bebe
+- Sous-catégorie manquante: bebe-puericulture > poussettes-landaus
+- Sous-catégorie manquante: bebe-puericulture > sieges-auto-bebe
+- Sous-catégorie manquante: bebe-puericulture > lits-berceaux-bebe
+- Sous-catégorie manquante: bebe-puericulture > chaises-hautes-repas
+- Sous-catégorie manquante: bebe-puericulture > allaitement-biberons
+- Sous-catégorie manquante: bebe-puericulture > soins-hygiene-bebe
+- Sous-catégorie manquante: bebe-puericulture > couches-toilette
+- Sous-catégorie manquante: bebe-puericulture > jouets-bebe-eveil
+- Sous-catégorie manquante: bebe-puericulture > securite-bebe
+- Sous-catégorie manquante: bebe-puericulture > chambre-bebe-deco
+- Sous-catégorie manquante: bebe-puericulture > porte-bebes-echarpes
+- Sous-catégorie manquante: bebe-puericulture > sacs-a-langer
+- Sous-catégorie manquante: mode-et-accessoires > chaussures
+- Sous-catégorie manquante: mode-et-accessoires > bijoux-montres
+- Sous-catégorie manquante: mode-et-accessoires > lunettes
+- Sous-catégorie manquante: mode-et-accessoires > accessoires-cheveux
+- Sous-catégorie manquante: mode-et-accessoires > ceintures-bretelles
+- Sous-catégorie manquante: mode-et-accessoires > chapeaux-casquettes
+- Sous-catégorie manquante: mode-et-accessoires > echarpes-foulards
+- Sous-catégorie manquante: mode-et-accessoires > gants
+- Sous-catégorie manquante: mode-et-accessoires > cravates
+- Sous-catégorie manquante: mode-et-accessoires > divers-mode-accessoires
+- Sous-catégorie manquante: mode-et-accessoires > intimes
+- Sous-catégorie manquante: mode-et-accessoires > entretien-accessoires
+- Sous-catégorie manquante: sacs-et-bagages > sacs-a-main
+- Sous-catégorie manquante: sacs-et-bagages > sacs-a-dos
+- Sous-catégorie manquante: sacs-et-bagages > sacs-voyage-week-end
+- Sous-catégorie manquante: sacs-et-bagages > valises-bagages
+- Sous-catégorie manquante: sacs-et-bagages > maroquinerie
+- Sous-catégorie manquante: sacs-et-bagages > sacs-professionnels
+- Sous-catégorie manquante: sacs-et-bagages > sacs-tech-mobilite
+- Sous-catégorie manquante: sacs-et-bagages > sacs-de-sport
+- Sous-catégorie manquante: sacs-et-bagages > sacs-enfants
+- Sous-catégorie manquante: sacs-et-bagages > sacs-specialises
+- Sous-catégorie manquante: sacs-et-bagages > bagagerie-professionnelle-voyage
+- Sous-catégorie manquante: sacs-et-bagages > housses-protections
+- Sous-catégorie manquante: sacs-et-bagages > accessoires-bagagerie
+- Sous-catégorie manquante: sacs-et-bagages > sacs-mode-luxe
+- Sous-catégorie manquante: sacs-et-bagages > sacs-artisanaux-locaux
+- Sous-catégorie manquante: sacs-et-bagages > materiaux-fabrication
+- Sous-catégorie manquante: sacs-et-bagages > segments-usages
+- Sous-catégorie manquante: electromenager > refrigerateurs-congelateurs
+- Sous-catégorie manquante: electromenager > lavage-sechage
+- Sous-catégorie manquante: electromenager > cuisson-cuisine
+- Sous-catégorie manquante: electromenager > petits-appareils-cuisine
+- Sous-catégorie manquante: electromenager > entretien-maison
+- Sous-catégorie manquante: electromenager > climatisation-chauffage
+- Sous-catégorie manquante: electromenager > electromenager-salle-de-bain
+- Sous-catégorie manquante: electromenager > traitement-eau
+- Sous-catégorie manquante: electromenager > appareils-specialises
+- Sous-catégorie manquante: electromenager > froid-congelation-pro
+- Sous-catégorie manquante: electromenager > cuisson-professionnelle
+- Sous-catégorie manquante: electromenager > accessoires-pieces-detachees
+- Sous-catégorie manquante: electromenager > electromenager-nomade-mini
+- Sous-catégorie manquante: electromenager > securite-energie
+- Sous-catégorie manquante: electromenager > marques-populaires
+- Sous-catégorie manquante: electromenager > segments-usage
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-salon-sejour
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-chambre
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-salle-a-manger
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-cuisine
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-bureau
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-salle-de-bain
+- Sous-catégorie manquante: mobilier-et-decoration > mobilier-exterieur-jardin
+- Sous-catégorie manquante: mobilier-et-decoration > decoration-murale
+- Sous-catégorie manquante: mobilier-et-decoration > luminaires-eclairage
+- Sous-catégorie manquante: mobilier-et-decoration > tapis-textiles-maison
+- Sous-catégorie manquante: mobilier-et-decoration > decoration-art-maison
+- Sous-catégorie manquante: mobilier-et-decoration > rangement-organisation
+- Sous-catégorie manquante: mobilier-et-decoration > maison-intelligente
+- Sous-catégorie manquante: mobilier-et-decoration > decoration-vegetale-plantes
+- Sous-catégorie manquante: mobilier-et-decoration > decoration-enfant-bebe
+- Sous-catégorie manquante: mobilier-et-decoration > styles-decoratifs
+- Sous-catégorie manquante: mobilier-et-decoration > materiaux
+- Sous-catégorie manquante: mobilier-et-decoration > accessoires-maison
+- Sous-catégorie manquante: mobilier-et-decoration > objets-artisanaux-locaux
+- Sous-catégorie manquante: image-son-equipement-musique > televiseurs-affichage
+- Sous-catégorie manquante: image-son-equipement-musique > audio-home-cinema
+- Sous-catégorie manquante: image-son-equipement-musique > casques-ecouteurs
+- Sous-catégorie manquante: image-son-equipement-musique > photo-video
+- Sous-catégorie manquante: image-son-equipement-musique > studios-audio-enregistrement
+- Sous-catégorie manquante: image-son-equipement-musique > sonorisation-evenementiel
+- Sous-catégorie manquante: image-son-equipement-musique > equipement-musique
+- Sous-catégorie manquante: image-son-equipement-musique > equipement-dj
+- Sous-catégorie manquante: image-son-equipement-musique > accessoires-instruments
+- Sous-catégorie manquante: image-son-equipement-musique > streaming-creation-contenu
+- Sous-catégorie manquante: image-son-equipement-musique > radios-multimedia
+- Sous-catégorie manquante: image-son-equipement-musique > equipements-cinema-maison
+- Sous-catégorie manquante: image-son-equipement-musique > electroniques-portables
+- Sous-catégorie manquante: image-son-equipement-musique > accessoires-image-son
+- Sous-catégorie manquante: image-son-equipement-musique > marques-populaires
+- Sous-catégorie manquante: image-son-equipement-musique > segments-usage
+- Sous-catégorie manquante: jeux-video-consoles > consoles-de-salon
+- Sous-catégorie manquante: jeux-video-consoles > consoles-portables
+- Sous-catégorie manquante: jeux-video-consoles > jeux-playstation
+- Sous-catégorie manquante: jeux-video-consoles > jeux-xbox
+- Sous-catégorie manquante: jeux-video-consoles > jeux-nintendo
+- Sous-catégorie manquante: jeux-video-consoles > jeux-pc-mac
+- Sous-catégorie manquante: jeux-video-consoles > jeux-retro-collections
+- Sous-catégorie manquante: jeux-video-consoles > accessoires-gaming
+- Sous-catégorie manquante: jeux-video-consoles > equipements-vr-ar
+- Sous-catégorie manquante: jeux-video-consoles > composants-e-sport
+- Sous-catégorie manquante: jeux-video-consoles > cartes-abonnements
+- Sous-catégorie manquante: jeux-video-consoles > streaming-capture-video
+- Sous-catégorie manquante: jeux-video-consoles > merchandising-gaming
+- Sous-catégorie manquante: quincaillerie-generale > outils-manuels
+- Sous-catégorie manquante: quincaillerie-generale > outils-electriques-electroportatifs
+- Sous-catégorie manquante: quincaillerie-generale > materiel-de-fixation
+- Sous-catégorie manquante: quincaillerie-generale > quincaillerie-porte-fenetre
+- Sous-catégorie manquante: quincaillerie-generale > securite-protection
+- Sous-catégorie manquante: quincaillerie-generale > materiel-de-plomberie
+- Sous-catégorie manquante: quincaillerie-generale > materiel-electrique
+- Sous-catégorie manquante: quincaillerie-generale > colles-adhesifs
+- Sous-catégorie manquante: quincaillerie-generale > produits-soudure-brasage
+- Sous-catégorie manquante: quincaillerie-generale > outillage-de-mesure
+- Sous-catégorie manquante: quincaillerie-generale > rangements-organisation
+- Sous-catégorie manquante: quincaillerie-generale > materiaux-metalliques-accessoires
+- Sous-catégorie manquante: quincaillerie-generale > peinture-preparation
+- Sous-catégorie manquante: quincaillerie-generale > jardinerie-bricolage-leger
+- Sous-catégorie manquante: quincaillerie-generale > accessoires-divers
+- Sous-catégorie manquante: agriculture-agroalimentaire > materiel-agricole
+- Sous-catégorie manquante: agriculture-agroalimentaire > outils-equipements-de-culture
+- Sous-catégorie manquante: agriculture-agroalimentaire > systemes-irrigation
+- Sous-catégorie manquante: agriculture-agroalimentaire > semences-plants
+- Sous-catégorie manquante: agriculture-agroalimentaire > engrais-fertilisants
+- Sous-catégorie manquante: agriculture-agroalimentaire > produits-phytosanitaires
+- Sous-catégorie manquante: agriculture-agroalimentaire > elevage-soins-animaux
+- Sous-catégorie manquante: agriculture-agroalimentaire > materiel-elevage
+- Sous-catégorie manquante: agriculture-agroalimentaire > produits-agricoles-bruts
+- Sous-catégorie manquante: agriculture-agroalimentaire > produits-agroalimentaires-transformes
+- Sous-catégorie manquante: agriculture-agroalimentaire > equipements-agroalimentaires
+- Sous-catégorie manquante: agriculture-agroalimentaire > serres-solutions-de-culture
+- Sous-catégorie manquante: agriculture-agroalimentaire > amenagement-agricole
+- Sous-catégorie manquante: agriculture-agroalimentaire > transport-logistique-agricole
+- Sous-catégorie manquante: agriculture-agroalimentaire > equipement-ruchers-apiculture
+- Sous-catégorie manquante: agriculture-agroalimentaire > controle-sanitaire-outils-produits
+- Sous-catégorie manquante: agriculture-agroalimentaire > accessoires-consommables
+- Sous-catégorie manquante: parapharmacie-produit-chimique > parapharmacie-generale
+- Sous-catégorie manquante: parapharmacie-produit-chimique > soins-visage
+- Sous-catégorie manquante: parapharmacie-produit-chimique > soins-corps
+- Sous-catégorie manquante: parapharmacie-produit-chimique > soins-capillaires
+- Sous-catégorie manquante: parapharmacie-produit-chimique > hygiene-corporelle
+- Sous-catégorie manquante: parapharmacie-produit-chimique > hygiene-feminine
+- Sous-catégorie manquante: parapharmacie-produit-chimique > hygiene-masculine
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-bebe
+- Sous-catégorie manquante: parapharmacie-produit-chimique > premiers-secours
+- Sous-catégorie manquante: parapharmacie-produit-chimique > materiel-medical-leger
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-solaires
+- Sous-catégorie manquante: parapharmacie-produit-chimique > phytotherapie
+- Sous-catégorie manquante: parapharmacie-produit-chimique > aromatherapie
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-dietetiques
+- Sous-catégorie manquante: parapharmacie-produit-chimique > desinfection-antiseptiques
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-menagers-chimiques
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-entretien-industriels
+- Sous-catégorie manquante: parapharmacie-produit-chimique > peintures-solvants
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-piscine
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-agricoles-chimiques
+- Sous-catégorie manquante: parapharmacie-produit-chimique > produits-laboratoires
+- Sous-catégorie manquante: parapharmacie-produit-chimique > equipements-securite-chimique
+- Sous-catégorie manquante: parapharmacie-produit-chimique > emballages-chimiques
+- Sous-catégorie manquante: parapharmacie-produit-chimique > hygiene-professionnelle
+- Sous-catégorie manquante: parapharmacie-produit-chimique > cosmetiques-specialises
+- Sous-catégorie manquante: sante-beaute > soins-visage
+- Sous-catégorie manquante: sante-beaute > soins-corps
+- Sous-catégorie manquante: sante-beaute > hygiene-corporelle
+- Sous-catégorie manquante: sante-beaute > soins-capillaires
+- Sous-catégorie manquante: sante-beaute > coiffure-styling
+- Sous-catégorie manquante: sante-beaute > parfums-fragrances
+- Sous-catégorie manquante: sante-beaute > maquillage
+- Sous-catégorie manquante: sante-beaute > accessoires-beaute
+- Sous-catégorie manquante: sante-beaute > manucure-pedicure
+- Sous-catégorie manquante: sante-beaute > produits-solaires
+- Sous-catégorie manquante: sante-beaute > beaute-naturelle-bio
+- Sous-catégorie manquante: sante-beaute > aromatherapie
+- Sous-catégorie manquante: sante-beaute > phytotherapie
+- Sous-catégorie manquante: sante-beaute > sante-generale
+- Sous-catégorie manquante: sante-beaute > medicaments-sans-ordonnance
+- Sous-catégorie manquante: sante-beaute > premiers-secours
+- Sous-catégorie manquante: sante-beaute > materiel-medical-leger
+- Sous-catégorie manquante: sante-beaute > hygiene-bucco-dentaire
+- Sous-catégorie manquante: sante-beaute > hygiene-feminine
+- Sous-catégorie manquante: sante-beaute > hygiene-masculine
+- Sous-catégorie manquante: sante-beaute > materiel-esthetique-pro
+- Sous-catégorie manquante: sante-beaute > epilation
+- Sous-catégorie manquante: sante-beaute > massage-bien-etre
+- Sous-catégorie manquante: sante-beaute > beaute-du-regard
+- Sous-catégorie manquante: sante-beaute > produits-spa-domicile
+- Sous-catégorie manquante: sante-beaute > dermatologie-specialisee
+- Sous-catégorie manquante: sante-beaute > nutrition-beaute
+- Sous-catégorie manquante: sante-beaute > accessoires-salle-de-bain
+- Sous-catégorie manquante: sante-beaute > blanchiment-dentaire
+- Sous-catégorie manquante: gastronomie-alimentation > epicerie-salee
+- Sous-catégorie manquante: gastronomie-alimentation > epicerie-sucree
+- Sous-catégorie manquante: gastronomie-alimentation > conserves-boites
+- Sous-catégorie manquante: gastronomie-alimentation > produits-frais
+- Sous-catégorie manquante: gastronomie-alimentation > produits-surgeles
+- Sous-catégorie manquante: gastronomie-alimentation > viandes-volailles
+- Sous-catégorie manquante: gastronomie-alimentation > poissons-fruits-de-mer
+- Sous-catégorie manquante: gastronomie-alimentation > fruits-legumes
+- Sous-catégorie manquante: gastronomie-alimentation > boulangerie-patisserie
+- Sous-catégorie manquante: gastronomie-alimentation > produits-laitiers
+- Sous-catégorie manquante: gastronomie-alimentation > huiles-condiments
+- Sous-catégorie manquante: gastronomie-alimentation > epices-assaisonnements
+- Sous-catégorie manquante: gastronomie-alimentation > boissons
+- Sous-catégorie manquante: gastronomie-alimentation > cafe-the
+- Sous-catégorie manquante: gastronomie-alimentation > produits-bio-naturels
+- Sous-catégorie manquante: gastronomie-alimentation > produits-orientaux-traditionnels
+- Sous-catégorie manquante: gastronomie-alimentation > snacks-aperitifs
+- Sous-catégorie manquante: gastronomie-alimentation > cuisine-internationale
+- Sous-catégorie manquante: gastronomie-alimentation > produits-halal
+- Sous-catégorie manquante: gastronomie-alimentation > nutrition-sportive
+- Sous-catégorie manquante: gastronomie-alimentation > dietetique-sante
+- Sous-catégorie manquante: gastronomie-alimentation > produits-patisserie
+- Sous-catégorie manquante: gastronomie-alimentation > produits-cuisine
+- Sous-catégorie manquante: gastronomie-alimentation > gourmandises-douceurs
+- Sous-catégorie manquante: gastronomie-alimentation > produits-bebe
+- Sous-catégorie manquante: gastronomie-alimentation > eaux-hydratation
+- Sous-catégorie manquante: gastronomie-alimentation > accessoires-culinaires
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > poterie-ceramique
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > artisanats-regionaux
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > tissage-tapis
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > bijoux-metaux
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > broderie-vetements
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > cuir-maroquinerie
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > bois-sculpture
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > vannerie-fibres
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > decoration-berbere
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > instruments-musique
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > produits-naturels
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > articles-culturels
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > services-coutumes
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > produits-locaux
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > plats-traditionnels
+- Sous-catégorie manquante: artisanat-traditionnel-algerien > patisseries-traditionnelles
+- Sous-catégorie manquante: voyages-tourisme > voyages-decouvertes
+- Sous-catégorie manquante: voyages-tourisme > hebergement-sejour
+- Sous-catégorie manquante: voyages-tourisme > transport-touristique
+- Sous-catégorie manquante: voyages-tourisme > activites-loisirs-touristiques
+- Sous-catégorie manquante: voyages-tourisme > tourisme-culturel-historique
+- Sous-catégorie manquante: voyages-tourisme > services-assistance-voyageurs
+- Sous-catégorie manquante: voyages-tourisme > produits-accessoires-voyage
+- Sous-catégorie manquante: voyages-tourisme > gastronomie-decouvertes-touristiques
+- Sous-catégorie manquante: evenements-billetterie > concerts-spectacles
+- Sous-catégorie manquante: evenements-billetterie > evenements-sportifs
+- Sous-catégorie manquante: evenements-billetterie > cinema-avant-premieres
+- Sous-catégorie manquante: evenements-billetterie > theatre-arts-sceniques
+- Sous-catégorie manquante: evenements-billetterie > conferences-formations
+- Sous-catégorie manquante: evenements-billetterie > festivals-fetes
+- Sous-catégorie manquante: evenements-billetterie > parcs-loisirs
+- Sous-catégorie manquante: evenements-billetterie > evenements-familiaux
+- Sous-catégorie manquante: evenements-billetterie > gala-receptions
+- Sous-catégorie manquante: evenements-billetterie > salons-expositions
+- Sous-catégorie manquante: evenements-billetterie > billetterie-transport
+- Sous-catégorie manquante: evenements-billetterie > evenements-religieux-traditionnels
+- Sous-catégorie manquante: evenements-billetterie > services-evenementiels
+- Sous-catégorie manquante: evenements-billetterie > packages-offres-speciales
+- Sous-catégorie manquante: emploi-carriere > offres-emploi
+- Sous-catégorie manquante: emploi-carriere > secteurs-professionnels
+- Sous-catégorie manquante: emploi-carriere > metiers-qualifies-techniques
+- Sous-catégorie manquante: emploi-carriere > metiers-du-digital
+- Sous-catégorie manquante: emploi-carriere > metiers-de-la-sante
+- Sous-catégorie manquante: emploi-carriere > metiers-de-leducation
+- Sous-catégorie manquante: emploi-carriere > services-aide-a-la-personne
+- Sous-catégorie manquante: emploi-carriere > hotellerie-restauration
+- Sous-catégorie manquante: emploi-carriere > transport-logistique
+- Sous-catégorie manquante: emploi-carriere > agriculture-elevage
+- Sous-catégorie manquante: emploi-carriere > appels-offres-marches-publics
+- Sous-catégorie manquante: emploi-carriere > formation-developpement-professionnel
+- Sous-catégorie manquante: emploi-carriere > entrepreneuriat-business
+- Sous-catégorie manquante: emploi-carriere > cv-services-recrutement
+- Sous-catégorie manquante: emploi-carriere > stages-opportunites-jeunes
+- Sous-catégorie manquante: emploi-carriere > job-temps-partiel-etudiant
+- Sous-catégorie manquante: education-loisirs > cours-formations
+- Sous-catégorie manquante: education-loisirs > livres-supports-educatifs
+- Sous-catégorie manquante: education-loisirs > arts-musique
+- Sous-catégorie manquante: education-loisirs > sports-loisirs
+- Sous-catégorie manquante: education-loisirs > enfance-activites-familiales
+- Sous-catégorie manquante: education-loisirs > clubs-associations
+- Sous-catégorie manquante: animaux-accessoires > animaux-domestiques
+- Sous-catégorie manquante: animaux-accessoires > animaux-elevage
+- Sous-catégorie manquante: animaux-accessoires > nourriture-soins
+- Sous-catégorie manquante: animaux-accessoires > accessoires-equipements
+- Sous-catégorie manquante: animaux-accessoires > elevage-reproduction
+- Sous-catégorie manquante: animaux-accessoires > services-animaliers
+- Sous-catégorie manquante: animaux-accessoires > produits-exterieurs
+- Sous-catégorie manquante: finance > monnaie-fiduciaire
+- Sous-catégorie manquante: finance > services-financiers
+- Sous-catégorie manquante: finance > monnaie-internationale
+- Sous-catégorie manquante: finance > or-metaux-precieux
+- Sous-catégorie manquante: finance > accessoires-numismatiques
+- Sous-catégorie manquante: finance > aide-collection
+- Sous-catégorie manquante: services-support > services-informatiques
+- Sous-catégorie manquante: services-support > services-telecom
+- Sous-catégorie manquante: services-support > services-electromenager
+- Sous-catégorie manquante: services-support > services-maison
+- Sous-catégorie manquante: services-support > services-artisanaux
+- Sous-catégorie manquante: services-support > transport-livraison
+- Sous-catégorie manquante: services-support > services-administratifs
+- Sous-catégorie manquante: services-support > support-business
+- Sous-catégorie manquante: services-support > services-formation
+- Sous-catégorie manquante: services-support > services-evenementiels
+- Sous-catégorie manquante: services-support > services-sante-bienetre
+- Sous-catégorie manquante: services-support > aide-personne
+- Sous-catégorie manquante: services-support > services-automobiles
+- Sous-catégorie manquante: services-support > services-creatifs
+- Sous-catégorie manquante: echanges-partage > troc-objets
+- Sous-catégorie manquante: echanges-partage > don-gratuit
+- Sous-catégorie manquante: echanges-partage > pret-objets
+- Sous-catégorie manquante: echanges-partage > partage-competences
+- Sous-catégorie manquante: echanges-partage > carpooling-deplacements
+- Sous-catégorie manquante: echanges-partage > partage-habitat
+- Sous-catégorie manquante: echanges-partage > echange-services
+- Sous-catégorie manquante: echanges-partage > communaute-entraide
+- Sous-catégorie manquante: echanges-partage > echange-culturel
+- Sous-catégorie manquante: echanges-partage > recuperation-reemploi
