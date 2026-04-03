@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Store, Loader2 } from "lucide-react";
 import ShopCard from "@/components/home/ShopCard";
 import SmartAnnouncementsGrid from "@/components/home/SmartAnnouncementsGrid";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { LocalizedLink } from "@/utils/linkUtils";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from "@/integrations/supabase/client";
+import SEOHead from "@/components/SEO/SEOHead";
+import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 type ShopRubrique =
   | "magasins"
@@ -38,6 +41,7 @@ const rubriqueToShopStatus: Record<Exclude<ShopRubrique, "boutique-en-ligne">, s
 
 export default function Boutiques() {
   const { t } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
   const { rubrique } = useParams<{ rubrique?: string }>();
   
   const [shops, setShops] = useState<any[]>([]);
@@ -100,23 +104,100 @@ export default function Boutiques() {
     return `${getLabel("shops.listing.categoryPrefix", "Rubrique :")} ${rubriqueLabel}`;
   })();
 
+  const shopsTitle = getLabel("shops.listing.title", "Boutiques");
+  const shopsBaseLabel = getLabel("shops.listing.allShops", "Toutes les boutiques");
+  const activeRubriqueName = (() => {
+    if (activeRubrique === "all") return shopsBaseLabel;
+    const rubriqueItem = rubriques.find((r) => r.slug === activeRubrique);
+    return rubriqueItem ? getLabel(rubriqueItem.labelKey, rubriqueItem.fallbackLabel) : activeRubrique;
+  })();
+  const shopsUrl = activeRubrique === "all" ? getLocalizedPath("/boutiques") : getLocalizedPath(`/boutiques/${activeRubrique}`);
+  const shopsBreadcrumbs = [
+    { label: t("breadcrumb.home"), href: getLocalizedPath("/") },
+    { label: shopsTitle, href: getLocalizedPath("/boutiques") },
+    ...(activeRubrique !== "all" ? [{ label: activeRubriqueName, href: shopsUrl }] : []),
+  ];
+  const shopsSeoTitle = activeRubrique === "all" ? shopsTitle : `${shopsTitle} - ${activeRubriqueName}`;
+  const shopsSeoDescription =
+    activeRubrique === "all"
+      ? `${shopsTitle} sur Aladdin Annonces Algérie. Découvrez les boutiques, magasins, cabinets, entreprises et associations disponibles.`
+      : `${activeRubriqueName} sur Aladdin Annonces Algérie. Parcourez les boutiques et professionnels disponibles dans cette rubrique.`;
+  const shopsStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: filteredShops.slice(0, 24).map((shop, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${window.location.origin}${getLocalizedPath(`/boutique/${shop.id}`)}`,
+      name: shop.name || `Boutique ${index + 1}`,
+    })),
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <>
+        <SEOHead
+          title={shopsSeoTitle}
+          description={shopsSeoDescription}
+          category={shopsTitle}
+          subcategory={activeRubrique !== "all" ? activeRubriqueName : undefined}
+          url={shopsUrl}
+          keywords={[shopsTitle, activeRubriqueName]}
+          breadcrumbs={shopsBreadcrumbs}
+        />
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <SEOHead
+        title={shopsSeoTitle}
+        description={shopsSeoDescription}
+        category={shopsTitle}
+        subcategory={activeRubrique !== "all" ? activeRubriqueName : undefined}
+        url={shopsUrl}
+        keywords={[shopsTitle, activeRubriqueName]}
+        breadcrumbs={shopsBreadcrumbs}
+        structuredData={filteredShops.length > 0 ? shopsStructuredData : undefined}
+      />
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto space-y-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to={getLocalizedPath("/")}>{t("breadcrumb.home")}</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                {activeRubrique === "all" ? (
+                  <BreadcrumbPage>{shopsTitle}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link to={getLocalizedPath("/boutiques")}>{shopsTitle}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              {activeRubrique !== "all" ? (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{activeRubriqueName}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              ) : null}
+            </BreadcrumbList>
+          </Breadcrumb>
           <div className="flex items-center gap-3">
             <Store className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-2xl font-bold text-foreground">
-                {getLabel("shops.listing.title", "Boutiques")}
+                {shopsTitle}
               </h1>
               <p className="text-muted-foreground">{activeRubriqueLabel}</p>
             </div>

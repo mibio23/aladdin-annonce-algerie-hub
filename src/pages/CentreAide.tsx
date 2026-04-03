@@ -4,12 +4,42 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, MessageCircle, Phone, Mail, HelpCircle, User, ShoppingCart, Shield, Wrench, CheckCircle } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
+import SEOHead from '@/components/SEO/SEOHead';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 const CentreAide = () => {
   const { t, isRTL } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
+  const helpFaqs = [
+    { question: t('helpCenter.popularTopics.createAccount'), answer: t('helpCenter.popularTopics.createAccountDesc') },
+    { question: t('helpCenter.popularTopics.postAd'), answer: t('helpCenter.popularTopics.postAdDesc') },
+    { question: t('helpCenter.popularTopics.payment'), answer: t('helpCenter.popularTopics.paymentDesc') },
+    { question: t('helpCenter.popularTopics.safety'), answer: t('helpCenter.popularTopics.safetyDesc') },
+    { question: t('helpCenter.popularTopics.delivery'), answer: t('helpCenter.popularTopics.deliveryDesc') },
+    { question: t('helpCenter.popularTopics.account'), answer: t('helpCenter.popularTopics.accountDesc') },
+  ];
+  const helpStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: helpFaqs.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
 
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isRTL ? 'rtl' : 'ltr'}`}>
+      <SEOHead
+        title={t('helpCenter.title')}
+        description={t('helpCenter.subtitle')}
+        url={getLocalizedPath('/centre-aide')}
+        keywords={[t('helpCenter.title'), 'aide', 'support', 'faq']}
+        structuredData={helpStructuredData}
+      />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">

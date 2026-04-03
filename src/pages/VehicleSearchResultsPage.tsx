@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useMemo, type MouseEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,6 +32,8 @@ import { wilayas } from '@/data/wilayaData';
 import { coerceWilayaCode, extractWilayaCodeFromText, normalizeArabicDiacritics, normalizeLatin } from '@/utils/distanceUtils';
 import { useFavorites } from '@/hooks/useFavorites';
 import { cn } from '@/lib/utils';
+import SEOHead from '@/components/SEO/SEOHead';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 // Types for filters
 interface VehicleFilters {
@@ -183,7 +185,7 @@ const VEHICLE_CATEGORY_SLUGS = ['vehicules-equipements', 'vehicules', 'vehicules
 const VehicleSearchResultsPage = () => {
   const { t, language, isRTL } = useSafeI18nWithRouter();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { navigateWithLanguage } = useLanguageNavigation();
+  const { navigateWithLanguage, getLocalizedPath } = useLanguageNavigation();
   const { fetchFavorites, toggleFavorite, isFavorite } = useFavorites();
 
   // State
@@ -588,18 +590,81 @@ const VehicleSearchResultsPage = () => {
     });
   };
 
+  const vehicleSearchTitle = t('search.vehicles.title', 'Recherche Auto-Immersive');
+  const vehicleSearchSubtitle = t('search.vehicles.subtitle', 'Trouvez votre prochain véhicule avec notre moteur intelligent');
+  const activeBrandLabel = filters.brand[0] || '';
+  const vehicleSearchPageTitle = activeBrandLabel
+    ? `${vehicleSearchTitle} - ${activeBrandLabel}`
+    : filters.query
+      ? `${vehicleSearchTitle} - ${filters.query}`
+      : vehicleSearchTitle;
+  const vehicleSearchPageDescription = activeBrandLabel
+    ? `Résultats de recherche véhicules pour ${activeBrandLabel} sur Aladdin Annonces Algérie.`
+    : filters.query
+      ? `Résultats de recherche véhicules pour "${filters.query}" sur Aladdin Annonces Algérie.`
+      : vehicleSearchSubtitle;
+  const vehicleSearchPageUrl = `${getLocalizedPath('/search/vehicles')}${paramsKey ? `?${paramsKey}` : ''}`;
+  const vehicleSearchBreadcrumbs = [
+    { label: t('breadcrumb.home'), href: getLocalizedPath('/') },
+    { label: t('search.page.title'), href: getLocalizedPath('/search') },
+    { label: vehicleSearchTitle, href: getLocalizedPath('/search/vehicles') },
+    ...(activeBrandLabel ? [{ label: activeBrandLabel, href: vehicleSearchPageUrl }] : []),
+    ...(!activeBrandLabel && filters.query ? [{ label: filters.query, href: vehicleSearchPageUrl }] : []),
+  ];
+  const vehicleStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: filteredResults.slice(0, 24).map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${window.location.origin}${getLocalizedPath(`/annonce/${item.id}`)}`,
+      name: item.title || `Véhicule ${index + 1}`,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <SEOHead
+        title={vehicleSearchPageTitle}
+        description={vehicleSearchPageDescription}
+        category={vehicleSearchTitle}
+        subcategory={activeBrandLabel || undefined}
+        url={vehicleSearchPageUrl}
+        canonicalUrl={paramsKey ? getLocalizedPath('/search/vehicles') : vehicleSearchPageUrl}
+        noIndex={Boolean(paramsKey)}
+        keywords={[vehicleSearchTitle, activeBrandLabel, filters.query]}
+        breadcrumbs={vehicleSearchBreadcrumbs}
+        structuredData={filteredResults.length > 0 ? vehicleStructuredData : undefined}
+      />
       {/* Header Banner - Immersive */}
       <div className="bg-slate-900 text-white py-8 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80')] bg-cover bg-center" />
         <div className="container mx-auto relative z-10">
+          <Breadcrumb className="mb-4 text-white/90">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to={getLocalizedPath('/')} className="text-white/80 hover:text-white">{t('breadcrumb.home')}</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="text-white/50" />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to={getLocalizedPath('/search')} className="text-white/80 hover:text-white">{t('search.page.title')}</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="text-white/50" />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-white">{vehicleSearchTitle}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
             <Car className="w-8 h-8 text-emerald-400" />
-            {t('search.vehicles.title', 'Recherche Auto-Immersive')}
+            {vehicleSearchTitle}
           </h1>
           <p className="text-slate-300">
-            {t('search.vehicles.subtitle', 'Trouvez votre prochain véhicule avec notre moteur intelligent')}
+            {vehicleSearchSubtitle}
           </p>
         </div>
       </div>

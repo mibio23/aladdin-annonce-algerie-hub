@@ -4,9 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, HelpCircle, MessageCircle, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SEOHead from '@/components/SEO/SEOHead';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 const FAQ = () => {
   const { t, isRTL } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
 
   const faqCategories = [
     {
@@ -112,9 +115,30 @@ const FAQ = () => {
       ]
     }
   ];
+  const faqStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqCategories.flatMap((category) =>
+      category.questions.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      }))
+    ),
+  };
 
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isRTL ? 'rtl' : 'ltr'}`}>
+      <SEOHead
+        title={t('faq.title')}
+        description={t('faq.subtitle')}
+        url={getLocalizedPath('/faq')}
+        keywords={[t('faq.title'), 'faq', 'aide', 'support']}
+        structuredData={faqStructuredData}
+      />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">

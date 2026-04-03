@@ -8,9 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Tag, ArrowRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import SEOHead from "@/components/SEO/SEOHead";
+import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 const Actualites = () => {
   const { t } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
 
   // Données d'exemple pour les actualités
   const newsArticles = [
@@ -53,9 +56,56 @@ const Actualites = () => {
   ];
 
   const categories = ["Toutes", "Technologie", "Expansion", "Sécurité", "Mise à jour"];
+  const actualitesStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: t('actualites.title'),
+      description: t('actualites.subtitle'),
+      url: `${window.location.origin}${getLocalizedPath('/actualites')}`,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: newsArticles.map((article, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${window.location.origin}${getLocalizedPath('/actualites')}`,
+        name: article.title,
+      })),
+    },
+    ...newsArticles.map((article) => ({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.title,
+      description: article.excerpt,
+      image: `${window.location.origin}${article.imageUrl}`,
+      datePublished: article.publishedDate,
+      author: {
+        '@type': 'Organization',
+        name: article.author,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Aladdin Annonces Algérie',
+        logo: {
+          '@type': 'ImageObject',
+          url: `${window.location.origin}/og-image.jpg`,
+        },
+      },
+      mainEntityOfPage: `${window.location.origin}${getLocalizedPath('/actualites')}`,
+    })),
+  ];
 
   return (
     <>
+      <SEOHead
+        title={t('actualites.title')}
+        description={t('actualites.subtitle')}
+        url={getLocalizedPath('/actualites')}
+        keywords={[t('actualites.title'), 'actualités', 'guides', 'conseils', 'Aladdin']}
+        structuredData={actualitesStructuredData}
+      />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}

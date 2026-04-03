@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 import AdaptiveImageCarousel from "@/components/common/AdaptiveImageCarousel";
 import ReportModal from "@/components/common/ReportModal";
+import SEOHead from "@/components/SEO/SEOHead";
 
 interface JobOffer {
   id: string;
@@ -55,7 +56,7 @@ const JobOfferDetailsPage = () => {
   const { t, isRTL } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { navigateWithLanguage } = useLanguageNavigation();
+  const { navigateWithLanguage, getLocalizedPath } = useLanguageNavigation();
   const [offer, setOffer] = useState<JobOffer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -326,18 +327,46 @@ const JobOfferDetailsPage = () => {
     );
   }
 
+  const tradesLabel = translateOrFallback('sections.tradesAndRepairers', 'Métiers & Réparateurs');
+  const jobOfferUrl = getLocalizedPath(`/offre-metier/${offer.id}`);
+  const jobOfferDescription = (() => {
+    const rawDescription = typeof offer.description === "string" ? offer.description.trim() : "";
+    if (!rawDescription) {
+      return `${offer.title} - ${tradesLabel} - Aladdin Annonces Algérie`;
+    }
+    return rawDescription.length > 180 ? `${rawDescription.slice(0, 177)}...` : rawDescription;
+  })();
+  const jobOfferBreadcrumbs = [
+    { label: t('breadcrumb.home'), href: getLocalizedPath('/') },
+    { label: tradesLabel, href: getLocalizedPath('/metiers-reparateurs') },
+    { label: offer.title, href: jobOfferUrl },
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8" dir={isRTL ? 'rtl' : 'ltr'}>
+      <SEOHead
+        title={offer.title}
+        description={jobOfferDescription}
+        category={tradesLabel}
+        subcategory={getProfessionLabel(offer.profession)}
+        image={offer.logo_url || offer.images?.[0] || '/og-image.jpg'}
+        url={jobOfferUrl}
+        breadcrumbs={jobOfferBreadcrumbs}
+      />
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">{t('breadcrumb.home')}</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link to={getLocalizedPath('/')}>{t('breadcrumb.home')}</Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/metiers-reparateurs">{t('sections.tradesAndRepairers')}</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link to={getLocalizedPath('/metiers-reparateurs')}>{tradesLabel}</Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

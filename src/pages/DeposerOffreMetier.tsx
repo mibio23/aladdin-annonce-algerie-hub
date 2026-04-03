@@ -17,6 +17,7 @@ import { GeolocationCoords } from '@/hooks/useGeolocation';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { AnimatePresence, motion } from 'framer-motion';
+import SEOHead from '@/components/SEO/SEOHead';
 
 // Import dynamique pour éviter les erreurs de chargement
 const GeolocationPicker = lazy(() => import('@/components/geolocation/GeolocationPicker'));
@@ -413,6 +414,12 @@ const DeposerOffreMetier = () => {
       }
     >
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12" dir={isRTL ? 'rtl' : 'ltr'}>
+        <SEOHead
+          title={t('jobOffer.title')}
+          description={t('jobOffer.subtitle')}
+          url={`/${language}/deposer-offre-metier`}
+          noIndex
+        />
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             
@@ -648,7 +655,7 @@ const DeposerOffreMetier = () => {
                             <ImageUpload
                               onImagesChange={setImages}
                               maxImages={6}
-                              bucket="job-offer-images"
+                              bucket="announcement-images"
                               initialImages={images}
                               hideStats={true}
                               placeholder={t('jobOffer.photosDesc')}
@@ -683,7 +690,7 @@ const DeposerOffreMetier = () => {
                               <ImageUpload
                                 onImagesChange={(urls) => setLogoUrl(urls[0] ?? null)}
                                 maxImages={1}
-                                bucket="job-offer-images"
+                                bucket="announcement-images"
                                 initialImages={logoUrl ? [logoUrl] : []}
                                 hideStats={true}
                                 placeholder={t('jobOffer.logoUploadText')}

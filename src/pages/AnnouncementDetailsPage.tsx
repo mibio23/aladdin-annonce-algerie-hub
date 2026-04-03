@@ -25,6 +25,9 @@ import { vehicleDictionary } from "@/data/search/vehicleDictionary";
 import { generalAnnouncements } from '@/data/mock/generalAnnouncements';
 import ReportModal from "@/components/common/ReportModal";
 import { useSecureContact } from "@/hooks/useSecureContact";
+import { useFavorites } from "@/hooks/useFavorites";
+import { cn } from "@/lib/utils";
+import SEOHead from "@/components/SEO/SEOHead";
 
 // Extended type definition to include all new fields
 type DetailedAnnouncement = Announcement & {
@@ -137,6 +140,11 @@ const AnnouncementDetailsPage: React.FC = () => {
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
   const [similarAnnouncements, setSimilarAnnouncements] = useState<AnnouncementType[]>([]);
   const menuCategories = getCategoryMenu(currentLanguage);
+  const { isFavorite, toggleFavorite, fetchFavorites } = useFavorites();
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   const normalizePhone = (value?: string | null) => {
     if (!value) return '';
@@ -489,12 +497,12 @@ const AnnouncementDetailsPage: React.FC = () => {
     return translateVehicleDictionaryValue("paper", raw);
   };
 
-  const handleFavoriteClick = () => {
-    toast({
-      title: t('createAd.favorites.added'),
-      description: t('createAd.favorites.addedDesc'),
-    });
+  const handleFavoriteClick = async () => {
+    if (!announcement?.id) return;
+    await toggleFavorite(announcement.id);
   };
+
+  const isAnnouncementFavorite = announcement?.id ? isFavorite(announcement.id) : false;
 
   const handleShareClick = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -910,9 +918,36 @@ const AnnouncementDetailsPage: React.FC = () => {
   const showBikeSpecsBlock =
     isBikeCategory &&
     (bike.frameSize || bike.wheelResolved || typeof bike.isElectric === 'boolean' || typeof bike.isMotorized === 'boolean' || bike.frameMaterial || bike.suspension || bike.brake || bike.gears || bike.bikeType || bike.weight);
+  const announcementUrl = getLocalizedPath(`/annonce/${announcement.id}`);
+  const seoDescription = (() => {
+    const rawDescription = typeof announcement.description === "string" ? announcement.description.trim() : "";
+    if (!rawDescription) {
+      return `${announcement.title} - ${resolvedCategoryName}${resolvedSubcategoryName ? ` - ${resolvedSubcategoryName}` : ""} - Aladdin Annonces Algérie`;
+    }
+    return rawDescription.length > 180 ? `${rawDescription.slice(0, 177)}...` : rawDescription;
+  })();
+  const seoBreadcrumbs = [
+    { label: t("breadcrumb.home"), href: getLocalizedPath("/") },
+    ...(resolvedCategorySlug
+      ? [{ label: resolvedCategoryName, href: getLocalizedPath(`/category/${resolvedCategorySlug}`) }]
+      : []),
+    ...(resolvedSubcategoryName && resolvedCategorySlug && resolvedSubcategorySlug
+      ? [{ label: resolvedSubcategoryName, href: getLocalizedPath(`/category/${resolvedCategorySlug}/${resolvedSubcategorySlug}`) }]
+      : []),
+    { label: announcement.title, href: announcementUrl },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-12">
+      <SEOHead
+        title={announcement.title}
+        description={seoDescription}
+        category={resolvedCategoryName}
+        subcategory={resolvedSubcategoryName || undefined}
+        image={allImages[0] || "/og-image.jpg"}
+        url={announcementUrl}
+        breadcrumbs={seoBreadcrumbs}
+      />
       <ReportModal
         open={showReportModal}
         onClose={() => setShowReportModal(false)}
@@ -1005,8 +1040,8 @@ const AnnouncementDetailsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                   <Button variant="ghost" size="icon" onClick={handleFavoriteClick} className="text-gray-500 hover:text-red-500">
-                    <Heart className="w-5 h-5" />
+                   <Button variant="ghost" size="icon" onClick={handleFavoriteClick} className={cn("text-gray-500 hover:text-red-500", isAnnouncementFavorite && "text-red-500 hover:text-red-600")}>
+                    <Heart className={cn("w-5 h-5", { "fill-red-500": isAnnouncementFavorite })} />
                    </Button>
                    <Button variant="ghost" size="icon" onClick={handleShareClick} className="text-gray-500 hover:text-blue-500">
                     <Share2 className="w-5 h-5" />

@@ -49,6 +49,8 @@ import { Shop } from '@/types/shop';
 import { useAuth } from '@/contexts/useAuth';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { generateSessionId } from '@/utils/searchUtils';
+import SEOHead from '@/components/SEO/SEOHead';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 const ShopDetails: React.FC = () => {
   const [shop, setShop] = useState<Shop | null>(null);
@@ -463,8 +465,34 @@ const ShopDetails: React.FC = () => {
     window.location.href = `tel:${phoneNumbers[0]}`;
   };
 
+  const shopsLabel = (() => {
+    const translated = t('shops.listing.title');
+    return translated && translated !== 'shops.listing.title' ? translated : 'Boutiques';
+  })();
+  const shopDescription = (() => {
+    const rawDescription = typeof shop.description === 'string' ? shop.description.trim() : '';
+    if (!rawDescription) {
+      return `${shop.name} - ${shopsLabel} - Aladdin Annonces Algérie`;
+    }
+    return rawDescription.length > 180 ? `${rawDescription.slice(0, 177)}...` : rawDescription;
+  })();
+  const shopUrl = getLocalizedPath(`/boutique/${shop.id}`);
+  const shopBreadcrumbs = [
+    { label: t('breadcrumb.home'), href: getLocalizedPath('/') },
+    { label: shopsLabel, href: getLocalizedPath('/boutiques') },
+    { label: shop.name, href: shopUrl },
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 pb-20">
+      <SEOHead
+        title={shop.name}
+        description={shopDescription}
+        category={shopsLabel}
+        image={shop.logoUrl || shop.bannerUrl || '/og-image.jpg'}
+        url={shopUrl}
+        breadcrumbs={shopBreadcrumbs}
+      />
       {/* Hero Banner Section */}
       <div className="relative h-48 md:h-72 lg:h-80 w-full overflow-hidden">
         {shop.bannerUrl ? (
@@ -504,6 +532,25 @@ const ShopDetails: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4">
+        <Breadcrumb className="mb-6 pt-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to={getLocalizedPath('/')}>{t('breadcrumb.home')}</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to={getLocalizedPath('/boutiques')}>{shopsLabel}</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{shop.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="relative -mt-16 md:-mt-24 mb-8">
           <div className="flex flex-col md:flex-row items-end gap-6 md:gap-8">
             {/* Logo with Animation */}

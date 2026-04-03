@@ -23,6 +23,7 @@ import { safeStringify } from '@/utils/safeStringify';
 import { logger } from '@/utils/silentLogger';
 import { compressImage, optimizeVideo, getMediaSettings } from '@/utils/mediaCompression';
 import { supabase } from "@/integrations/supabase/client";
+import SEOHead from '@/components/SEO/SEOHead';
 
 const SHOP_STATUS_PREVIEW_IMAGES: Record<string, string[]> = {
   'shops': [
@@ -689,6 +690,12 @@ const CreateShopPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12" dir={isRTL ? 'rtl' : 'ltr'}>
+      <SEOHead
+        title={t('createShop.title')}
+        description={t('createShop.subtitle')}
+        url={getLocalizedPath('/creer-boutique')}
+        noIndex
+      />
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-white/50 dark:border-slate-700/50 overflow-hidden relative">

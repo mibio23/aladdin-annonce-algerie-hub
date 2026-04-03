@@ -1,6 +1,5 @@
 import React from 'react';
 import SEOHead from '@/components/SEO/SEOHead';
-import { Breadcrumb } from '@/components/SEO/Breadcrumb';
 
 interface SubcategoryPageSEOProps {
   categoryName: string;
@@ -32,12 +31,12 @@ export function SubcategoryPageSEO({
         subcategory={subcategoryName}
         image={`/images/subcategories/${subcategorySlug}.jpg`}
         url={`/fr/category/${categorySlug}/${subcategorySlug}`}
+        breadcrumbs={[
+          { label: 'Accueil', href: '/fr' },
+          { label: categoryName, href: `/fr/category/${categorySlug}` },
+          { label: subcategoryName, href: `/fr/category/${categorySlug}/${subcategorySlug}` }
+        ]}
       />
-      <Breadcrumb items={[
-        { label: 'Accueil', href: '/fr' },
-        { label: categoryName, href: `/fr/category/${categorySlug}` },
-        { label: subcategoryName }
-      ]} />
     </>
   );
 }

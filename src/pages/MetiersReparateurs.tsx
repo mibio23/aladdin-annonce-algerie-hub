@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   Search,
   Star,
@@ -23,6 +24,9 @@ import { logger } from '@/utils/silentLogger';
 import { LocalizedLink } from '@/utils/linkUtils';
 import { translationFallback } from '@/lib/i18n/utils/fallback';
 import { languageConfig } from '@/lib/i18n/config';
+import SEOHead from '@/components/SEO/SEOHead';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 import { PROFESSION_KEYS, PROFESSION_KEYWORDS, ProfessionKey } from '@/data/searchKeywords';
 
@@ -244,6 +248,7 @@ const getProfessionValuesForKey = (professionKey: ProfessionKey): string[] => {
 
 const MetiersReparateurs: React.FC = () => {
   const { t, language } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
   const params = useParams();
   const professionSlug = params.profession;
 
@@ -385,27 +390,103 @@ const MetiersReparateurs: React.FC = () => {
     return t('metiers.title');
   };
 
+  const tradesTitle = t('sections.tradesAndRepairers') !== 'sections.tradesAndRepairers'
+    ? t('sections.tradesAndRepairers')
+    : 'Métiers & Réparateurs';
+  const tradesPageUrl = professionSlug
+    ? getLocalizedPath(`/metiers-reparateurs/${professionSlug}`)
+    : getLocalizedPath('/metiers-reparateurs');
+  const tradesSeoTitle = professionSlug && professionLabel
+    ? `${tradesTitle} - ${professionLabel}`
+    : tradesTitle;
+  const tradesSeoDescription = professionSlug && professionLabel
+    ? `${professionLabel} sur Aladdin Annonces Algérie. Trouvez des professionnels qualifiés, artisans et prestataires disponibles.`
+    : 'Métiers & Réparateurs sur Aladdin Annonces Algérie. Trouvez des professionnels qualifiés, artisans et services spécialisés.';
+  const tradesBreadcrumbs = [
+    { label: t('breadcrumb.home'), href: getLocalizedPath('/') },
+    { label: tradesTitle, href: getLocalizedPath('/metiers-reparateurs') },
+    ...(professionSlug && professionLabel ? [{ label: professionLabel, href: tradesPageUrl }] : []),
+  ];
+  const tradesStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: sortedAnnouncements.slice(0, 24).map((announcement, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${window.location.origin}${getLocalizedPath(`/offre-metier/${announcement.id}`)}`,
+      name: announcement.title || `Offre de service ${index + 1}`,
+    })),
+  };
+
   if (error) {
     logger.error('Error in MetiersReparateurs:', error);
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
-            Erreur de chargement
-          </h1>
-          <p className="text-gray-600 mb-4">
-            Une erreur s'est produite lors du chargement des annonces.
-          </p>
-          <Button onClick={() => window.location.reload()}>
-            Réessayer
-          </Button>
+      <>
+        <SEOHead
+          title={tradesSeoTitle}
+          description={tradesSeoDescription}
+          category={tradesTitle}
+          subcategory={professionSlug ? professionLabel : undefined}
+          url={tradesPageUrl}
+          keywords={[tradesTitle, professionLabel]}
+          breadcrumbs={tradesBreadcrumbs}
+        />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">
+              Erreur de chargement
+            </h1>
+            <p className="text-gray-600 mb-4">
+              Une erreur s'est produite lors du chargement des annonces.
+            </p>
+            <Button onClick={() => window.location.reload()}>
+              Réessayer
+            </Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-6">
+      <SEOHead
+        title={tradesSeoTitle}
+        description={tradesSeoDescription}
+        category={tradesTitle}
+        subcategory={professionSlug ? professionLabel : undefined}
+        url={tradesPageUrl}
+        keywords={[tradesTitle, professionLabel]}
+        breadcrumbs={tradesBreadcrumbs}
+        structuredData={sortedAnnouncements.length > 0 ? tradesStructuredData : undefined}
+      />
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to={getLocalizedPath('/')}>{t('breadcrumb.home')}</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            {professionSlug ? (
+              <BreadcrumbLink asChild>
+                <Link to={getLocalizedPath('/metiers-reparateurs')}>{tradesTitle}</Link>
+              </BreadcrumbLink>
+            ) : (
+              <BreadcrumbPage>{tradesTitle}</BreadcrumbPage>
+            )}
+          </BreadcrumbItem>
+          {professionSlug ? (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{professionLabel}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          ) : null}
+        </BreadcrumbList>
+      </Breadcrumb>
       {/* Header Section - Style exact from image */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-3">

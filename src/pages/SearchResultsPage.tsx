@@ -18,11 +18,14 @@ import SearchSortingControls, { SortOption, ViewMode } from '@/components/search
 import SearchResultsGrid from '@/components/search/SearchResultsGrid';
 import SearchBreadcrumb from '@/components/search/SearchBreadcrumb';
 import SearchPagination from '@/components/search/SearchPagination';
+import SEOHead from '@/components/SEO/SEOHead';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t, language } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
   const { announcements = [], loading, fetchAnnouncements, totalCount, isApproximate } = useAnnouncements();
 
   useRealtimeAnnouncements();
@@ -171,8 +174,52 @@ const SearchResultsPage: React.FC = () => {
     }
   }
 
+  const selectedCategoryName = selectedCategory
+    ? categoryMenu.find((cat) => cat.slug === selectedCategory)?.name || selectedCategory
+    : '';
+  const searchPageTitle = searchQuery
+    ? `${t('search.page.title')} - ${searchQuery}`
+    : selectedCategoryName
+      ? `${t('search.page.title')} - ${selectedCategoryName}`
+      : t('search.page.title');
+  const searchPageDescription = searchQuery
+    ? `Résultats de recherche pour "${searchQuery}" sur Aladdin Annonces Algérie. Parcourez les annonces disponibles${selectedCategoryName ? ` dans ${selectedCategoryName}` : ''}.`
+    : selectedCategoryName
+      ? `Résultats de recherche dans ${selectedCategoryName} sur Aladdin Annonces Algérie.`
+      : 'Résultats de recherche sur Aladdin Annonces Algérie. Parcourez les annonces selon vos filtres.';
+  const searchPageUrl = `${getLocalizedPath('/search')}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+  const searchHasDynamicFilters = Boolean(searchQuery || selectedCategory || selectedSubCategory || selectedSpecialisation || selectedCondition || minPrice || maxPrice || location || selectedWilaya);
+  const searchBreadcrumbs = [
+    { label: t('breadcrumb.home'), href: getLocalizedPath('/') },
+    { label: t('search.page.title'), href: getLocalizedPath('/search') },
+    ...(selectedCategoryName ? [{ label: selectedCategoryName, href: getLocalizedPath(`/category/${selectedCategory}`) }] : []),
+    ...(searchQuery ? [{ label: searchQuery, href: searchPageUrl }] : []),
+  ];
+  const searchStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: displayResults.slice(0, 24).map((announcement: any, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${window.location.origin}${getLocalizedPath(`/annonce/${announcement.id}`)}`,
+      name: announcement.title || `Annonce ${index + 1}`,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-background py-8">
+      <SEOHead
+        title={searchPageTitle}
+        description={searchPageDescription}
+        category={selectedCategoryName || undefined}
+        subcategory={selectedSubCategory || undefined}
+        url={searchPageUrl}
+        canonicalUrl={searchHasDynamicFilters ? getLocalizedPath('/search') : searchPageUrl}
+        noIndex={searchHasDynamicFilters}
+        keywords={[t('search.page.title'), searchQuery, selectedCategoryName, selectedSubCategory]}
+        breadcrumbs={searchBreadcrumbs}
+        structuredData={displayResults.length > 0 ? searchStructuredData : undefined}
+      />
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <SearchBreadcrumb items={breadcrumbItems} query={searchQuery} />

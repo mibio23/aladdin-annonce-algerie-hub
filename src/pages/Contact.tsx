@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { logger } from '@/utils/silentLogger';
+import SEOHead from "@/components/SEO/SEOHead";
+import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 interface ContactFormData {
   name: string;
@@ -21,8 +23,45 @@ interface ContactFormData {
 
 const Contact = () => {
   const { t } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const contactFaqs = [
+    { question: t('contact.faq.question1'), answer: t('contact.faq.answer1') },
+    { question: t('contact.faq.question2'), answer: t('contact.faq.answer2') },
+    { question: t('contact.faq.question3'), answer: t('contact.faq.answer3') },
+    { question: t('contact.faq.question4'), answer: t('contact.faq.answer4') },
+  ];
+  const contactStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      name: 'Aladdin Annonces Algérie',
+      url: `${window.location.origin}${getLocalizedPath('/contact')}`,
+      image: `${window.location.origin}/og-image.jpg`,
+      telephone: t('contact.info.phone.main'),
+      email: t('contact.info.email.general'),
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: t('contact.info.address.street'),
+        addressLocality: t('contact.info.address.city'),
+        addressCountry: t('contact.info.address.country'),
+      },
+      areaServed: 'DZ',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: contactFaqs.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    },
+  ];
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormData>();
 
@@ -39,6 +78,13 @@ const Contact = () => {
 
   return (
     <>
+      <SEOHead
+        title={t('contact.title')}
+        description={t('contact.subtitle')}
+        url={getLocalizedPath('/contact')}
+        keywords={[t('contact.title'), 'contact', 'support', 'Aladdin']}
+        structuredData={contactStructuredData}
+      />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Page Header */}
