@@ -34,7 +34,7 @@ const LegacyAnnouncementCard: React.FC<any> = (props) => {
     user_id: props.user_id || 'unknown',
     created_at: toSafeISOString(props.date),
     updated_at: toSafeISOString(props.date),
-    is_active: props.isActive !== false,
+    is_active: !!props.isActive,
     is_featured: props.isFeatured || false,
     is_urgent: props.isUrgent || false,
     views_count: 0,

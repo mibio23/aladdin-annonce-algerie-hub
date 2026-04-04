@@ -55,9 +55,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   const { fetchFavorites, isFavorite, toggleFavorite } = useFavorites();
   const { t, isRTL, language } = useSafeI18nWithRouter();
 
-  const announcementUrl = announcement.categorySlug === 'services-professionnels' 
-    ? `${window.location.origin}/offre-metier/${announcement.id}` 
-    : `${window.location.origin}/annonce/${announcement.id}`;
+  const announcementUrl = `${window.location.origin}/annonce/${announcement.id}`;
   const shareTitle = announcement.title;
 
   useEffect(() => {
