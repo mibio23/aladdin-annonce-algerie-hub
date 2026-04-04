@@ -23,6 +23,7 @@ export const jobOffer = {
   "jobOffer.logoUploadText": "Drag and drop your logo or click to select a file",
   "jobOffer.experience": "Experience",
   "jobOffer.selectExperience": "Select experience",
+  "jobOffer.yearsExperience": "Years of experience",
   "jobOffer.availability": "Availability",
   "jobOffer.selectAvailability": "Select availability",
   "jobOffer.rate": "Rate (optional)",

@@ -15,6 +15,9 @@ import {
   Clock,
   Wrench,
   CheckCircle,
+  ShieldCheck,
+  Home as HomeIcon,
+  Award,
   Eye,
   MapPin,
   MessageCircle,
@@ -798,7 +801,15 @@ const MetiersReparateurs: React.FC = () => {
                                   {isRTL ? "علاء الدين" : "Aladdin"}
                                 </span>
                                 <span className="text-[9px] font-bold text-red-600 uppercase tracking-wider leading-none drop-shadow-sm">
-                                  {isRTL ? "الإختيار الأفضل" : "Sélection Or"}
+                                  {language === 'ar' 
+                                    ? "الاحترافية والمهن"
+                                    : language === 'es'
+                                      ? "Profesionalismo y Oficios"
+                                      : language === 'it'
+                                        ? "Professionalità e Mestieri"
+                                        : language === 'de'
+                                          ? "Professionalität & Handwerk"
+                                          : "professionnalisme et Métiers"}
                                 </span>
                               </div>
                               <div className="w-8 h-8 bg-white/50 backdrop-blur-sm rounded-lg shadow-inner flex items-center justify-center border border-white/50 p-1 group-hover:scale-110 transition-transform duration-300">
@@ -825,13 +836,42 @@ const MetiersReparateurs: React.FC = () => {
                             </div>
                           )}
 
-                          {announcement.profession && (
-                            <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
-                              <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold border border-blue-100 dark:border-blue-800">
-                                {announcement.profession}
-                              </span>
-                            </div>
-                          )}
+                          {(() => {
+                            const isGraduate = (announcement as any)?.is_graduate === true || (announcement as any)?.diplome === true;
+                            const homeService = (announcement as any)?.home_service === true || (announcement as any)?.deplacement === true;
+                            const years = typeof (announcement as any)?.years_experience === 'number' ? (announcement as any)?.years_experience : undefined;
+                            const level = (announcement as any)?.experience_level;
+                            const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
+
+                            const graduateLabel = language === 'ar' ? "دبلوم/معتمد" : language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié";
+                            const homeLabel = language === 'ar' ? "خدمة منزلية متاحة" : language === 'es' ? "Servicio a domicilio" : language === 'it' ? "Disponibile a domicilio" : language === 'de' ? "Hausbesuche möglich" : "Déplacement à domicile possible";
+                            const expertLabel = language === 'ar' ? "خبير (أكثر من 10 سنوات)" : language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)";
+
+                            return (
+                              <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
+                                {announcement.profession ? (
+                                  <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold border border-blue-100 dark:border-blue-800">
+                                    {announcement.profession}
+                                  </span>
+                                ) : null}
+                                {isGraduate ? (
+                                  <span className="flex items-center gap-1 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-blue-100 dark:border-blue-800">
+                                    <ShieldCheck className="w-3 h-3" /> {graduateLabel}
+                                  </span>
+                                ) : null}
+                                {homeService ? (
+                                  <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">
+                                    <HomeIcon className="w-3 h-3" /> {homeLabel}
+                                  </span>
+                                ) : null}
+                                {isExpert ? (
+                                  <span className="flex items-center gap-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-200 dark:border-slate-700">
+                                    <Award className="w-3 h-3" /> {expertLabel}
+                                  </span>
+                                ) : null}
+                              </div>
+                            );
+                          })()}
 
                           <span className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold z-20">
                             {formatRelativeTime(announcement.created_at)}
@@ -867,11 +907,7 @@ const MetiersReparateurs: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
-                        <span className="flex items-center">
-                          <Phone className="w-3 h-3 mr-1" />
-                          {announcement.contact_phone || announcement.contact_email || 'Contact sur demande'}
-                        </span>
+                      <div className="flex items-center justify-end text-xs text-muted-foreground mb-4">
                         <div className="flex items-center bg-primary/5 px-2 py-0.5 rounded-full">
                           <Eye className="w-3 h-3 mr-1 text-primary" />
                           <span className="font-medium text-primary">{announcement.view_count || 0}</span>
@@ -879,20 +915,6 @@ const MetiersReparateurs: React.FC = () => {
                       </div>
 
                       <div className="flex gap-2 w-full">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (announcement.contact_phone) {
-                              window.location.href = `tel:${announcement.contact_phone}`;
-                            } else {
-                              toast.error('Aucun numéro de téléphone disponible');
-                            }
-                          }}
-                          className="flex-1 flex items-center justify-center min-w-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-lg text-sm font-medium transition-colors shadow-sm"
-                        >
-                          <Phone className="w-3.5 h-3.5 mr-2 flex-shrink-0" />
-                          <span className="truncate">Contacter</span>
-                        </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

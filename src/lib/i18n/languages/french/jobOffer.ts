@@ -24,6 +24,7 @@ export const jobOffer = {
   "jobOffer.logoUploadText": "Glissez-déposez votre logo ou cliquez pour sélectionner un fichier",
   "jobOffer.experience": "Expérience",
   "jobOffer.selectExperience": "Sélectionner l'expérience",
+  "jobOffer.yearsExperience": "Années d'expérience",
   "jobOffer.availability": "Disponibilité",
   "jobOffer.selectAvailability": "Sélectionner la disponibilité",
   "jobOffer.rate": "Tarif (optionnel)",

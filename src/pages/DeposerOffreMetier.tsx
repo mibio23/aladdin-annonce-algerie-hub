@@ -115,6 +115,7 @@ const DeposerOffreMetier = () => {
     profession: '',
     specialite: '',
     experience: '',
+    years_experience: '',
     disponibilite: '',
     salaire: '',
     devise: 'DZD',
@@ -295,7 +296,8 @@ const DeposerOffreMetier = () => {
           description: formData.description,
           profession: formData.profession,
           specialty: formData.specialite,
-          experience_level: formData.experience,
+          experience_level: formData.experience || null,
+          years_experience: formData.years_experience ? parseInt(formData.years_experience as string, 10) : null,
           availability: formData.disponibilite,
           salary: formData.salaire ? parseFloat(formData.salaire) : null,
           currency: formData.devise,
@@ -706,12 +708,33 @@ const DeposerOffreMetier = () => {
                               </SelectTrigger>
                               <SelectContent>
                                 {niveauxExperience.map((niveau) => (
-                                  <SelectItem key={niveau.key} value={niveau.value}>
+                                  <SelectItem key={niveau.key} value={niveau.key}>
                                     {niveau.value}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
+                          </div>
+
+                          <div className={inputGroupClassName}>
+                            <Label className="text-base font-bold text-slate-800 mb-1 block">
+                              {(() => {
+                                const k = 'jobOffer.yearsExperience';
+                                const lbl = t(k);
+                                return lbl && lbl !== k ? lbl : "Années d'expérience";
+                              })()}
+                            </Label>
+                            <div className="relative">
+                              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-400" />
+                              <Input
+                                type="number"
+                                min="0"
+                                value={formData.years_experience}
+                                onChange={(e) => handleInputChange('years_experience', e.target.value)}
+                                placeholder="0"
+                                className={`${inputClassName} pl-10`}
+                              />
+                            </div>
                           </div>
 
                           <div className={inputGroupClassName}>

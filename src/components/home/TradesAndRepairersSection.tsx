@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import SmartAnnouncementsGrid from './SmartAnnouncementsGrid';
-import { Briefcase, ArrowRight, Phone, MessageCircle, Share2 } from 'lucide-react';
+import { Briefcase, ArrowRight, Phone, MessageCircle, Share2, ShieldCheck, Home, Award } from 'lucide-react';
 import { LocalizedLink } from '@/utils/linkUtils';
 import { Link } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
@@ -33,7 +33,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
       try {
         const { data, error } = await supabase
           .from('professional_job_offers')
-          .select('id, title, description, phone_numbers, images, logo_url, created_at')
+          .select('id, title, description, phone_numbers, images, logo_url, created_at, is_graduate, home_service, years_experience, experience_level')
           .eq('is_active', true)
           .order('created_at', { ascending: false })
           .limit(8);
@@ -47,7 +47,11 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
           description: item.description,
           link_url: item.phone_numbers && item.phone_numbers.length > 0 ? item.phone_numbers.join(', ') : null,
           image_url: item.images && item.images.length > 0 ? item.images[0] : (item.logo_url || null),
-          created_at: item.created_at
+          created_at: item.created_at,
+          is_graduate: item.is_graduate,
+          home_service: item.home_service,
+          years_experience: item.years_experience,
+          experience_level: item.experience_level
         }));
         
         setOffers(transformedData);
@@ -176,12 +180,20 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                               ? 'px-3 rounded-bl-[25px] rounded-br-[25px] border-x' 
                               : 'pl-3 pr-1 rounded-bl-[25px] border-l'
                           }`}>
-                            <div className={cn("flex flex-col", isRTL ? "items-start" : "items-end")}>
+                          <div className={cn("flex flex-col", isRTL ? "items-start" : "items-end")}>
                               <span className="text-xs font-extrabold text-slate-900 leading-none mb-0.5 drop-shadow-sm">
                                 {isRTL ? "علاء الدين" : "Aladdin"}
                               </span>
                               <span className="text-[9px] font-bold text-red-600 uppercase tracking-wider leading-none drop-shadow-sm">
-                                {isRTL ? "الإختيار الأفضل" : "Sélection Or"}
+                              {language === 'ar' 
+                                ? "الاحترافية والمهن"
+                                : language === 'es'
+                                  ? "Profesionalismo y Oficios"
+                                  : language === 'it'
+                                    ? "Professionalità e Mestieri"
+                                    : language === 'de'
+                                      ? "Professionalität & Handwerk"
+                                      : "professionnalisme et Métiers"}
                               </span>
                             </div>
                             <div className="w-8 h-8 bg-white/50 backdrop-blur-sm rounded-lg shadow-inner flex items-center justify-center border border-white/50 p-1 group-hover:scale-110 transition-transform duration-300">
@@ -209,6 +221,38 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                         <span className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold z-20">
                           {formatRelativeTime(offer.created_at)}
                         </span>
+
+                        {(() => {
+                          const isGraduate = (offer as any)?.is_graduate === true;
+                          const homeService = (offer as any)?.home_service === true;
+                          const years = typeof (offer as any)?.years_experience === 'number' ? (offer as any)?.years_experience : undefined;
+                          const level = (offer as any)?.experience_level;
+                          const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
+
+                          const graduateLabel = isRTL ? "دبلوم/معتمد" : (language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié");
+                          const homeLabel = isRTL ? "خدمة منزلية متاحة" : (language === 'es' ? "Servicio a domicilio" : language === 'it' ? "Disponibile a domicilio" : language === 'de' ? "Hausbesuche möglich" : "Déplacement à domicile possible");
+                          const expertLabel = isRTL ? "خبير (أكثر من 10 سنوات)" : (language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)");
+
+                          return (
+                            <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
+                              {isGraduate ? (
+                                <span className="flex items-center gap-1 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-blue-100 dark:border-blue-800">
+                                  <ShieldCheck className="w-3 h-3" /> {graduateLabel}
+                                </span>
+                              ) : null}
+                              {homeService ? (
+                                <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">
+                                  <Home className="w-3 h-3" /> {homeLabel}
+                                </span>
+                              ) : null}
+                              {isExpert ? (
+                                <span className="flex items-center gap-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-200 dark:border-slate-700">
+                                  <Award className="w-3 h-3" /> {expertLabel}
+                                </span>
+                              ) : null}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -222,29 +266,9 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                       {offer.description}
                     </p>
 
-                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
-                      <span className="flex items-center">
-                        <Phone className="w-3 h-3 mr-1" />
-                        {(offer.link_url && offer.link_url.split(',')[0]?.trim()) || 'Contact sur demande'}
-                      </span>
-                    </div>
+                    <div className="flex items-center justify-end text-xs text-muted-foreground mb-4"></div>
 
                     <div className="flex gap-2 w-full">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const phone = offer.link_url && offer.link_url.split(',')[0]?.trim();
-                          if (phone) {
-                            window.location.href = `tel:${phone}`;
-                          } else {
-                            toast.error('Aucun numéro de téléphone disponible');
-                          }
-                        }}
-                        className="flex-1 flex items-center justify-center min-w-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-lg text-sm font-medium transition-colors shadow-sm"
-                      >
-                        <Phone className="w-3.5 h-3.5 mr-2 flex-shrink-0" />
-                        <span className="truncate">Contacter</span>
-                      </button>
                       <button
                         onClick={handleWhatsApp}
                         className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border bg-transparent hover:bg-muted transition-colors"

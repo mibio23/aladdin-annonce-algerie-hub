@@ -92,6 +92,9 @@ const germanTranslations = {
   'sections.beTheFirstTrade': 'Seien Sie der Erste, der seine Dienste in diesem Bereich anbietet.',
   'sections.noTradesOffers': 'Momentan keine Angebote',
 
+  // Job Offer additions
+  'jobOffer.yearsExperience': 'Jahre Erfahrung',
+
   // Menu items - Mobile nav - imported from navigationDe
 
   // Advanced search

@@ -17,6 +17,10 @@ export interface MetierAnnouncement {
   profession?: string | null;
   view_count?: number;
   wilaya?: string | null;
+  is_graduate?: boolean | null;
+  home_service?: boolean | null;
+  years_experience?: number | null;
+  experience_level?: string | null;
 }
 
 export const useMetiersAnnouncements = (options?: { professionValues?: string[] }) => {
@@ -36,7 +40,7 @@ export const useMetiersAnnouncements = (options?: { professionValues?: string[] 
 
       let query = supabase
         .from('professional_job_offers')
-        .select('id, user_id, title, description, phone_numbers, email, location, salary, images, created_at, is_active, profession, wilaya')
+        .select('id, user_id, title, description, phone_numbers, email, location, salary, images, created_at, is_active, profession, wilaya, is_graduate, home_service, years_experience, experience_level')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
@@ -61,7 +65,11 @@ export const useMetiersAnnouncements = (options?: { professionValues?: string[] 
         user_id: item.user_id,
         profession: (item as unknown as { profession?: string | null }).profession ?? null,
         view_count: 0,
-        wilaya: (item as unknown as { wilaya?: string | null }).wilaya ?? null
+        wilaya: (item as unknown as { wilaya?: string | null }).wilaya ?? null,
+        is_graduate: (item as unknown as { is_graduate?: boolean | null }).is_graduate ?? null,
+        home_service: (item as unknown as { home_service?: boolean | null }).home_service ?? null,
+        years_experience: (item as unknown as { years_experience?: number | null }).years_experience ?? null,
+        experience_level: (item as unknown as { experience_level?: string | null }).experience_level ?? null
       }));
 
       setAnnouncements(transformedData);

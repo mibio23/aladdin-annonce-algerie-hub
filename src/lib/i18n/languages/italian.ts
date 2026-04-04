@@ -43,6 +43,9 @@ const italianTranslations = {
   'common.noPhone': 'Nessun numero di telefono',
   'common.sendMessage': 'Invia un messaggio',
 
+  // Job Offer additions
+  'jobOffer.yearsExperience': "Anni d'esperienza",
+
   'safety.tip1': 'Incontrati in un luogo pubblico',
   'safety.tip2': "Verifica l'identità del professionista",
   'safety.tip3': 'Non pagare un anticipo eccessivo',

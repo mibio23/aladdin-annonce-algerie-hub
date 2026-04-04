@@ -97,6 +97,9 @@ const spanishTranslations = {
   'sections.beTheFirstTrade': 'Sé el primero en ofrecer tus servicios en esta sección.',
   'sections.noTradesOffers': 'No hay ofertas por el momento',
 
+  // Job Offer additions
+  'jobOffer.yearsExperience': 'Años de experiencia',
+
   // Section titles
   'sections.mostSearched': 'Los más buscados',
   'sections.trendingDescription': '⚡ Descubre los anuncios que contiene nuestra Caverna Al@ddin, que captan la atención y encuentran solución a tus necesidades',

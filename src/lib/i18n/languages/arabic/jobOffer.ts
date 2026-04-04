@@ -24,6 +24,7 @@ export const jobOffer = {
   "jobOffer.logoUploadText": "اسحب وأفلت شعارك أو انقر لاختيار ملف",
   "jobOffer.experience": "الخبرة",
   "jobOffer.selectExperience": "اختر مستوى الخبرة",
+  "jobOffer.yearsExperience": "سنوات الخبرة",
   "jobOffer.availability": "التوفر",
   "jobOffer.selectAvailability": "اختر التوفر",
   "jobOffer.rate": "السعر (اختياري)",
