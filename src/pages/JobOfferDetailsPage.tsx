@@ -166,12 +166,7 @@ const JobOfferDetailsPage = () => {
 
   const handleStartChat = async () => {
     if (!user) {
-      toast({
-        title: translateOrFallback('auth.loginRequired', ''),
-        description: translateOrFallback('messages.loginRequiredDesc', ''),
-        variant: 'destructive',
-      });
-      navigateWithLanguage('/connexion');
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
       return;
     }
 
@@ -203,6 +198,18 @@ const JobOfferDetailsPage = () => {
       let conversationId = existingConversation?.id as string | undefined;
 
       if (!conversationId) {
+        const { data: participantConversation, error: participantFetchError } = await supabase
+          .from('conversations')
+          .select('id')
+          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
+          .limit(1)
+          .maybeSingle();
+
+        if (participantFetchError) throw participantFetchError;
+        conversationId = participantConversation?.id as string | undefined;
+      }
+
+      if (!conversationId) {
         const now = new Date().toISOString();
         const { data: newConversation, error: createError } = await supabase
           .from('conversations')
@@ -218,8 +225,19 @@ const JobOfferDetailsPage = () => {
           .select('id')
           .single();
 
-        if (createError) throw createError;
-        conversationId = newConversation.id;
+        if (createError) {
+          const { data: fallbackConversation, error: fallbackError } = await supabase
+            .from('conversations')
+            .select('id')
+            .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
+            .limit(1)
+            .maybeSingle();
+
+          if (fallbackError || !fallbackConversation?.id) throw createError;
+          conversationId = fallbackConversation.id;
+        } else {
+          conversationId = newConversation.id;
+        }
       }
 
       navigateWithLanguage(`/messages?conversation=${conversationId}`);

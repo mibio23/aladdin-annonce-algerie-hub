@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/dateUtils';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 
 interface TradeOffer {
@@ -28,11 +29,75 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
   const { t, isRTL, language } = useSafeI18nWithRouter();
   const [offers, setOffers] = useState<TradeOffer[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toggleFavorite, isFavorite, fetchFavorites } = useFavorites();
+  const { fetchFavorites } = useFavorites();
+  const { user } = useAuth();
+  const [proFavoriteIds, setProFavoriteIds] = React.useState<Set<string>>(new Set());
   
   useEffect(() => {
     fetchFavorites();
   }, [fetchFavorites]);
+
+  const loadProFavorites = async () => {
+    if (!user) {
+      setProFavoriteIds(new Set());
+      return;
+    }
+    const { data, error } = await supabase
+      .from('pro_favorites')
+      .select('pro_id')
+      .eq('user_id', user.id);
+    if (!error && Array.isArray(data)) {
+      setProFavoriteIds(new Set(data.map((r: any) => r.pro_id)));
+    }
+  };
+
+  useEffect(() => {
+    loadProFavorites();
+  }, [user]);
+
+  const isProFavorite = (id: string) => proFavoriteIds.has(id);
+  const toggleProFavorite = async (id: string) => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
+      return;
+    }
+    const { data: existing, error: existingError } = await supabase
+      .from('pro_favorites')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('pro_id', id)
+      .maybeSingle();
+
+    if (existingError) {
+      toast.error("Impossible de mettre à jour le favori");
+      return;
+    }
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from('pro_favorites')
+        .delete()
+        .eq('id', existing.id)
+        .eq('user_id', user.id);
+      if (error) {
+        toast.error("Impossible de retirer le favori");
+        return;
+      }
+      await loadProFavorites();
+      return;
+    }
+
+    const { error } = await supabase
+      .from('pro_favorites')
+      .upsert({ user_id: user.id, pro_id: id }, { onConflict: 'user_id,pro_id' });
+
+    if (error) {
+      toast.error("Impossible d'ajouter aux favoris");
+      return;
+    }
+
+    await loadProFavorites();
+  };
 
   useEffect(() => {
         const fetchOffers = async () => {
@@ -173,7 +238,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                 window.open(whatsappUrl, '_blank');
               };
 
-              const favorite = isFavorite(offer.id);
+              const favorite = isProFavorite(offer.id);
               return (
                 <div
                   key={offer.id}
@@ -293,7 +358,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleFavorite(offer.id);
+                          toggleProFavorite(offer.id);
                         }}
                         className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border bg-transparent hover:bg-muted transition-colors"
                         aria-label="Favori"

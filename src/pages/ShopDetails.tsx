@@ -40,6 +40,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 import ShopImageGallery from '@/components/shop/ShopImageGallery';
 import ContactModal from '@/components/shop/ContactModal';
+import ShopReviewModal from '@/components/shop/ShopReviewModal';
 import LocationPicker from '@/components/ui/LocationPicker';
 import MultilingualText from '@/components/ui/MultilingualText';
 import { safeStringify } from '@/utils/safeStringify';
@@ -57,6 +58,7 @@ const ShopDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportDetails, setReportDetails] = useState('');
@@ -321,11 +323,6 @@ const ShopDetails: React.FC = () => {
           .insert({ user_id: user.id, shop_id: shop.id });
           
         if (error) throw error;
-        
-        toast({
-          title: t('viewShop.addedToFavorites'),
-          description: t('viewShop.addedToFavorites'),
-        });
       } else {
         const { error } = await supabase
           .from('shop_favorites')
@@ -334,11 +331,6 @@ const ShopDetails: React.FC = () => {
           .eq('shop_id', shop.id);
           
         if (error) throw error;
-        
-        toast({
-          title: t('viewShop.removedFromFavorites'),
-          description: t('viewShop.removedFromFavorites'),
-        });
       }
     } catch (error) {
       console.error("Error updating favorites:", error);
@@ -898,7 +890,7 @@ const ShopDetails: React.FC = () => {
                           Votre avis aide les autres utilisateurs à découvrir les meilleures boutiques d'Algérie.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                          <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12">
+                          <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12" onClick={() => setShowReviewModal(true)}>
                             Laisser un avis
                           </Button>
                           <Button variant="outline" className="rounded-xl px-8 h-12 font-bold">
@@ -1216,6 +1208,13 @@ const ShopDetails: React.FC = () => {
         <ContactModal
           shop={shop}
           onClose={() => setShowContactModal(false)}
+        />
+      )}
+      {showReviewModal && (
+        <ShopReviewModal
+          shopId={shop.id}
+          open={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
         />
       )}
     </div>

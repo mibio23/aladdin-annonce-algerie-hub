@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import type { Shop } from '@/types/shop';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 interface ContactModalProps {
   shop: Shop | null;
@@ -32,6 +33,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
   const open = !!shop;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,12 +49,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
     }
     
     if (!user) {
-      toast({
-        title: t('auth.loginRequired'),
-        description: t('auth.loginRequiredDesc'),
-      });
-      // Optionnel : Rediriger vers la page de connexion
-      // navigate('/auth'); 
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
       return;
     }
 
@@ -73,13 +70,31 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
         .from('conversations') as any)
         .select('id')
         .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${shop.ownerId}),and(participant_1_id.eq.${shop.ownerId},participant_2_id.eq.${user.id})`)
-        .single();
+        .eq('subject_type', 'shop')
+        .eq('subject_id', shop.id)
+        .limit(1)
+        .maybeSingle();
 
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (fetchError) {
         throw fetchError;
       }
 
       let conversationId = existingConversations?.id;
+
+      if (!conversationId) {
+        const { data: participantConversation, error: participantFetchError } = await (supabase
+          .from('conversations') as any)
+          .select('id')
+          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${shop.ownerId}),and(participant_1_id.eq.${shop.ownerId},participant_2_id.eq.${user.id})`)
+          .limit(1)
+          .maybeSingle();
+
+        if (participantFetchError) {
+          throw participantFetchError;
+        }
+
+        conversationId = participantConversation?.id;
+      }
 
       // 2. Si aucune conversation n'existe, en créer une
       if (!conversationId) {
@@ -88,13 +103,30 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
           .insert({
             participant_1_id: user.id,
             participant_2_id: shop.ownerId,
-            updated_at: new Date().toISOString() // Assurez-vous que cette colonne existe ou utilisez created_at par défaut
+            subject_type: 'shop',
+            subject_id: shop.id,
+            title: shop.name,
+            updated_at: new Date().toISOString()
           })
           .select('id')
           .single();
 
-        if (createError) throw createError;
-        conversationId = newConversation.id;
+        if (createError) {
+          const { data: fallbackConversation, error: fallbackError } = await (supabase
+            .from('conversations') as any)
+            .select('id')
+            .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${shop.ownerId}),and(participant_1_id.eq.${shop.ownerId},participant_2_id.eq.${user.id})`)
+            .limit(1)
+            .maybeSingle();
+
+          if (fallbackError || !fallbackConversation?.id) {
+            throw createError;
+          }
+
+          conversationId = fallbackConversation.id;
+        } else {
+          conversationId = newConversation.id;
+        }
       }
 
       // 3. Envoyer le message
@@ -127,8 +159,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
       // Fermer le modal
       setTimeout(() => {
         onClose();
-        // Rediriger vers la messagerie avec la conversation ouverte
-        navigate(`/messages?conversation=${conversationId}`);
+        navigate(getLocalizedPath(`/messages?conversation=${conversationId}`));
       }, 1500);
       
     } catch (error) {

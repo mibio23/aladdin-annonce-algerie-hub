@@ -190,7 +190,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         } else {
            toast({
             title: t('viewShop.addedToFavorites'),
-            description: t('viewShop.addedToFavorites'),
+            description: "La boutique est maintenant enregistrée dans vos favoris.",
           });
         }
       } else {
@@ -213,7 +213,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         } else {
           toast({
             title: t('viewShop.removedFromFavorites'),
-            description: t('viewShop.removedFromFavorites'),
+            description: "La boutique a été retirée de votre liste de favoris.",
           });
         }
       }

@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 interface AnnouncementContactModalProps {
   announcement: {
@@ -26,6 +27,7 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +68,29 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
         .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${announcement.user_id}),and(participant_1_id.eq.${announcement.user_id},participant_2_id.eq.${user.id})`)
         .eq('subject_type', 'ad')
         .eq('subject_id', announcement.id)
-        .single();
+        .limit(1)
+        .maybeSingle();
 
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (fetchError) {
         throw fetchError;
       }
 
       let conversationId = existingConversations?.id;
+
+      if (!conversationId) {
+        const { data: participantConversation, error: participantFetchError } = await (supabase
+          .from('conversations') as any)
+          .select('id')
+          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${announcement.user_id}),and(participant_1_id.eq.${announcement.user_id},participant_2_id.eq.${user.id})`)
+          .limit(1)
+          .maybeSingle();
+
+        if (participantFetchError) {
+          throw participantFetchError;
+        }
+
+        conversationId = participantConversation?.id;
+      }
 
       // 2. If no conversation exists, create one
       if (!conversationId) {
@@ -89,8 +107,22 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
           .select('id')
           .single();
 
-        if (createError) throw createError;
-        conversationId = newConversation.id;
+        if (createError) {
+          const { data: fallbackConversation, error: fallbackError } = await (supabase
+            .from('conversations') as any)
+            .select('id')
+            .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${announcement.user_id}),and(participant_1_id.eq.${announcement.user_id},participant_2_id.eq.${user.id})`)
+            .limit(1)
+            .maybeSingle();
+
+          if (fallbackError || !fallbackConversation?.id) {
+            throw createError;
+          }
+
+          conversationId = fallbackConversation.id;
+        } else {
+          conversationId = newConversation.id;
+        }
       }
 
       // 3. Send message
@@ -121,7 +153,7 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
       
       setTimeout(() => {
         onClose();
-        navigate(`/messages?conversation=${conversationId}`);
+        navigate(getLocalizedPath(`/messages?conversation=${conversationId}`));
       }, 1500);
       
     } catch (error) {
