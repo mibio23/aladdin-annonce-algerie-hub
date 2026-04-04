@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -13,11 +14,15 @@ import {
   Users,
   Clock,
   Wrench,
-  CheckCircle
+  CheckCircle,
+  Eye,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Share2
 } from 'lucide-react';
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
-import { useMetiersAnnouncements } from '@/hooks/useMetiersAnnouncements';
-import AnnouncementCard from '@/components/announcements/AnnouncementCard';
+import { useMetiersAnnouncements, type MetierAnnouncement } from '@/hooks/useMetiersAnnouncements';
 import { Skeleton } from '@/components/ui/skeleton';
 import { wilayas } from '@/data/wilayaData';
 import { logger } from '@/utils/silentLogger';
@@ -27,6 +32,11 @@ import { languageConfig } from '@/lib/i18n/config';
 import SEOHead from '@/components/SEO/SEOHead';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import AnnouncementCard from '@/components/announcements/AnnouncementCard';
+import SmartAnnouncementsGrid from '@/components/home/SmartAnnouncementsGrid';
+import type { Announcement } from '@/hooks/useAnnouncements';
 
 import { PROFESSION_KEYS, PROFESSION_KEYWORDS, ProfessionKey } from '@/data/searchKeywords';
 
@@ -246,9 +256,43 @@ const getProfessionValuesForKey = (professionKey: ProfessionKey): string[] => {
   return Array.from(values);
 };
 
+const mapMetierToAnnouncement = (metier: MetierAnnouncement): Announcement => {
+  return {
+    id: metier.id,
+    title: metier.title,
+    description: metier.description || '',
+    price: metier.price || 0,
+    category_id: 'services-professionnels',
+    categorySlug: 'services-professionnels',
+    condition: 'new',
+    images: metier.images || [],
+    location: metier.location || '',
+    wilaya: metier.wilaya || '',
+    contact_phone: metier.contact_phone || '',
+    contact_email: metier.contact_email || '',
+    user_id: metier.user_id,
+    created_at: metier.created_at,
+    updated_at: metier.created_at,
+    is_active: metier.is_active,
+    is_featured: false,
+    is_urgent: false,
+    views_count: metier.view_count || 0,
+    currency: 'DZD',
+    expires_at: null,
+    delivery_options: [],
+    attributes: {
+      profession: metier.profession
+    },
+    categories: {
+      name: metier.profession || 'Service professionnel',
+      slug: 'services-professionnels'
+    }
+  };
+};
+
 const MetiersReparateurs: React.FC = () => {
   const { t, language } = useSafeI18nWithRouter();
-  const { getLocalizedPath } = useLanguageNavigation();
+  const { getLocalizedPath, navigateWithLanguage } = useLanguageNavigation();
   const params = useParams();
   const professionSlug = params.profession;
 
@@ -727,40 +771,28 @@ const MetiersReparateurs: React.FC = () => {
               <Wrench className="w-5 h-5 text-primary" />
               Annonces de Métiers & Réparateurs et Services Professionnels
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <SmartAnnouncementsGrid itemsPerRow={3}>
               {sortedAnnouncements.map(announcement => {
-                // Transform MetierAnnouncement to Announcement format
-                const transformedAnnouncement = {
-                  ...announcement,
-                  category_id: 'metier-reparateur',
-                  condition: 'neuf',
-                  images: announcement.images || [],
-                  wilaya: announcement.location || '',
-                  contact_phone: announcement.contact_phone || '',
-                  contact_email: announcement.contact_email || '',
-                  user_id: 'system',
-                  updated_at: announcement.created_at,
-                  is_featured: false,
-                  is_urgent: false,
-                  views_count: announcement.view_count || 0,
-                  currency: 'DZD',
-                  expires_at: null,
-                  delivery_options: [],
-                  description: announcement.description || '',
-                  price: announcement.price || 0,
-                  location: announcement.location || ''
-                };
+                const mappedAnnouncement = mapMetierToAnnouncement(announcement);
                 
                 return (
-                  <div key={announcement.id} onClick={() => window.location.href = `/offre-metier/${announcement.id}`} className="cursor-pointer">
-                    <AnnouncementCard
-                      announcement={transformedAnnouncement}
-                      variant="default"
-                    />
-                  </div>
+                  <AnnouncementCard
+                    key={mappedAnnouncement.id}
+                    announcement={mappedAnnouncement}
+                    onView={() => {
+                      navigateWithLanguage(`/offre-metier/${mappedAnnouncement.id}`);
+                    }}
+                    onContact={() => {
+                      if (mappedAnnouncement.contact_phone) {
+                        window.location.href = `tel:${mappedAnnouncement.contact_phone}`;
+                      } else {
+                        toast.error('Aucun numéro de téléphone disponible');
+                      }
+                    }}
+                  />
                 );
               })}
-            </div>
+            </SmartAnnouncementsGrid>
           </div>
         ) : (
           <Card>
