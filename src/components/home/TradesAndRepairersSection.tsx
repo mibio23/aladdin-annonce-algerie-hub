@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import SmartAnnouncementsGrid from './SmartAnnouncementsGrid';
-import { Briefcase, ArrowRight, Phone, MessageCircle, Share2, ShieldCheck, Home, Award } from 'lucide-react';
+import { Briefcase, ArrowRight, Phone, MessageCircle, Share2, ShieldCheck, Home, Award, MapPin, Clock, Heart } from 'lucide-react';
 import { LocalizedLink } from '@/utils/linkUtils';
 import { Link } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/dateUtils';
 import { toast } from 'sonner';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface TradeOffer {
   id: string;
@@ -24,16 +25,21 @@ type TradesAndRepairersSectionProps = {
 };
 
 const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSectionProps) => {
-  const { t, isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL, language } = useSafeI18nWithRouter();
   const [offers, setOffers] = useState<TradeOffer[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toggleFavorite, isFavorite, fetchFavorites } = useFavorites();
+  
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   useEffect(() => {
         const fetchOffers = async () => {
       try {
         const { data, error } = await supabase
           .from('professional_job_offers')
-          .select('id, title, description, phone_numbers, images, logo_url, created_at, is_graduate, home_service, years_experience, experience_level')
+          .select('id, title, description, phone_numbers, images, logo_url, created_at, location, wilaya, is_graduate, home_service, years_experience, experience_level')
           .eq('is_active', true)
           .order('created_at', { ascending: false })
           .limit(8);
@@ -48,6 +54,8 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
           link_url: item.phone_numbers && item.phone_numbers.length > 0 ? item.phone_numbers.join(', ') : null,
           image_url: item.images && item.images.length > 0 ? item.images[0] : (item.logo_url || null),
           created_at: item.created_at,
+          location: item.location,
+          wilaya: item.wilaya,
           is_graduate: item.is_graduate,
           home_service: item.home_service,
           years_experience: item.years_experience,
@@ -165,6 +173,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                 window.open(whatsappUrl, '_blank');
               };
 
+              const favorite = isFavorite(offer.id);
               return (
                 <div
                   key={offer.id}
@@ -218,41 +227,9 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                           </div>
                         )}
 
-                        <span className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold z-20">
-                          {formatRelativeTime(offer.created_at)}
-                        </span>
+                        {/* Temps relatif déplacé sous la zone titre (comme 'Les plus recherchés') */}
 
-                        {(() => {
-                          const isGraduate = (offer as any)?.is_graduate === true;
-                          const homeService = (offer as any)?.home_service === true;
-                          const years = typeof (offer as any)?.years_experience === 'number' ? (offer as any)?.years_experience : undefined;
-                          const level = (offer as any)?.experience_level;
-                          const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
-
-                          const graduateLabel = isRTL ? "دبلوم/معتمد" : (language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié");
-                          const homeLabel = isRTL ? "خدمة منزلية متاحة" : (language === 'es' ? "Servicio a domicilio" : language === 'it' ? "Disponibile a domicilio" : language === 'de' ? "Hausbesuche möglich" : "Déplacement à domicile possible");
-                          const expertLabel = isRTL ? "خبير (أكثر من 10 سنوات)" : (language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)");
-
-                          return (
-                            <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
-                              {isGraduate ? (
-                                <span className="flex items-center gap-1 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-blue-100 dark:border-blue-800">
-                                  <ShieldCheck className="w-3 h-3" /> {graduateLabel}
-                                </span>
-                              ) : null}
-                              {homeService ? (
-                                <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">
-                                  <Home className="w-3 h-3" /> {homeLabel}
-                                </span>
-                              ) : null}
-                              {isExpert ? (
-                                <span className="flex items-center gap-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-200 dark:border-slate-700">
-                                  <Award className="w-3 h-3" /> {expertLabel}
-                                </span>
-                              ) : null}
-                            </div>
-                          );
-                        })()}
+                        {/* Badges déplacés sous la description */}
                       </div>
                     </div>
                   </div>
@@ -262,19 +239,67 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                       <h3 className="font-bold text-lg line-clamp-1">{offer.title}</h3>
                     </div>
 
-                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4">
-                      {offer.description}
-                    </p>
+                    {/* Description supprimée sur cette carte */}
 
-                    <div className="flex items-center justify-end text-xs text-muted-foreground mb-4"></div>
+                    {(() => {
+                      const isGraduate = (offer as any)?.is_graduate === true;
+                      const homeService = (offer as any)?.home_service === true;
+                      const years = typeof (offer as any)?.years_experience === 'number' ? (offer as any)?.years_experience : undefined;
+                      const level = (offer as any)?.experience_level;
+                      const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
 
-                    <div className="flex gap-2 w-full">
+                      const graduateLabel = isRTL ? "دبلوم/معتمد" : (language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié");
+                      const homeLabel = isRTL ? "خدمة منزلية متاحة" : (language === 'es' ? "Servicio a domicilio" : language === 'it' ? "Disponibile a domicilio" : language === 'de' ? "Hausbesuche möglich" : "Déplacement à domicile possible");
+                      const expertLabel = isRTL ? "خبير (أكثر من 10 سنوات)" : (language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)");
+
+                      const locale = language === 'ar' ? 'ar-DZ' : language === 'es' ? 'es-ES' : language === 'it' ? 'it-IT' : language === 'de' ? 'de-DE' : language === 'en' ? 'en-US' : 'fr-FR';
+                      const publishedAt = new Date(offer.created_at).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                      return (
+                        <>
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {isGraduate ? (
+                              <span className="flex items-center gap-1 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full text-[11px] font-semibold border border-blue-100 dark:border-blue-800">
+                                <ShieldCheck className="w-3 h-3" /> {graduateLabel}
+                              </span>
+                            ) : null}
+                            {homeService ? (
+                              <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 px-2 py-0.5 rounded-full text-[11px] font-semibold border border-emerald-100 dark:border-emerald-800">
+                                <Home className="w-3 h-3" /> {homeLabel}
+                              </span>
+                            ) : null}
+                            {isExpert ? (
+                              <span className="flex items-center gap-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full text-[11px] font-semibold border border-slate-200 dark:border-slate-700">
+                                <Award className="w-3 h-3" /> {expertLabel}
+                              </span>
+                            ) : null}
+                          </div>
+
+                          <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                            <span className="flex items-center gap-2 truncate">
+                              <MapPin className="w-3 h-3 text-primary" />
+                              <span className="truncate">{(offer as any)?.wilaya || 'Non spécifiée'}</span>
+                              <span className="text-slate-400">•</span>
+                              <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                                {formatRelativeTime(offer.created_at)}
+                              </span>
+                            </span>
+                          </div>
+                        </>
+                      );
+                    })()}
+
+                    <div className="flex gap-3 w-full justify-center">
                       <button
-                        onClick={handleWhatsApp}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(offer.id);
+                        }}
                         className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border bg-transparent hover:bg-muted transition-colors"
-                        aria-label="WhatsApp"
+                        aria-label="Favori"
+                        title={t('mesFavoris.title') || 'Favoris'}
                       >
-                        <MessageCircle className="h-4 w-4 text-emerald-500" />
+                        <Heart className="h-4 w-4 text-rose-600" fill={favorite ? 'currentColor' : 'none'} />
                       </button>
                       <button
                         onClick={handleShare}
@@ -285,31 +310,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                       </button>
                     </div>
 
-                    <div className="overflow-hidden h-0 group-hover:h-12 transition-all duration-300 ease-in-out">
-                      <div className="pt-2 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
-                        <div className="bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-lg font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between px-3">
-                          <span className="flex-1 text-center" dir={isRTL ? 'rtl' : 'ltr'}>
-                            {t('common.viewDetail')}
-                          </span>
-                          <div className="flex gap-1.5 ms-2 border-s border-slate-200 dark:border-slate-600 ps-2">
-                            <button
-                              onClick={handleWhatsApp}
-                              className="p-1 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-full transition-colors"
-                              title="WhatsApp"
-                            >
-                              <MessageCircle className="w-4 h-4 text-emerald-500" />
-                            </button>
-                            <button
-                              onClick={handleShare}
-                              className="p-1 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-full transition-colors"
-                              title="Partager"
-                            >
-                              <Share2 className="w-4 h-4 text-blue-500" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Barre "voir détail" supprimée pour la carte de la section Métiers & Réparateurs */}
                   </div>
                 </div>
               );

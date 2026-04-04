@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -263,9 +263,13 @@ const getProfessionValuesForKey = (professionKey: ProfessionKey): string[] => {
 const MetiersReparateurs: React.FC = () => {
   const { t, isRTL, language } = useSafeI18nWithRouter();
   const { getLocalizedPath, navigateWithLanguage } = useLanguageNavigation();
-  const { toggleFavorite, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite, fetchFavorites } = useFavorites();
   const params = useParams();
   const professionSlug = params.profession;
+  
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   const { professionValues, isUnknownProfessionSlug, professionLabel } = useMemo(() => {
     if (!professionSlug) {
@@ -821,6 +825,20 @@ const MetiersReparateurs: React.FC = () => {
                               </div>
                             </div>
                           </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFavorite(e);
+                            }}
+                            title={t('mesFavoris.title') || 'Favoris'}
+                            className={`absolute top-2 z-30 ${isRTL ? 'right-2' : 'left-2'} p-2 rounded-full bg-white/80 hover:bg-white shadow-md border border-white/70 transition-colors`}
+                            aria-label="Favori"
+                          >
+                            <Heart
+                              className={['w-4 h-4', favorite ? 'text-rose-600' : 'text-rose-400'].join(' ')}
+                              fill={favorite ? 'currentColor' : 'none'}
+                            />
+                          </button>
 
                           {imageUrl ? (
                             <img
@@ -836,46 +854,7 @@ const MetiersReparateurs: React.FC = () => {
                             </div>
                           )}
 
-                          {(() => {
-                            const isGraduate = (announcement as any)?.is_graduate === true || (announcement as any)?.diplome === true;
-                            const homeService = (announcement as any)?.home_service === true || (announcement as any)?.deplacement === true;
-                            const years = typeof (announcement as any)?.years_experience === 'number' ? (announcement as any)?.years_experience : undefined;
-                            const level = (announcement as any)?.experience_level;
-                            const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
-
-                            const graduateLabel = language === 'ar' ? "دبلوم/معتمد" : language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié";
-                            const homeLabel = language === 'ar' ? "خدمة منزلية متاحة" : language === 'es' ? "Servicio a domicilio" : language === 'it' ? "Disponibile a domicilio" : language === 'de' ? "Hausbesuche möglich" : "Déplacement à domicile possible";
-                            const expertLabel = language === 'ar' ? "خبير (أكثر من 10 سنوات)" : language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)";
-
-                            return (
-                              <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
-                                {announcement.profession ? (
-                                  <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold border border-blue-100 dark:border-blue-800">
-                                    {announcement.profession}
-                                  </span>
-                                ) : null}
-                                {isGraduate ? (
-                                  <span className="flex items-center gap-1 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-blue-100 dark:border-blue-800">
-                                    <ShieldCheck className="w-3 h-3" /> {graduateLabel}
-                                  </span>
-                                ) : null}
-                                {homeService ? (
-                                  <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">
-                                    <HomeIcon className="w-3 h-3" /> {homeLabel}
-                                  </span>
-                                ) : null}
-                                {isExpert ? (
-                                  <span className="flex items-center gap-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-200 dark:border-slate-700">
-                                    <Award className="w-3 h-3" /> {expertLabel}
-                                  </span>
-                                ) : null}
-                              </div>
-                            );
-                          })()}
-
-                          <span className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold z-20">
-                            {formatRelativeTime(announcement.created_at)}
-                          </span>
+                          {/* Badges déplacés sous la description */}
 
                           {!announcement.is_active && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-30">
@@ -893,19 +872,62 @@ const MetiersReparateurs: React.FC = () => {
                         <h3 className="font-bold text-lg line-clamp-1">{announcement.title}</h3>
                       </div>
 
-                      <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                        <span className="flex items-center mb-1">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {announcement.location || announcement.wilaya || 'Non spécifiée'}
-                        </span>
-                        {hasPrice ? (
-                          <span className="font-bold text-emerald-600 whitespace-nowrap">
-                            {announcement.price?.toLocaleString()} DZD
-                          </span>
-                        ) : (
-                          <span className="text-xs font-bold text-slate-500">Prix par contact</span>
-                        )}
-                      </div>
+                      {/* Description supprimée sur cette carte */}
+
+                      {(() => {
+                        const isGraduate = (announcement as any)?.is_graduate === true || (announcement as any)?.diplome === true;
+                        const homeService = (announcement as any)?.home_service === true || (announcement as any)?.deplacement === true;
+                        const years = typeof (announcement as any)?.years_experience === 'number' ? (announcement as any)?.years_experience : undefined;
+                        const level = (announcement as any)?.experience_level;
+                        const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
+
+                        const graduateLabel = language === 'ar' ? "دبلوم/معتمد" : language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié";
+                        const homeLabel = language === 'ar' ? "خدمة منزلية متاحة" : language === 'es' ? "Servicio a domicilio" : language === 'it' ? "Disponibile a domicilio" : language === 'de' ? "Hausbesuche möglich" : "Déplacement à domicile possible";
+                        const expertLabel = language === 'ar' ? "خبير (أكثر من 10 سنوات)" : language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)";
+
+                        const locale = language === 'ar' ? 'ar-DZ' : language === 'es' ? 'es-ES' : language === 'it' ? 'it-IT' : language === 'de' ? 'de-DE' : language === 'en' ? 'en-US' : 'fr-FR';
+                        const publishedAt = new Date(announcement.created_at).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                        return (
+                          <>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {isGraduate ? (
+                                <span className="flex items-center gap-1 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full text-[11px] font-semibold border border-blue-100 dark:border-blue-800">
+                                  <ShieldCheck className="w-3 h-3" /> {graduateLabel}
+                                </span>
+                              ) : null}
+                              {homeService ? (
+                                <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 px-2 py-0.5 rounded-full text-[11px] font-semibold border border-emerald-100 dark:border-emerald-800">
+                                  <HomeIcon className="w-3 h-3" /> {homeLabel}
+                                </span>
+                              ) : null}
+                              {isExpert ? (
+                                <span className="flex items-center gap-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full text-[11px] font-semibold border border-slate-200 dark:border-slate-700">
+                                  <Award className="w-3 h-3" /> {expertLabel}
+                                </span>
+                              ) : null}
+                            </div>
+
+                            <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                              <span className="flex items-center gap-2 truncate">
+                                <MapPin className="w-3 h-3 text-primary" />
+                                <span className="truncate">{announcement.wilaya || 'Non spécifiée'}</span>
+                                <span className="text-slate-400">•</span>
+                                <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                                  {formatRelativeTime(announcement.created_at)}
+                                </span>
+                              </span>
+                              {hasPrice ? (
+                                <span className="font-bold text-emerald-600 whitespace-nowrap">
+                                  {announcement.price?.toLocaleString()} DZD
+                                </span>
+                              ) : (
+                                <span className="text-xs font-bold text-slate-500">Prix par contact</span>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()}
 
                       <div className="flex items-center justify-end text-xs text-muted-foreground mb-4">
                         <div className="flex items-center bg-primary/5 px-2 py-0.5 rounded-full">
@@ -914,16 +936,17 @@ const MetiersReparateurs: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex gap-2 w-full">
+                      <div className="flex gap-3 w-full justify-center">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleWhatsAppShare(e);
+                            handleFavorite(e);
                           }}
                           className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border bg-transparent hover:bg-muted transition-colors"
-                          aria-label="WhatsApp"
+                          aria-label="Favori"
+                          title={t('mesFavoris.title') || 'Favoris'}
                         >
-                          <MessageCircle className="h-4 w-4 text-emerald-500" />
+                          <Heart className="h-4 w-4 text-rose-600" fill={favorite ? 'currentColor' : 'none'} />
                         </button>
                         <button
                           onClick={(e) => {
@@ -937,55 +960,7 @@ const MetiersReparateurs: React.FC = () => {
                         </button>
                       </div>
 
-                      <div className="overflow-hidden h-0 group-hover:h-12 transition-all duration-300 ease-in-out">
-                        <div className="pt-2 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
-                          <div className="bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-lg font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between px-3">
-                            <span className="flex-1 text-center" dir={isRTL ? 'rtl' : 'ltr'}>
-                              {t('common.viewDetail')}
-                            </span>
-                            <div className="flex gap-1.5 ms-2 border-s border-slate-200 dark:border-slate-600 ps-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFavorite(e);
-                                }}
-                                className="p-1 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-full transition-colors group/fav"
-                                title={t('mesFavoris.title') || 'Favoris'}
-                              >
-                                <Heart
-                                  className={[
-                                    'w-4 h-4 transition-transform group-hover/fav:scale-110',
-                                    favorite
-                                      ? 'text-rose-700 dark:text-rose-500'
-                                      : 'text-rose-400 dark:text-rose-400 animate-pulse group-hover/fav:text-rose-500',
-                                  ].join(' ')}
-                                  fill={favorite ? 'currentColor' : 'none'}
-                                />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleWhatsAppShare(e);
-                                }}
-                                className="p-1 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-full transition-colors group/wa"
-                                title="WhatsApp"
-                              >
-                                <MessageCircle className="w-4 h-4 text-emerald-500 group-hover/wa:scale-110 transition-transform" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleShare(e);
-                                }}
-                                className="p-1 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-full transition-colors group/sh"
-                                title="Partager"
-                              >
-                                <Share2 className="w-4 h-4 text-blue-500 group-hover/sh:scale-110 transition-transform" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      {/* Barre "voir détail" supprimée pour la carte Métiers & Réparateurs */}
                     </div>
                   </div>
                 );

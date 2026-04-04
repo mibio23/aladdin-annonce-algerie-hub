@@ -299,7 +299,9 @@ const DeposerOffreMetier = () => {
           experience_level: formData.experience || null,
           years_experience: formData.years_experience ? parseInt(formData.years_experience as string, 10) : null,
           availability: formData.disponibilite,
-          salary: formData.salaire ? parseFloat(formData.salaire) : null,
+          salary: (formData.salaire && Number.isFinite(Number.parseFloat(formData.salaire)))
+            ? Number.parseFloat(formData.salaire)
+            : null,
           currency: formData.devise,
           phone_numbers: formData.telephones.filter(tel => tel.trim() !== ''),
           email: formData.email,
@@ -313,7 +315,7 @@ const DeposerOffreMetier = () => {
           is_urgent: formData.urgent
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -321,16 +323,24 @@ const DeposerOffreMetier = () => {
 
       const trimmedAddress = formData.adresse.trim();
       if (trimmedAddress) {
-        const { error: addressError } = await supabase
-          .from('professional_job_offer_addresses')
-          .insert({
-            job_offer_id: data.id,
-            address: trimmedAddress
+        try {
+          const { error: addressError } = await supabase
+            .from('professional_job_offer_addresses')
+            .insert({
+              job_offer_id: data.id,
+              address: trimmedAddress
+            });
+          if (addressError) {
+            toast({
+              title: t('jobOffer.error') || "Erreur",
+              description: (addressError.message || "Adresse non enregistrée") as string,
+            });
+          }
+        } catch (addrErr) {
+          toast({
+            title: t('jobOffer.error') || "Erreur",
+            description: "Adresse non enregistrée",
           });
-
-        if (addressError) {
-          await supabase.from('professional_job_offers').delete().eq('id', data.id);
-          throw addressError;
         }
       }
 
@@ -339,15 +349,10 @@ const DeposerOffreMetier = () => {
         description: t('jobOffer.offerPublishedDesc') || "Votre offre de métier a été publiée avec succès",
       });
 
-      // Rediriger vers la nouvelle offre (en tenant compte de la langue courante si nécessaire)
-      // Note: L'URL doit être absolue pour éviter des problèmes de concaténation
-      // Utiliser le hook de navigation pour gérer la langue
-      // Comme on a déplacé la route en public, elle est accessible via /offre-metier/:id
-      // ou /:lang/offre-metier/:id
-      
-      // Rediriger vers la nouvelle offre avec le préfixe de langue correct
-      const targetPath = language ? `/${language}/offre-metier/${data.id}` : `/offre-metier/${data.id}`;
-      navigate(targetPath);
+      if (data?.id) {
+        const targetPath = language ? `/${language}/offre-metier/${data.id}` : `/offre-metier/${data.id}`;
+        navigate(targetPath);
+      }
       
     } catch (error) {
       logger.error('Error creating job offer:', error);
