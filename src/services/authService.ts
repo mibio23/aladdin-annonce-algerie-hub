@@ -78,6 +78,16 @@ export const authService = {
 
   async signOut() {
     try {
+      // Obtenir l'utilisateur actuel avant la déconnexion
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Mettre à jour le statut de présence à hors ligne
+        await supabase
+          .from('user_presence' as any)
+          .update({ is_online: false, last_seen_at: new Date().toISOString() })
+          .eq('user_id', user.id);
+      }
+
       cleanupAuthState();
       
       // Attempt global sign out

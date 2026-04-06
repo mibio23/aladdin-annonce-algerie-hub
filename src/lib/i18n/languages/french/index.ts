@@ -63,6 +63,16 @@ const frenchTranslations = {
   "footer.useful.safetyTips": "Conseils de sécurité",
   "footer.useful.proBusiness": "Espace Pro",
   "footer.useful.helpCenter": "Centre d'aide",
+
+  // Messages Tabs
+  'messages.tabs.all.title': 'Toutes les discussions',
+  'messages.tabs.all.desc': 'Gérez tous vos échanges en un seul endroit',
+  'messages.tabs.ad.title': 'Annonces',
+  'messages.tabs.ad.desc': 'Messages liés à l\'achat ou vente d\'articles',
+  'messages.tabs.shop.title': 'Boutiques',
+  'messages.tabs.shop.desc': 'Échanges avec les magasins professionnels',
+  'messages.tabs.job_offer.title': 'Métiers',
+  'messages.tabs.job_offer.desc': 'Contacts pour des services et réparations',
 };
 
 export default frenchTranslations;

@@ -53,6 +53,15 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
       return;
     }
 
+    if (shop.ownerId === user.id) {
+      toast({
+        title: "Erreur",
+        description: "Vous ne pouvez pas envoyer de message à votre propre boutique.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!message.trim()) {
       toast({
         title: "Erreur",
@@ -185,117 +194,86 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
   return (
     <Dialog open={!!shop} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-none shadow-2xl">
-        {!user ? (
-          <div className="py-8">
-            <div className="flex flex-col gap-4 text-center">
-              <div>
-                <h3 className="text-lg font-bold">{t('auth.loginRequired')}</h3>
-                <p className="text-sm text-muted-foreground mt-2">{t('auth.loginRequiredDesc')}</p>
+        <DialogHeader className="space-y-3 pb-4 border-b">
+          <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
+            <MessageCircle className="h-6 w-6 text-primary" />
+          </div>
+          <DialogTitle className="text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+            Contacter {shop.name}
+          </DialogTitle>
+          <DialogDescription className="text-center text-sm px-4">
+            Envoyez un message directement à la boutique.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-6 pt-4">
+          {/* Informations de contact de la boutique */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
+            <h4 className="font-semibold text-sm text-center text-gray-500 mb-2 uppercase tracking-wider">Coordonnées</h4>
+            
+            {shop.phoneNumbers.length > 0 && (
+              <div
+                className="flex items-center justify-center gap-3 text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+                onClick={() => {
+                  const normalizedPhone = normalizePhone(shop.phoneNumbers[0]);
+                  if (normalizedPhone) {
+                    window.location.href = `tel:${normalizedPhone}`;
+                  }
+                }}
+              >
+                <div className="bg-green-100 p-2 rounded-full">
+                  <Phone className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="font-medium">{shop.phoneNumbers.join(', ')}</span>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }))}
-                  className="w-full sm:w-auto"
-                >
-                  {t('auth.login')}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'register' }))}
-                  className="w-full sm:w-auto bg-transparent border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-slate-100"
-                >
-                  {t('auth.register')}
-                </Button>
+            )}
+            
+            <div className="flex items-center justify-center gap-3 text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+              <div className="bg-blue-100 p-2 rounded-full">
+                <Mail className="h-4 w-4 text-blue-600" />
               </div>
+              <span className="font-medium">contact@{shop.name.toLowerCase().replace(/\s/g, '')}.dz</span>
+            </div>
+            
+            <div className="flex items-center justify-center gap-3 text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+              <div className="bg-orange-100 p-2 rounded-full">
+                <MapPin className="h-4 w-4 text-orange-600" />
+              </div>
+              <span className="font-medium">{shop.wilaya}, Algérie</span>
             </div>
           </div>
-        ) : (
-          <>
-            <DialogHeader className="space-y-3 pb-4 border-b">
-              <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
-                <MessageCircle className="h-6 w-6 text-primary" />
-              </div>
-              <DialogTitle className="text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-                Contacter {shop.name}
-              </DialogTitle>
-              <DialogDescription className="text-center text-sm px-4">
-                Envoyez un message directement à la boutique.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-6 pt-4">
-              {/* Informations de contact de la boutique */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
-                <h4 className="font-semibold text-sm text-center text-gray-500 mb-2 uppercase tracking-wider">Coordonnées</h4>
-                
-                {shop.phoneNumbers.length > 0 && (
-                  <div
-                    className="flex items-center justify-center gap-3 text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
-                    onClick={() => {
-                      const normalizedPhone = normalizePhone(shop.phoneNumbers[0]);
-                      if (normalizedPhone) {
-                        window.location.href = `tel:${normalizedPhone}`;
-                      }
-                    }}
-                  >
-                    <div className="bg-green-100 p-2 rounded-full">
-                      <Phone className="h-4 w-4 text-green-600" />
-                    </div>
-                    <span className="font-medium">{shop.phoneNumbers.join(', ')}</span>
-                  </div>
-                )}
-                
-                <div className="flex items-center justify-center gap-3 text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Mail className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <span className="font-medium">contact@{shop.name.toLowerCase().replace(/\s/g, '')}.dz</span>
-                </div>
-                
-                <div className="flex items-center justify-center gap-3 text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                  <div className="bg-orange-100 p-2 rounded-full">
-                    <MapPin className="h-4 w-4 text-orange-600" />
-                  </div>
-                  <span className="font-medium">{shop.wilaya}, Algérie</span>
-                </div>
-              </div>
-              
-              {/* Formulaire de contact */}
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="message" className="text-sm font-semibold ml-1">Votre message</Label>
-                  <Textarea
-                    id="message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Bonjour, je suis intéressé par..."
-                    rows={5}
-                    className="resize-none focus-visible:ring-primary rounded-xl border-gray-200 shadow-sm p-4 text-base"
-                    required
-                  />
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  disabled={loading} 
-                  className="w-full h-12 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {loading ? (
-                    <>Envoi en cours...</>
-                  ) : (
-                    <>
-                      <Send className="h-5 w-5 mr-2" />
-                      Envoyer le message
-                    </>
-                  )}
-                </Button>
-              </form>
+          
+          {/* Formulaire de contact */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-sm font-semibold ml-1">Votre message</Label>
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Bonjour, je suis intéressé par..."
+                rows={5}
+                className="resize-none focus-visible:ring-primary rounded-xl border-gray-200 shadow-sm p-4 text-base"
+                required
+              />
             </div>
-          </>
-        )}
+            
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full h-12 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {loading ? (
+                <>Envoi en cours...</>
+              ) : (
+                <>
+                  <Send className="h-5 w-5 mr-2" />
+                  Envoyer le message
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

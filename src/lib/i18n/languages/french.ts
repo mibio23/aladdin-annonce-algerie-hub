@@ -450,6 +450,8 @@ const frenchTranslations = {
   'messages.errorFetchingConversations': 'Impossible de charger les conversations',
   'messages.errorSending': 'Impossible d\'envoyer le message',
   'messages.loginRequiredDesc': 'Vous devez être connecté pour accéder à vos messages',
+  'messages.online': 'En ligne',
+  'messages.offline': 'Hors ligne',
 
   'safety.tip1': 'Rencontrez en lieu public',
   'safety.tip2': 'Vérifiez l\'identité du professionnel',

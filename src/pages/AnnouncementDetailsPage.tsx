@@ -26,6 +26,7 @@ import { generalAnnouncements } from '@/data/mock/generalAnnouncements';
 import ReportModal from "@/components/common/ReportModal";
 import { useSecureContact } from "@/hooks/useSecureContact";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useAuth } from "@/contexts/useAuth";
 import { cn } from "@/lib/utils";
 import SEOHead from "@/components/SEO/SEOHead";
 
@@ -129,11 +130,20 @@ type SellerProfile = {
 const AnnouncementDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const { user } = useAuth();
   const { t, language: currentLanguage } = useSafeI18nWithRouter();
   const { getSecureAnnouncementDetails } = useSecureContact();
   const isRTL = currentLanguage === 'ar';
   const { getLocalizedPath } = useLanguageNavigation();
   const [showContactModal, setShowContactModal] = useState(false);
+
+  const handleContactClick = () => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
+      return;
+    }
+    setShowContactModal(true);
+  };
   const [showReportModal, setShowReportModal] = useState(false);
   const [announcement, setAnnouncement] = useState<DetailedAnnouncement | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1541,7 +1551,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                     </Button>
 
                     <Button 
-                      onClick={() => setShowContactModal(true)}
+                      onClick={handleContactClick}
                       variant="outline"
                       className="w-full py-6 text-lg font-semibold border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all hover:scale-[1.02]"
                     >
@@ -1706,7 +1716,7 @@ const AnnouncementDetailsPage: React.FC = () => {
               <MessageCircle className="w-5 h-5" />
             </Button>
             <Button 
-              onClick={() => setShowContactModal(true)}
+              onClick={handleContactClick}
               variant="outline"
               size="icon"
               className="h-full w-12 border-2 border-primary/20 text-primary"

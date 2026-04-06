@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, MessageCircle, Send, User, Smile } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Send, User, Smile, ExternalLink, ShoppingBag, Briefcase, FileText } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
+import { Link } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -31,11 +33,21 @@ const MessageThread: React.FC<MessageThreadProps> = ({
 }) => {
   const { t, isRTL } = useSafeI18nWithRouter();
   const { user } = useAuth();
+  const { getLocalizedPath } = useLanguageNavigation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [otherUser, setOtherUser] = useState<{ full_name?: string, avatar_url?: string } | null>(null);
+  const [otherUser, setOtherUser] = useState<{ id?: string, full_name?: string, avatar_url?: string } | null>(null);
+  const [isOtherUserOnline, setIsOtherUserOnline] = useState(false);
+  const [subjectDetails, setSubjectDetails] = useState<{
+    type: string | null;
+    id: string | null;
+    title: string | null;
+    price?: number | null;
+    image_url?: string | null;
+    link?: string;
+  } | null>(null);
 
   // Fetch conversation details (to get other user info)
   useEffect(() => {
@@ -44,7 +56,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
       
       const { data: conv } = await supabase
         .from('conversations')
-        .select('participant_1_id, participant_2_id')
+        .select('participant_1_id, participant_2_id, subject_type, subject_id, title')
         .eq('id', conversationId)
         .single();
         
@@ -56,12 +68,124 @@ const MessageThread: React.FC<MessageThreadProps> = ({
           .eq('user_id', otherUserId)
           .maybeSingle();
           
-        setOtherUser(profile);
+        setOtherUser({ id: otherUserId, ...profile });
+
+        // Fetch subject details
+        if (conv.subject_type && conv.subject_id) {
+          let price = null;
+          let image_url = null;
+          let link = '';
+
+          try {
+            if (conv.subject_type === 'ad') {
+              const { data: adData } = await supabase
+                .from('announcements')
+                .select('price, images')
+                .eq('id', conv.subject_id)
+                .maybeSingle();
+              if (adData) {
+                price = adData.price;
+                image_url = adData.images?.[0];
+              }
+              link = `/annonce/${conv.subject_id}`;
+            } else if (conv.subject_type === 'shop') {
+              const { data: shopData } = await supabase
+                .from('shops')
+                .select('logo_url')
+                .eq('id', conv.subject_id)
+                .maybeSingle();
+              if (shopData) {
+                image_url = shopData.logo_url;
+              }
+              link = `/boutique/${conv.subject_id}`;
+            } else if (conv.subject_type === 'job_offer') {
+              const { data: jobData } = await supabase
+                .from('professional_job_offers')
+                .select('images')
+                .eq('id', conv.subject_id)
+                .maybeSingle();
+              if (jobData) {
+                image_url = jobData.images?.[0];
+              }
+              link = `/offre-metier/${conv.subject_id}`;
+            }
+
+            setSubjectDetails({
+              type: conv.subject_type,
+              id: conv.subject_id,
+              title: conv.title,
+              price,
+              image_url,
+              link
+            });
+          } catch (e) {
+            console.error('Error fetching subject details', e);
+          }
+        }
       }
     };
     
     fetchConversationDetails();
   }, [conversationId, user]);
+
+  // Check online status
+  useEffect(() => {
+    if (!otherUser?.id) return;
+
+    // 1. Initial DB check
+    const checkPresence = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('user_presence' as any)
+          .select('last_seen_at, is_online')
+          .eq('user_id', otherUser.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        const isOnlineDb = (data as any)?.is_online as boolean | null | undefined;
+        const lastSeenAt = (data as any)?.last_seen_at as string | null | undefined;
+        
+        if (lastSeenAt && isOnlineDb) {
+          const lastSeen = new Date(lastSeenAt);
+          const now = new Date();
+          const diffMinutes = (now.getTime() - lastSeen.getTime()) / (1000 * 60);
+          setIsOtherUserOnline(diffMinutes < 5);
+        } else {
+          setIsOtherUserOnline(false);
+        }
+      } catch (err) {
+        console.error('Error checking presence:', err);
+        setIsOtherUserOnline(false);
+      }
+    };
+
+    checkPresence();
+    const interval = setInterval(checkPresence, 60000);
+
+    // 2. Direct Realtime Presence Subscription
+    const channel = supabase.channel('global_presence');
+    channel.on('presence', { event: 'sync' }, () => {
+      const state = channel.presenceState();
+      // Check if other user is in the presence state
+      if (state[otherUser.id] && state[otherUser.id].length > 0) {
+        setIsOtherUserOnline(true);
+      }
+    });
+
+    channel.on('presence', { event: 'leave' }, ({ key }) => {
+      if (key === otherUser.id) {
+        setIsOtherUserOnline(false);
+      }
+    });
+
+    channel.subscribe();
+
+    return () => {
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
+  }, [otherUser?.id]);
 
   // Fetch messages and subscribe
   useEffect(() => {
@@ -213,10 +337,19 @@ const MessageThread: React.FC<MessageThreadProps> = ({
                 {otherUser?.full_name || t('messages.conversations')}
               </h3>
               {otherUser && (
-                 <span className="text-xs text-muted-foreground flex items-center gap-1">
-                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                   En ligne
-                 </span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  {isOtherUserOnline ? (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                      {t('messages.online') === 'messages.online' ? 'En ligne' : t('messages.online')}
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      {t('messages.offline') === 'messages.offline' ? 'Hors ligne' : t('messages.offline')}
+                    </>
+                  )}
+                </span>
               )}
             </div>
           </div>
@@ -225,6 +358,61 @@ const MessageThread: React.FC<MessageThreadProps> = ({
         <div className="flex-1 p-0 overflow-hidden bg-transparent">
           <ScrollArea className="h-[calc(600px-135px)] p-4 sm:p-6">
             <div className="space-y-6">
+              
+              {/* Summary Card */}
+              {subjectDetails && subjectDetails.type && (
+                <div className="mx-auto max-w-sm mb-8 relative group">
+                  <div className={cn(
+                    "absolute -inset-0.5 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500",
+                    subjectDetails.type === 'ad' ? "bg-gradient-to-r from-green-500 to-emerald-500" :
+                    subjectDetails.type === 'shop' ? "bg-gradient-to-r from-purple-500 to-fuchsia-500" :
+                    "bg-gradient-to-r from-blue-500 to-cyan-500"
+                  )}></div>
+                  <div className="relative bg-white dark:bg-slate-900 rounded-2xl p-3 flex gap-4 items-center shadow-md border border-slate-100 dark:border-slate-800">
+                    {/* Image */}
+                    <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                      {subjectDetails.image_url ? (
+                        <img src={subjectDetails.image_url} alt={subjectDetails.title || ''} className="w-full h-full object-cover" />
+                      ) : (
+                        subjectDetails.type === 'shop' ? <ShoppingBag className="h-6 w-6 text-slate-400" /> :
+                        subjectDetails.type === 'job_offer' ? <Briefcase className="h-6 w-6 text-slate-400" /> :
+                        <FileText className="h-6 w-6 text-slate-400" />
+                      )}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 py-1">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className={cn(
+                          "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
+                          subjectDetails.type === 'ad' ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
+                          subjectDetails.type === 'shop' ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" :
+                          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                        )}>
+                          {subjectDetails.type === 'ad' ? 'Annonce' : subjectDetails.type === 'shop' ? 'Boutique' : 'Métier'}
+                        </span>
+                      </div>
+                      <h4 className="font-semibold text-sm truncate text-slate-800 dark:text-slate-200">
+                        {subjectDetails.title}
+                      </h4>
+                      {subjectDetails.price !== null && subjectDetails.price !== undefined && (
+                        <p className="text-sm font-bold text-primary mt-0.5">{subjectDetails.price.toLocaleString()} DA</p>
+                      )}
+                    </div>
+
+                    {/* Action */}
+                    {subjectDetails.link && (
+                      <Button asChild size="sm" variant="secondary" className="shrink-0 rounded-xl px-3 h-9 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300">
+                        <Link to={getLocalizedPath(subjectDetails.link)}>
+                          Voir
+                          <ExternalLink className="h-3 w-3 ml-1.5 opacity-70" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {messages.length === 0 ? (
                 <div className="text-center text-muted-foreground py-20 opacity-50 flex flex-col items-center">
                   <div className="w-20 h-20 bg-white/50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-4 shadow-inner">

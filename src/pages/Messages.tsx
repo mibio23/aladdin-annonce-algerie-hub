@@ -1,18 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
 import { useAuth } from '@/contexts/useAuth';
-import { MessageCircle, Loader2 } from 'lucide-react';
+import { MessageCircle, Loader2, FileText, ShoppingBag, Briefcase, ArrowLeft } from 'lucide-react';
 import ConversationList from '@/components/messaging/ConversationList';
 import MessageThread from '@/components/messaging/MessageThread';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 const Messages = () => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [initializing, setInitializing] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'ad' | 'shop' | 'job_offer'>('all');
+  const { getLocalizedPath } = useLanguageNavigation();
+  
+  // Use `t` for translations
+  const translate = t;
+
+  const handleTabClick = (filter: 'all' | 'ad' | 'shop' | 'job_offer') => {
+    setActiveFilter(filter);
+    setSelectedConversationId(null);
+  };
 
   // Handle URL parameters for starting new conversations
   useEffect(() => {
@@ -122,9 +135,9 @@ const Messages = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center">
             <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-2xl font-bold mb-4">{t('auth.loginRequired')}</h2>
+            <h2 className="text-2xl font-bold mb-4">{translate('auth.loginRequired')}</h2>
             <p className="text-muted-foreground">
-              {t('messages.loginRequiredDesc')}
+              {translate('messages.loginRequiredDesc')}
             </p>
           </div>
         </div>
@@ -144,19 +157,112 @@ const Messages = () => {
               border: '1px solid rgba(255,255,255,0.6)'
             }}
           >
-            <div className="dark:bg-slate-800/90 dark:backdrop-blur-sm p-6">
+            <div className="dark:bg-slate-800/90 dark:backdrop-blur-sm p-6 relative">
+              <Button 
+                asChild
+                variant="outline" 
+                className={cn(
+                  "absolute top-1/2 -translate-y-1/2 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-sm text-slate-700 dark:text-slate-300 transition-all font-semibold hidden md:flex",
+                  language === 'ar' ? "left-6" : "right-6"
+                )}
+              >
+                <Link to={getLocalizedPath('/')}>
+                  {translate('categories.backToHome') === 'categories.backToHome' ? "Retour à l'accueil" : translate('categories.backToHome')}
+                </Link>
+              </Button>
               <div className="flex items-center gap-3">
                 <div className="p-3 rounded-full bg-primary/10">
                   <MessageCircle className="h-8 w-8 text-primary" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-                    {t('messages.title')}
+                    {translate('messages.title')}
                   </h1>
-                  <p className="text-muted-foreground">{t('messages.subtitle')}</p>
+                  <p className="text-muted-foreground">{translate('messages.subtitle')}</p>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Onglets 3D Bombés de Filtrage (Filter Tabs) */}
+          <div className="flex flex-wrap gap-4 mb-8 pb-2 px-2">
+            <button
+              onClick={() => handleTabClick('all')}
+              className={cn(
+                "flex-1 min-w-[220px] flex flex-col items-center justify-center gap-2 px-6 py-4 rounded-[20px] transition-all border-2 group",
+                activeFilter === 'all' 
+                  ? "bg-slate-800 text-white border-slate-700 shadow-[inset_0_2px_8px_rgba(255,255,255,0.2),0_12px_24px_-10px_rgba(0,0,0,0.6)] transform -translate-y-1.5" 
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-[0_6px_15px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_20px_-5px_rgba(0,0,0,0.15)] hover:-translate-y-1"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <MessageCircle className={cn("h-7 w-7", activeFilter === 'all' ? "text-white" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200")} />
+                <span className="text-lg font-extrabold">{translate('messages.tabs.all.title') === 'messages.tabs.all.title' ? 'Toutes les discussions' : translate('messages.tabs.all.title')}</span>
+              </div>
+              <span className={cn("text-xs font-medium text-center", activeFilter === 'all' ? "text-slate-300" : "text-slate-400")}>
+                {translate('messages.tabs.all.desc') === 'messages.tabs.all.desc' ? 'Gérez tous vos échanges en un seul endroit' : translate('messages.tabs.all.desc')}
+              </span>
+            </button>
+            
+            <button
+              onClick={() => handleTabClick('ad')}
+              className={cn(
+                "flex-1 min-w-[220px] flex flex-col items-center justify-center gap-2 px-6 py-4 rounded-[20px] transition-all border-2 group",
+                activeFilter === 'ad' 
+                  ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white border-green-500 shadow-[inset_0_2px_8px_rgba(255,255,255,0.4),0_12px_24px_-10px_rgba(16,185,129,0.7)] transform -translate-y-1.5" 
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-[0_6px_15px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_20px_-5px_rgba(16,185,129,0.3)] hover:-translate-y-1 hover:border-green-300"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'ad' ? "bg-white/20" : "bg-green-50 dark:bg-green-900/30 group-hover:bg-green-100 dark:group-hover:bg-green-900/50")}>
+                  <FileText className={cn("h-6 w-6", activeFilter === 'ad' ? "text-white" : "text-green-500")} />
+                </div>
+                <span className="text-lg font-extrabold">{translate('messages.tabs.ad.title') === 'messages.tabs.ad.title' ? 'Annonces' : translate('messages.tabs.ad.title')}</span>
+              </div>
+              <span className={cn("text-xs font-medium text-center", activeFilter === 'ad' ? "text-green-100" : "text-slate-400")}>
+                {translate('messages.tabs.ad.desc') === 'messages.tabs.ad.desc' ? "Messages liés à l'achat ou vente d'articles" : translate('messages.tabs.ad.desc')}
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleTabClick('shop')}
+              className={cn(
+                "flex-1 min-w-[220px] flex flex-col items-center justify-center gap-2 px-6 py-4 rounded-[20px] transition-all border-2 group",
+                activeFilter === 'shop' 
+                  ? "bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 text-white border-purple-500 shadow-[inset_0_2px_8px_rgba(255,255,255,0.4),0_12px_24px_-10px_rgba(139,92,246,0.7)] transform -translate-y-1.5" 
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-[0_6px_15px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_20px_-5px_rgba(139,92,246,0.3)] hover:-translate-y-1 hover:border-purple-300"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'shop' ? "bg-white/20" : "bg-purple-50 dark:bg-purple-900/30 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/50")}>
+                  <ShoppingBag className={cn("h-6 w-6", activeFilter === 'shop' ? "text-white" : "text-purple-500")} />
+                </div>
+                <span className="text-lg font-extrabold">{translate('messages.tabs.shop.title') === 'messages.tabs.shop.title' ? 'Boutiques' : translate('messages.tabs.shop.title')}</span>
+              </div>
+              <span className={cn("text-xs font-medium text-center", activeFilter === 'shop' ? "text-purple-100" : "text-slate-400")}>
+                {translate('messages.tabs.shop.desc') === 'messages.tabs.shop.desc' ? 'Échanges avec les magasins professionnels' : translate('messages.tabs.shop.desc')}
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleTabClick('job_offer')}
+              className={cn(
+                "flex-1 min-w-[220px] flex flex-col items-center justify-center gap-2 px-6 py-4 rounded-[20px] transition-all border-2 group",
+                activeFilter === 'job_offer' 
+                  ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white border-blue-500 shadow-[inset_0_2px_8px_rgba(255,255,255,0.4),0_12px_24px_-10px_rgba(59,130,246,0.7)] transform -translate-y-1.5" 
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-[0_6px_15px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_20px_-5px_rgba(59,130,246,0.3)] hover:-translate-y-1 hover:border-blue-300"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'job_offer' ? "bg-white/20" : "bg-blue-50 dark:bg-blue-900/30 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50")}>
+                  <Briefcase className={cn("h-6 w-6", activeFilter === 'job_offer' ? "text-white" : "text-blue-500")} />
+                </div>
+                <span className="text-lg font-extrabold">{translate('messages.tabs.job_offer.title') === 'messages.tabs.job_offer.title' ? 'Métiers' : translate('messages.tabs.job_offer.title')}</span>
+              </div>
+              <span className={cn("text-xs font-medium text-center", activeFilter === 'job_offer' ? "text-blue-100" : "text-slate-400")}>
+                {translate('messages.tabs.job_offer.desc') === 'messages.tabs.job_offer.desc' ? 'Contacts pour des services et réparations' : translate('messages.tabs.job_offer.desc')}
+              </span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
@@ -183,6 +289,7 @@ const Messages = () => {
                       <ConversationList
                         onSelectConversation={setSelectedConversationId}
                         selectedConversationId={selectedConversationId || undefined}
+                        activeFilter={activeFilter}
                       />
                     )}
                   </div>

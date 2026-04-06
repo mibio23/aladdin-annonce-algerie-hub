@@ -835,10 +835,35 @@ const englishTranslations = {
 
   'auth.loginRequired': 'Login required',
   'auth.loginRequiredDesc': 'Sign in or create an account to send a message.',
+
+  // Messages translations
   'messages.error': 'Error',
+  'messages.title': 'Messages',
+  'messages.subtitle': 'Manage your conversations with sellers and buyers',
+  'messages.conversations': 'Conversations',
+  'messages.noConversations': 'No conversations',
+  'messages.noConversationsDesc': 'You have no conversations yet. Contact a seller to start.',
+  'messages.aboutAd': 'About the ad',
+  'messages.typeMessage': 'Type your message...',
+  'messages.selectConversation': 'Select a conversation',
+  'messages.selectConversationDesc': 'Choose a conversation from the list to start chatting.',
+  'messages.errorFetchingMessages': 'Failed to load messages',
+  'messages.noMessages': 'No messages',
   'messages.errorFetchingConversations': 'Failed to load conversations',
   'messages.errorSending': 'Failed to send message',
   'messages.loginRequiredDesc': 'You must be logged in to access your messages',
+  'messages.online': 'Online',
+  'messages.offline': 'Offline',
+
+  // Messages Tabs
+  'messages.tabs.all.title': 'All discussions',
+  'messages.tabs.all.desc': 'Manage all your chats in one place',
+  'messages.tabs.ad.title': 'Ads',
+  'messages.tabs.ad.desc': 'Messages related to buying or selling items',
+  'messages.tabs.shop.title': 'Shops',
+  'messages.tabs.shop.desc': 'Exchanges with professional stores',
+  'messages.tabs.job_offer.title': 'Professions',
+  'messages.tabs.job_offer.desc': 'Contacts for services and repairs',
 };
 
 export default englishTranslations;

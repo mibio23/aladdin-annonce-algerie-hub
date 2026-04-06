@@ -44,6 +44,16 @@ const englishTranslations = {
 
   // Banner button translations
   ...englishBanner,
+
+  // Messages Tabs
+  'messages.tabs.all.title': 'All discussions',
+  'messages.tabs.all.desc': 'Manage all your chats in one place',
+  'messages.tabs.ad.title': 'Classified Ads',
+  'messages.tabs.ad.desc': 'Messages related to buying or selling items',
+  'messages.tabs.shop.title': 'Shops',
+  'messages.tabs.shop.desc': 'Chats with professional stores',
+  'messages.tabs.job_offer.title': 'Services',
+  'messages.tabs.job_offer.desc': 'Contacts for services and repairs',
 };
 
 export default englishTranslations;

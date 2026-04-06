@@ -58,6 +58,14 @@ const ShopDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+
+  const handleMessageClick = () => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
+      return;
+    }
+    setShowContactModal(true);
+  };
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
@@ -228,32 +236,53 @@ const ShopDetails: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('user_presence' as any)
-          .select('last_seen_at')
+          .select('last_seen_at, is_online')
           .eq('user_id', shop.ownerId)
           .maybeSingle();
 
         if (error) throw error;
 
+        const isOnlineDb = (data as any)?.is_online as boolean | null | undefined;
         const lastSeenAt = (data as any)?.last_seen_at as string | null | undefined;
-        if (lastSeenAt) {
+        
+        if (lastSeenAt && isOnlineDb) {
           const lastSeen = new Date(lastSeenAt);
           const now = new Date();
           const diffMinutes = (now.getTime() - lastSeen.getTime()) / (1000 * 60);
-          // Considérer en ligne si vu dans les 5 dernières minutes
           setIsOwnerOnline(diffMinutes < 5);
         } else {
           setIsOwnerOnline(false);
         }
       } catch (err) {
         console.error('Error checking owner presence:', err);
+        setIsOwnerOnline(false);
       }
     };
 
     checkOwnerPresence();
-    
-    // Polling toutes les minutes
     const interval = setInterval(checkOwnerPresence, 60000);
-    return () => clearInterval(interval);
+
+    // Direct Realtime Subscription for instant updates
+    const channel = supabase.channel('global_presence');
+    channel.on('presence', { event: 'sync' }, () => {
+      const state = channel.presenceState();
+      if (state[shop.ownerId] && state[shop.ownerId].length > 0) {
+        setIsOwnerOnline(true);
+      }
+    });
+
+    channel.on('presence', { event: 'leave' }, ({ key }) => {
+      if (key === shop.ownerId) {
+        setIsOwnerOnline(false);
+      }
+    });
+
+    channel.subscribe();
+
+    return () => {
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
   }, [shop?.ownerId]);
 
   // Vérifier si la boutique est dans les favoris
@@ -502,7 +531,7 @@ const ShopDetails: React.FC = () => {
         <div className="absolute top-6 right-6 flex flex-col gap-2 z-10">
           <Badge className={`${isOwnerOnline ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} text-white border-none px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1`}>
             <div className={`w-2 h-2 bg-white rounded-full ${isOwnerOnline ? 'animate-pulse' : ''}`} />
-            {isOwnerOnline ? "Utilisateur En Ligne" : "Utilisateur Déconnecté"}
+            {isOwnerOnline ? (t('messages.online') === 'messages.online' ? 'En ligne' : t('messages.online')) : (t('messages.offline') === 'messages.offline' ? 'Hors ligne' : t('messages.offline'))}
           </Badge>
           
           {shop.isVerified && (
@@ -958,7 +987,7 @@ const ShopDetails: React.FC = () => {
                           >
                             Appeler
                           </Button>
-                          <Button variant="outline" className="flex-1 h-12 rounded-xl font-bold border-2" onClick={() => setShowContactModal(true)}>
+                          <Button variant="outline" className="flex-1 h-12 rounded-xl font-bold border-2" onClick={handleMessageClick}>
                             <MessageCircle className="h-5 w-5 mr-2" />
                             Message
                           </Button>
@@ -1014,7 +1043,7 @@ const ShopDetails: React.FC = () => {
                   </Button>
                   <Button 
                     variant="secondary" 
-                    onClick={() => setShowContactModal(true)}
+                    onClick={handleMessageClick}
                     className="w-full h-12 rounded-xl bg-slate-800 hover:bg-slate-700 border-none text-white"
                   >
                     <MessageCircle className="h-4 w-4 mr-2 text-blue-400" />
@@ -1139,7 +1168,7 @@ const ShopDetails: React.FC = () => {
           <AlertTriangle className="h-5 w-5" />
         </Button>
         <Button 
-          onClick={() => setShowContactModal(true)} 
+          onClick={handleMessageClick} 
           className="flex-1 h-14 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold"
         >
           Contacter

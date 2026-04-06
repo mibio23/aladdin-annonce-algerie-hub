@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 import AdaptiveImageCarousel from "@/components/common/AdaptiveImageCarousel";
 import ReportModal from "@/components/common/ReportModal";
+import JobOfferContactModal from "@/components/job_offer/JobOfferContactModal";
 import SEOHead from "@/components/SEO/SEOHead";
 
 interface JobOffer {
@@ -61,6 +62,7 @@ const JobOfferDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   const translateOrFallback = (key: string, fallback: string) => {
     const translated = t(key);
@@ -164,90 +166,13 @@ const JobOfferDetailsPage = () => {
     return availability;
   };
 
-  const handleStartChat = async () => {
+  const handleStartChat = () => {
     if (!user) {
       window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
       return;
     }
 
-    if (!offer || !offer.user_id) {
-      toast({
-        title: translateOrFallback('messages.error', ''),
-        description: translateOrFallback('messages.errorFetchingConversations', ''),
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (offer.user_id === user.id) {
-      return;
-    }
-
-    try {
-      const { data: existingConversation, error: fetchError } = await supabase
-        .from('conversations')
-        .select('id')
-        .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
-        .eq('subject_type', 'job_offer')
-        .eq('subject_id', offer.id)
-        .limit(1)
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-
-      let conversationId = existingConversation?.id as string | undefined;
-
-      if (!conversationId) {
-        const { data: participantConversation, error: participantFetchError } = await supabase
-          .from('conversations')
-          .select('id')
-          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
-          .limit(1)
-          .maybeSingle();
-
-        if (participantFetchError) throw participantFetchError;
-        conversationId = participantConversation?.id as string | undefined;
-      }
-
-      if (!conversationId) {
-        const now = new Date().toISOString();
-        const { data: newConversation, error: createError } = await supabase
-          .from('conversations')
-          .insert({
-            participant_1_id: user.id,
-            participant_2_id: offer.user_id,
-            subject_type: 'job_offer',
-            subject_id: offer.id,
-            title: offer.title,
-            updated_at: now,
-            last_message_at: now,
-          })
-          .select('id')
-          .single();
-
-        if (createError) {
-          const { data: fallbackConversation, error: fallbackError } = await supabase
-            .from('conversations')
-            .select('id')
-            .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
-            .limit(1)
-            .maybeSingle();
-
-          if (fallbackError || !fallbackConversation?.id) throw createError;
-          conversationId = fallbackConversation.id;
-        } else {
-          conversationId = newConversation.id;
-        }
-      }
-
-      navigateWithLanguage(`/messages?conversation=${conversationId}`);
-    } catch {
-      toast({
-        title: translateOrFallback('messages.error', ''),
-        description: translateOrFallback('messages.errorSending', ''),
-        variant: 'destructive',
-      });
-    }
+    setShowContactModal(true);
   };
 
   useEffect(() => {
@@ -660,6 +585,12 @@ const JobOfferDetailsPage = () => {
           wilaya: offer.wilaya ?? null,
         }}
       />
+      {showContactModal && (
+        <JobOfferContactModal
+          offer={offer}
+          onClose={() => setShowContactModal(false)}
+        />
+      )}
     </div>
   );
 };

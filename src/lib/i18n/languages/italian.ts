@@ -447,7 +447,35 @@ const italianTranslations = {
 
   // Import referral translations
 
-  ...italianParrainage
+  ...italianParrainage,
+
+  // Messages translations
+  'messages.title': 'Messaggi',
+  'messages.subtitle': 'Gestisci le tue conversazioni con venditori e acquirenti',
+  'messages.conversations': 'Conversazioni',
+  'messages.noConversations': 'Nessuna conversazione',
+  'messages.noConversationsDesc': 'Non hai ancora conversazioni. Contatta un venditore per iniziare.',
+  'messages.aboutAd': 'A proposito dell\'annuncio',
+  'messages.typeMessage': 'Scrivi il tuo messaggio...',
+  'messages.selectConversation': 'Seleziona una conversazione',
+  'messages.selectConversationDesc': 'Scegli una conversazione nell\'elenco per iniziare a chattare.',
+  'messages.errorFetchingMessages': 'Impossibile caricare i messaggi',
+  'messages.noMessages': 'Nessun messaggio',
+  'messages.errorFetchingConversations': 'Impossibile caricare le conversazioni',
+  'messages.errorSending': 'Impossibile inviare il messaggio',
+  'messages.loginRequiredDesc': 'Devi effettuare l\'accesso per visualizzare i tuoi messaggi',
+  'messages.online': 'Online',
+  'messages.offline': 'Offline',
+
+  // Messages Tabs
+  'messages.tabs.all.title': 'Tutte le discussioni',
+  'messages.tabs.all.desc': 'Gestisci tutte le tue chat in un solo posto',
+  'messages.tabs.ad.title': 'Annunci',
+  'messages.tabs.ad.desc': 'Messaggi relativi all\'acquisto o vendita di articoli',
+  'messages.tabs.shop.title': 'Negozi',
+  'messages.tabs.shop.desc': 'Scambi con negozi professionali',
+  'messages.tabs.job_offer.title': 'Servizi',
+  'messages.tabs.job_offer.desc': 'Contatti per servizi e riparazioni',
 };
 
 export default italianTranslations;

@@ -878,10 +878,35 @@ const arabicTranslations = {
 
   'auth.loginRequired': 'تسجيل الدخول مطلوب',
   'auth.loginRequiredDesc': 'سجّل الدخول أو أنشئ حسابًا لإرسال رسالة.',
+  
+  // Messages translations
   'messages.error': 'خطأ',
-  'messages.errorFetchingConversations': 'فشل في تحميل المحادثات',
-  'messages.errorSending': 'فشل في إرسال الرسالة',
-  'messages.loginRequiredDesc': 'يجب عليك تسجيل الدخول للوصول إلى رسائلك',
+  'messages.title': 'الرسائل',
+  'messages.subtitle': 'إدارة محادثاتك مع البائعين والمشترين',
+  'messages.conversations': 'المحادثات',
+  'messages.noConversations': 'لا توجد محادثات',
+  'messages.noConversationsDesc': 'ليس لديك محادثات بعد. اتصل ببائع للبدء.',
+  'messages.aboutAd': 'حول الإعلان',
+  'messages.typeMessage': 'اكتب رسالتك...',
+  'messages.selectConversation': 'حدد محادثة',
+  'messages.selectConversationDesc': 'اختر محادثة من القائمة لبدء الدردشة.',
+  'messages.errorFetchingMessages': 'فشل تحميل الرسائل',
+  'messages.noMessages': 'لا توجد رسائل',
+  'messages.errorFetchingConversations': 'فشل تحميل المحادثات',
+  'messages.errorSending': 'فشل إرسال الرسالة',
+  'messages.loginRequiredDesc': 'يجب تسجيل الدخول للوصول إلى رسائلك',
+  'messages.online': 'متصل',
+  'messages.offline': 'غير متصل',
+
+  // Messages Tabs
+  'messages.tabs.all.title': 'كل المحادثات',
+  'messages.tabs.all.desc': 'إدارة جميع محادثاتك في مكان واحد',
+  'messages.tabs.ad.title': 'إعلانات',
+  'messages.tabs.ad.desc': 'رسائل متعلقة بشراء أو بيع السلع',
+  'messages.tabs.shop.title': 'متاجر',
+  'messages.tabs.shop.desc': 'تبادلات مع المتاجر المهنية',
+  'messages.tabs.job_offer.title': 'مهن',
+  'messages.tabs.job_offer.desc': 'جهات اتصال للخدمات والإصلاحات',
 };
 
 export default arabicTranslations;

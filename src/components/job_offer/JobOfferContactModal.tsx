@@ -11,8 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
-interface AnnouncementContactModalProps {
-  announcement: {
+interface JobOfferContactModalProps {
+  offer: {
     id: string;
     title: string;
     user_id?: string | null;
@@ -20,7 +20,7 @@ interface AnnouncementContactModalProps {
   onClose: () => void;
 }
 
-const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ announcement, onClose }) => {
+const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onClose }) => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -32,24 +32,21 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!announcement || !announcement.user_id) {
+    if (!offer || !offer.user_id) {
       toast({
         title: "Erreur",
-        description: "Impossible de contacter le vendeur (Informations manquantes)",
+        description: "Impossible de contacter le professionnel (Informations manquantes)",
         variant: "destructive"
       });
       return;
     }
     
     if (!user) {
-      toast({
-        title: t('auth.loginRequired'),
-        description: t('auth.loginRequiredDesc'),
-      });
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
       return;
     }
 
-    if (announcement.user_id === user.id) {
+    if (offer.user_id === user.id) {
       toast({
         title: "Erreur",
         description: "Vous ne pouvez pas envoyer de message à vous-même.",
@@ -74,9 +71,9 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
       const { data: existingConversations, error: fetchError } = await (supabase
         .from('conversations') as any)
         .select('id')
-        .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${announcement.user_id}),and(participant_1_id.eq.${announcement.user_id},participant_2_id.eq.${user.id})`)
-        .eq('subject_type', 'ad')
-        .eq('subject_id', announcement.id)
+        .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
+        .eq('subject_type', 'job_offer')
+        .eq('subject_id', offer.id)
         .limit(1)
         .maybeSingle();
 
@@ -90,7 +87,7 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
         const { data: participantConversation, error: participantFetchError } = await (supabase
           .from('conversations') as any)
           .select('id')
-          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${announcement.user_id}),and(participant_1_id.eq.${announcement.user_id},participant_2_id.eq.${user.id})`)
+          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
           .limit(1)
           .maybeSingle();
 
@@ -107,10 +104,10 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
           .from('conversations')
           .insert({
             participant_1_id: user.id,
-            participant_2_id: announcement.user_id,
-            subject_type: 'ad',
-            subject_id: announcement.id,
-            title: announcement.title,
+            participant_2_id: offer.user_id,
+            subject_type: 'job_offer',
+            subject_id: offer.id,
+            title: offer.title,
             updated_at: new Date().toISOString()
           })
           .select('id')
@@ -120,7 +117,7 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
           const { data: fallbackConversation, error: fallbackError } = await (supabase
             .from('conversations') as any)
             .select('id')
-            .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${announcement.user_id}),and(participant_1_id.eq.${announcement.user_id},participant_2_id.eq.${user.id})`)
+            .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
             .limit(1)
             .maybeSingle();
 
@@ -155,7 +152,7 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
       
       toast({
         title: "Message envoyé !",
-        description: `Votre message a été envoyé au vendeur.`,
+        description: `Votre message a été envoyé avec succès.`,
       });
       
       setMessage('');
@@ -178,25 +175,20 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
   };
 
 
-  // Auto-redirect if not logged in removed as AuthRequiredBubble now handles it with AuthDrawer
-  useEffect(() => {
-    // This effect is now empty or can be removed
-  }, [user, announcement, onClose]);
-
-  if (!announcement) return null;
+  if (!offer) return null;
 
   return (
-    <Dialog open={!!announcement} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={!!offer} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 border-none shadow-2xl">
         <DialogHeader className="space-y-3 pb-4 border-b">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
             <MessageCircle className="h-6 w-6 text-primary" />
           </div>
           <DialogTitle className="text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-            Contacter le vendeur
+            Contacter le professionnel
           </DialogTitle>
           <DialogDescription className="text-center text-sm px-4">
-            Envoyez un message concernant "{announcement.title}"
+            Envoyez un message concernant "{offer.title}"
           </DialogDescription>
         </DialogHeader>
         
@@ -208,7 +200,7 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Bonjour, votre annonce m'intéresse. Est-elle toujours disponible ?"
+                placeholder="Bonjour, je suis intéressé par vos services. Pouvez-vous me donner plus d'informations ?"
                 rows={5}
                 className="resize-none focus-visible:ring-primary rounded-xl border-gray-200 shadow-sm p-4 text-base"
                 required
@@ -236,4 +228,4 @@ const AnnouncementContactModal: React.FC<AnnouncementContactModalProps> = ({ ann
   );
 };
 
-export default AnnouncementContactModal;
+export default JobOfferContactModal;

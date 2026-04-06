@@ -8,13 +8,14 @@ export const usePresenceTracker = () => {
   useEffect(() => {
     if (!user) return;
 
-    const updatePresence = async () => {
+    // 1. Maintain database state for offline queries/history
+    const updatePresence = async (isOnline = true) => {
       try {
         const { error } = await supabase
           .from('user_presence' as any)
           .upsert({ 
             user_id: user.id,
-            is_online: true,
+            is_online: isOnline,
             last_seen_at: new Date().toISOString()
           }, { 
             onConflict: 'user_id' 
@@ -28,24 +29,44 @@ export const usePresenceTracker = () => {
       }
     };
 
-    // Initial update
-    updatePresence();
+    // Initial DB update
+    updatePresence(true);
+    const intervalId = setInterval(() => updatePresence(true), 2 * 60 * 1000);
 
-    // Set up interval (every 2 minutes)
-    const intervalId = setInterval(updatePresence, 2 * 60 * 1000);
+    // 2. Direct Realtime Connection (Supabase Channels)
+    const channel = supabase.channel('global_presence', {
+      config: {
+        presence: {
+          key: user.id,
+        },
+      },
+    });
 
-    // Update on visibility change
+    channel.on('presence', { event: 'sync' }, () => {
+      // Presence state is synced
+    });
+
+    channel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await channel.track({
+          user_id: user.id,
+          online_at: new Date().toISOString(),
+        });
+      }
+    });
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        updatePresence();
+        updatePresence(true);
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       clearInterval(intervalId);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      updatePresence(false);
+      supabase.removeChannel(channel);
     };
   }, [user]);
 };

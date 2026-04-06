@@ -727,10 +727,35 @@ const spanishTranslations = {
 
   'auth.loginRequired': 'Inicio de sesión requerido',
   'auth.loginRequiredDesc': 'Inicia sesión o crea una cuenta para enviar un mensaje.',
+  
+  // Messages translations
   'messages.error': 'Error',
-  'messages.errorFetchingConversations': 'No se pudieron cargar las conversaciones',
-  'messages.errorSending': 'No se pudo enviar el mensaje',
-  'messages.loginRequiredDesc': 'Debe iniciar sesión para acceder a sus mensajes',
+  'messages.title': 'Mensajes',
+  'messages.subtitle': 'Gestiona tus conversaciones con vendedores y compradores',
+  'messages.conversations': 'Conversaciones',
+  'messages.noConversations': 'Sin conversaciones',
+  'messages.noConversationsDesc': 'Aún no tienes conversaciones. Contacta a un vendedor para empezar.',
+  'messages.aboutAd': 'Acerca del anuncio',
+  'messages.typeMessage': 'Escribe tu mensaje...',
+  'messages.selectConversation': 'Selecciona una conversación',
+  'messages.selectConversationDesc': 'Elige una conversación de la lista para empezar a chatear.',
+  'messages.errorFetchingMessages': 'Error al cargar los mensajes',
+  'messages.noMessages': 'Sin mensajes',
+  'messages.errorFetchingConversations': 'Error al cargar las conversaciones',
+  'messages.errorSending': 'Error al enviar el mensaje',
+  'messages.loginRequiredDesc': 'Debes iniciar sesión para acceder a tus mensajes',
+  'messages.online': 'En línea',
+  'messages.offline': 'Desconectado',
+
+  // Messages Tabs
+  'messages.tabs.all.title': 'Todas las discusiones',
+  'messages.tabs.all.desc': 'Gestiona todas tus discusiones en un solo lugar',
+  'messages.tabs.ad.title': 'Anuncios',
+  'messages.tabs.ad.desc': 'Mensajes relacionados con la compra o venta de artículos',
+  'messages.tabs.shop.title': 'Tiendas',
+  'messages.tabs.shop.desc': 'Intercambios con tiendas profesionales',
+  'messages.tabs.job_offer.title': 'Oficios',
+  'messages.tabs.job_offer.desc': 'Contactos para servicios y reparaciones',
 };
 
 export default spanishTranslations;
