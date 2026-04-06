@@ -164,26 +164,41 @@ const MessageThread: React.FC<MessageThreadProps> = ({
     const interval = setInterval(checkPresence, 60000);
 
     // 2. Direct Realtime Presence Subscription
-    const channel = supabase.channel('global_presence');
-    channel.on('presence', { event: 'sync' }, () => {
+    let channel = supabase.getChannels().find(c => c.topic === 'realtime:global_presence');
+    let isNewChannel = false;
+
+    if (!channel) {
+      channel = supabase.channel('global_presence');
+      isNewChannel = true;
+    }
+
+    const onSync = () => {
+      if (!channel) return;
       const state = channel.presenceState();
       // Check if other user is in the presence state
       if (state[otherUser.id] && state[otherUser.id].length > 0) {
         setIsOtherUserOnline(true);
       }
-    });
+    };
 
-    channel.on('presence', { event: 'leave' }, ({ key }) => {
+    const onLeave = ({ key }: { key: string }) => {
       if (key === otherUser.id) {
         setIsOtherUserOnline(false);
       }
-    });
+    };
 
-    channel.subscribe();
+    channel.on('presence', { event: 'sync' }, onSync);
+    channel.on('presence', { event: 'leave' }, onLeave);
+
+    if (isNewChannel) {
+      channel.subscribe();
+    } else {
+      onSync();
+    }
 
     return () => {
       clearInterval(interval);
-      supabase.removeChannel(channel);
+      // Ne pas appeler supabase.removeChannel(channel) ici car d'autres composants peuvent l'utiliser
     };
   }, [otherUser?.id]);
 

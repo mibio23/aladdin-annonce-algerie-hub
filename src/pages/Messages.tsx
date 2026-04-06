@@ -191,16 +191,18 @@ const Messages = () => {
               className={cn(
                 "flex-1 min-w-[220px] flex flex-col items-center justify-center gap-2 px-6 py-4 rounded-[20px] transition-all border-2 group",
                 activeFilter === 'all' 
-                  ? "bg-slate-800 text-white border-slate-700 shadow-[inset_0_2px_8px_rgba(255,255,255,0.2),0_12px_24px_-10px_rgba(0,0,0,0.6)] transform -translate-y-1.5" 
-                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-[0_6px_15px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_20px_-5px_rgba(0,0,0,0.15)] hover:-translate-y-1"
+                  ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-blue-400 shadow-[inset_0_2px_8px_rgba(255,255,255,0.4),0_12px_24px_-10px_rgba(59,130,246,0.7)] transform -translate-y-1.5" 
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 shadow-[0_6px_15px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_20px_-5px_rgba(59,130,246,0.3)] hover:-translate-y-1 hover:border-blue-300"
               )}
             >
               <div className="flex items-center gap-3">
-                <MessageCircle className={cn("h-7 w-7", activeFilter === 'all' ? "text-white" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200")} />
-                <span className="text-lg font-extrabold">{translate('messages.tabs.all.title') === 'messages.tabs.all.title' ? 'Toutes les discussions' : translate('messages.tabs.all.title')}</span>
+                <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'all' ? "bg-white/20" : "bg-blue-50 dark:bg-blue-900/30 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50")}>
+                  <MessageCircle className={cn("h-6 w-6", activeFilter === 'all' ? "text-white" : "text-blue-500")} />
+                </div>
+                <span className="text-lg font-extrabold">{t('messages.tabs.all.title') === 'messages.tabs.all.title' ? 'Toutes les discussions' : t('messages.tabs.all.title')}</span>
               </div>
-              <span className={cn("text-xs font-medium text-center", activeFilter === 'all' ? "text-slate-300" : "text-slate-400")}>
-                {translate('messages.tabs.all.desc') === 'messages.tabs.all.desc' ? 'Gérez tous vos échanges en un seul endroit' : translate('messages.tabs.all.desc')}
+              <span className={cn("text-xs font-medium text-center", activeFilter === 'all' ? "text-blue-100" : "text-slate-400")}>
+                {t('messages.tabs.all.desc') === 'messages.tabs.all.desc' ? 'Gérez tous vos échanges en un seul endroit' : t('messages.tabs.all.desc')}
               </span>
             </button>
             

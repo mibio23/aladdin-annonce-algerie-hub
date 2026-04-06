@@ -233,8 +233,16 @@ const ConversationList: React.FC<ConversationListProps> = ({
     const interval = setInterval(fetchOnlineStatuses, 60000);
 
     // 2. Direct Realtime Presence Subscription
-    const channel = supabase.channel('global_presence');
-    channel.on('presence', { event: 'sync' }, () => {
+    let channel = supabase.getChannels().find(c => c.topic === 'realtime:global_presence');
+    let isNewChannel = false;
+
+    if (!channel) {
+      channel = supabase.channel('global_presence');
+      isNewChannel = true;
+    }
+
+    const onSync = () => {
+      if (!channel) return;
       const state = channel.presenceState();
       
       setOnlineUsers(prev => {
@@ -248,21 +256,28 @@ const ConversationList: React.FC<ConversationListProps> = ({
         
         return newSet;
       });
-    });
+    };
 
-    channel.on('presence', { event: 'leave' }, ({ key }) => {
+    const onLeave = ({ key }: { key: string }) => {
       setOnlineUsers(prev => {
         const newSet = new Set(prev);
         newSet.delete(key);
         return newSet;
       });
-    });
+    };
 
-    channel.subscribe();
+    channel.on('presence', { event: 'sync' }, onSync);
+    channel.on('presence', { event: 'leave' }, onLeave);
+
+    if (isNewChannel) {
+      channel.subscribe();
+    } else {
+      onSync();
+    }
 
     return () => {
       clearInterval(interval);
-      supabase.removeChannel(channel);
+      // Ne pas détruire le canal global
     };
   }, [conversations]);
 

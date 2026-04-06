@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,14 +50,25 @@ import { Shop } from '@/types/shop';
 import { useAuth } from '@/contexts/useAuth';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { generateSessionId } from '@/utils/searchUtils';
+import { cn } from '@/lib/utils';
 import SEOHead from '@/components/SEO/SEOHead';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 const ShopDetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
+  const { getLocalizedPath } = useLanguageNavigation();
+  const { t } = useSafeI18nWithRouter();
+  const { user } = useAuth();
+  const location = useLocation();
+
   const [shop, setShop] = useState<Shop | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [isOwnerOnline, setIsOwnerOnline] = useState(false);
 
   const handleMessageClick = () => {
     if (!user) {
@@ -66,16 +77,83 @@ const ShopDetails: React.FC = () => {
     }
     setShowContactModal(true);
   };
+
+  const handleReviewClick = () => {
+    if (!user) {
+      sessionStorage.setItem('authRedirectUrl', location.pathname + location.search);
+      sessionStorage.setItem('openReviewModalAfterLogin', 'true');
+      window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
+      return;
+    }
+    setShowReviewModal(true);
+  };
+
   const [showReviewModal, setShowReviewModal] = useState(false);
+
+  // Ouvrir automatiquement la modale d'avis après une connexion réussie
+  useEffect(() => {
+    if (user && sessionStorage.getItem('openReviewModalAfterLogin') === 'true') {
+      sessionStorage.removeItem('openReviewModalAfterLogin');
+      // Petit délai pour laisser le temps au drawer de se fermer
+      setTimeout(() => {
+        setShowReviewModal(true);
+      }, 500);
+    }
+  }, [user]);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [reportReason, setReportReason] = useState('');
   const [reportDetails, setReportDetails] = useState('');
   const [reportSubmitting, setReportSubmitting] = useState(false);
-  const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
-  const { getLocalizedPath } = useLanguageNavigation();
-  const { user } = useAuth();
-  const { t } = useSafeI18nWithRouter();
+  const currentUserReview = user ? reviews.find((review) => review.user_id === user.id) ?? null : null;
+
+  const fetchShopReviews = async (shopId: string) => {
+    const { data: reviewsData, error: reviewsError } = await supabase
+      .from('shop_reviews')
+      .select('id, rating, comment, created_at, user_id')
+      .eq('shop_id', shopId)
+      .order('created_at', { ascending: false });
+
+    if (reviewsError) {
+      throw reviewsError;
+    }
+
+    const userIds = Array.from(
+      new Set((reviewsData || []).map((review) => review.user_id).filter(Boolean))
+    );
+
+    let profilesMap = new Map<string, { full_name: string | null; avatar_url: string | null }>();
+
+    if (userIds.length > 0) {
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, avatar_url')
+        .in('user_id', userIds);
+
+      if (profilesError) {
+        throw profilesError;
+      }
+
+      profilesMap = new Map(
+        (profilesData || []).map((profile) => [
+          profile.user_id as string,
+          {
+            full_name: (profile as any).full_name ?? null,
+            avatar_url: (profile as any).avatar_url ?? null,
+          },
+        ])
+      );
+    }
+
+    const normalizedReviews = (reviewsData || []).map((review) => ({
+      ...review,
+      profiles: profilesMap.get(review.user_id) || null,
+    }));
+
+    setReviews(normalizedReviews);
+
+    return normalizedReviews;
+  };
 
   const getOrCreateReportSessionId = () => {
     const storageKey = 'report_session_id';
@@ -182,12 +260,14 @@ const ShopDetails: React.FC = () => {
             openingHours: (data.opening_hours as any) ?? undefined,
             deliveryOptions: (data.delivery_options as any) ?? undefined,
             paymentMethods: (data.payment_methods as any) ?? undefined,
-            rating: 4.5, // Valeur par défaut
-            reviewCount: 0,
+            rating: data.rating || 0, // Utiliser la vraie note ou 0
+            reviewCount: data.review_count || 0, // Utiliser le vrai count ou 0
             followerCount: data.view_count || 0,
             gpsCoordinates: data.gps_coordinates as { lat: number; lng: number } || { lat: 36.75, lng: 3.06 }
           };
           setShop(adaptedShop);
+
+          await fetchShopReviews(id);
 
           const viewKey = `viewed_shop_${id}`;
           if (!sessionStorage.getItem(viewKey)) {
@@ -226,12 +306,11 @@ const ShopDetails: React.FC = () => {
     }
   }, [id, toast]);
 
-  const [isOwnerOnline, setIsOwnerOnline] = useState(false);
-
   // Vérifier le statut de connexion du propriétaire
   useEffect(() => {
     if (!shop?.ownerId) return;
 
+    // 1. Initial DB check
     const checkOwnerPresence = async () => {
       try {
         const { data, error } = await supabase
@@ -263,25 +342,46 @@ const ShopDetails: React.FC = () => {
     const interval = setInterval(checkOwnerPresence, 60000);
 
     // Direct Realtime Subscription for instant updates
-    const channel = supabase.channel('global_presence');
-    channel.on('presence', { event: 'sync' }, () => {
+    let channel = supabase.getChannels().find(c => c.topic === 'realtime:global_presence');
+    let isNewChannel = false;
+    
+    if (!channel) {
+      channel = supabase.channel('global_presence');
+      isNewChannel = true;
+    }
+
+    // Fonction de rappel pour la synchronisation
+    const onSync = () => {
+      if (!channel) return;
       const state = channel.presenceState();
+      // On met en ligne SEULEMENT si l'utilisateur est bien dans l'état (donc actif)
       if (state[shop.ownerId] && state[shop.ownerId].length > 0) {
         setIsOwnerOnline(true);
+      } else {
+        // Sinon, la BDD (ou le check DB) a peut-être raison de le dire hors-ligne
+        // checkOwnerPresence s'en chargera
       }
-    });
+    };
 
-    channel.on('presence', { event: 'leave' }, ({ key }) => {
+    // Fonction de rappel pour le départ
+    const onLeave = ({ key }: { key: string }) => {
       if (key === shop.ownerId) {
         setIsOwnerOnline(false);
       }
-    });
+    };
 
-    channel.subscribe();
+    channel.on('presence', { event: 'sync' }, onSync);
+    channel.on('presence', { event: 'leave' }, onLeave);
+
+    if (isNewChannel) {
+      channel.subscribe();
+    } else {
+      // Si le channel existe déjà, forcer une synchronisation initiale
+      onSync();
+    }
 
     return () => {
       clearInterval(interval);
-      supabase.removeChannel(channel);
     };
   }, [shop?.ownerId]);
 
@@ -565,10 +665,6 @@ const ShopDetails: React.FC = () => {
               <BreadcrumbLink asChild>
                 <Link to={getLocalizedPath('/boutiques')}>{shopsLabel}</Link>
               </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{shop.name}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -909,25 +1005,107 @@ const ShopDetails: React.FC = () => {
                       </div>
                     </div>
 
-                    <Card className="border-none shadow-sm bg-slate-50 dark:bg-slate-900/50">
-                      <CardContent className="text-center py-12">
-                        <div className="bg-white dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border">
-                          <MessageCircle className="h-10 w-10 text-slate-300" />
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">Partagez votre expérience</h3>
-                        <p className="text-slate-500 text-sm mb-8 max-w-xs mx-auto">
-                          Votre avis aide les autres utilisateurs à découvrir les meilleures boutiques d'Algérie.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                          <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12" onClick={() => setShowReviewModal(true)}>
-                            Laisser un avis
+                    {currentUserReview && (
+                      <Card className="border border-orange-200 bg-orange-50/80 shadow-sm">
+                        <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-orange-700">Votre avis est déjà publié</p>
+                            <p className="text-sm text-orange-600">
+                              Vous avez donné {currentUserReview.rating}/5 à cette boutique. Vous pouvez le modifier à tout moment.
+                            </p>
+                          </div>
+                          <Button
+                            className="rounded-xl bg-orange-500 hover:bg-orange-600 font-bold"
+                            onClick={handleReviewClick}
+                          >
+                            Modifier mon avis
                           </Button>
-                          <Button variant="outline" className="rounded-xl px-8 h-12 font-bold">
-                            Voir tous les avis
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {reviews.length > 0 ? (
+                      <div className="space-y-4 mt-6">
+                        {reviews.map((review) => {
+                          const isOwnReview = user?.id === review.user_id;
+
+                          return (
+                          <Card
+                            key={review.id}
+                            className={cn(
+                              "shadow-sm bg-white dark:bg-slate-900 border",
+                              isOwnReview
+                                ? "border-orange-200 bg-orange-50/50"
+                                : "border-slate-200"
+                            )}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="h-10 w-10">
+                                    <AvatarImage src={review.profiles?.avatar_url} />
+                                    <AvatarFallback className="bg-primary/10 text-primary">
+                                      {review.profiles?.full_name?.substring(0, 2).toUpperCase() || 'U'}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-semibold text-sm">{review.profiles?.full_name || 'Utilisateur'}</p>
+                                      {isOwnReview && (
+                                        <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-bold text-orange-700">
+                                          Votre avis
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-slate-500">
+                                      {new Date(review.created_at).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-0.5 text-yellow-500">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star 
+                                      key={star} 
+                                      className={`h-3.5 w-3.5 ${star <= review.rating ? 'fill-current' : 'text-slate-300'}`} 
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              {review.comment && (
+                                <p className="mt-3 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                  {review.comment}
+                                </p>
+                              )}
+                            </CardContent>
+                          </Card>
+                        )})}
+                      </div>
+                    ) : (
+                      <Card className="border-none shadow-sm bg-slate-50 dark:bg-slate-900/50">
+                        <CardContent className="text-center py-12">
+                          <div className="bg-white dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border">
+                            <MessageCircle className="h-10 w-10 text-slate-300" />
+                          </div>
+                          <h3 className="text-xl font-bold mb-2">Partagez votre expérience</h3>
+                          <p className="text-slate-500 text-sm mb-8 max-w-xs mx-auto">
+                            Votre avis aide les autres utilisateurs à découvrir les meilleures boutiques d'Algérie.
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12" onClick={handleReviewClick}>
+                              {currentUserReview ? 'Modifier mon avis' : 'Laisser un avis'}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                    
+                    {reviews.length > 0 && !currentUserReview && (
+                      <div className="flex justify-center mt-6">
+                        <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12" onClick={handleReviewClick}>
+                          {currentUserReview ? 'Modifier mon avis' : 'Laisser un avis'}
+                        </Button>
+                      </div>
+                    )}
                   </motion.div>
                 </TabsContent>
 
@@ -1239,11 +1417,20 @@ const ShopDetails: React.FC = () => {
           onClose={() => setShowContactModal(false)}
         />
       )}
-      {showReviewModal && (
+      {showReviewModal && shop && (
         <ShopReviewModal
-          shopId={shop.id}
-          open={showReviewModal}
+          isOpen={showReviewModal}
           onClose={() => setShowReviewModal(false)}
+          shopId={shop.id}
+          shopName={shop.name}
+          existingReview={currentUserReview}
+          onReviewSubmitted={async () => {
+            const data = await fetchShopReviews(shop.id);
+            const avg = data.length > 0
+              ? data.reduce((acc, curr) => acc + curr.rating, 0) / data.length
+              : 0;
+            setShop(prev => prev ? { ...prev, rating: avg, reviewCount: data.length } : null);
+          }}
         />
       )}
     </div>

@@ -116,6 +116,17 @@ const AuthDrawer: React.FC<AuthDrawerProps> = ({ children }) => {
       setTimeout(() => {
         setIsOpen(false);
         setMessage(null);
+        
+        // Rediriger si on a une URL sauvegardée dans la session
+        const redirectUrl = sessionStorage.getItem('authRedirectUrl');
+        if (redirectUrl) {
+          sessionStorage.removeItem('authRedirectUrl');
+          navigate(redirectUrl);
+        } else {
+          // Rafraîchir l'état de la page courante pour que les éléments liés à la session s'affichent correctement
+          // Par exemple, l'ouverture de la modale "Avis" dans ShopDetails
+          navigate(location.pathname + location.search, { replace: true });
+        }
       }, 2000);
     }
   };

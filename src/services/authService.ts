@@ -15,6 +15,19 @@ export const authService = {
         };
       }
 
+      // Si un ancien compte est encore connecté localement, le marquer hors ligne
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        if (currentUser) {
+          await supabase
+            .from('user_presence' as any)
+            .update({ is_online: false, last_seen_at: new Date().toISOString() })
+            .eq('user_id', currentUser.id);
+        }
+      } catch (presenceError) {
+        logger.warn('Presence cleanup warning before sign in:', presenceError);
+      }
+
       // Clean up any existing auth state first
       cleanupAuthState();
 

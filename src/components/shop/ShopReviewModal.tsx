@@ -1,83 +1,194 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
-import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface ShopReviewModalProps {
-  shopId: string;
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
+  shopId: string;
+  shopName: string;
+  onReviewSubmitted: () => void | Promise<void>;
+  existingReview?: {
+    id: string;
+    rating: number;
+    comment?: string | null;
+  } | null;
 }
 
-const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ shopId, open, onClose }) => {
+const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shopId, shopName, onReviewSubmitted, existingReview }) => {
   const { user } = useAuth();
-  const { t } = useSafeI18nWithRouter();
   const { toast } = useToast();
-  const [rating, setRating] = useState<number>(0);
-  const [hover, setHover] = useState<number>(0);
-  const [comment, setComment] = useState<string>('');
-  const [submitting, setSubmitting] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const send = async () => {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    setRating(existingReview?.rating ?? 0);
+    setComment(existingReview?.comment ?? '');
+    setHoverRating(0);
+  }, [isOpen, existingReview]);
+
+  const handleSubmit = async () => {
     if (!user) {
+      toast({
+        title: 'Connexion requise',
+        description: 'Vous devez être connecté pour laisser un avis.',
+        variant: 'destructive',
+      });
       window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
-      return;
-    }
-    if (rating < 1 || rating > 5) {
-      toast({ title: t('reviews.ratingRequired') || 'Note requise', description: t('reviews.ratingRequiredDesc') || 'Veuillez choisir entre 1 et 5 étoiles.' });
-      return;
-    }
-    try {
-      setSubmitting(true);
-      const { error } = await (supabase as any)
-        .from('shop_reviews')
-        .upsert({
-          shop_id: shopId,
-          user_id: user.id,
-          rating,
-          comment: comment && comment.trim().length > 0 ? comment.trim() : null
-        }, { onConflict: 'shop_id,user_id' });
-      if (error) throw error;
-      toast({ title: t('reviews.submitted') || 'Avis envoyé', description: t('reviews.submittedDesc') || 'Votre avis a été envoyé avec succès.' });
       onClose();
-    } catch {
-      toast({ title: t('reviews.error') || 'Erreur', description: t('reviews.errorDesc') || "Une erreur est survenue." , variant: 'destructive' });
+      return;
+    }
+
+    if (rating === 0) {
+      toast({
+        title: 'Note requise',
+        description: 'Veuillez sélectionner une note entre 1 et 5 étoiles.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        shop_id: shopId,
+        user_id: user.id,
+        rating,
+        comment: comment.trim() || null,
+      };
+
+      const { data: existingReview, error: existingReviewError } = await supabase
+        .from('shop_reviews')
+        .select('id')
+        .eq('shop_id', shopId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existingReviewError) throw existingReviewError;
+
+      if (existingReview?.id) {
+        const { error: updateError } = await supabase
+          .from('shop_reviews')
+          .update({
+            ...payload,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingReview.id);
+
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from('shop_reviews')
+          .insert(payload);
+
+        if (insertError) throw insertError;
+      }
+
+      toast({
+        title: existingReview ? 'Avis mis à jour' : 'Avis publié',
+        description: existingReview
+          ? 'Votre avis a bien été mis à jour.'
+          : 'Merci d\'avoir partagé votre expérience !',
+      });
+
+      await onReviewSubmitted();
+      onClose();
+      setRating(0);
+      setComment('');
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      const errorMessage =
+        (error as { message?: string })?.message ||
+        'Une erreur est survenue lors de l\'envoi de votre avis.';
+      toast({
+        title: 'Erreur',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <DialogContent>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t('reviews.writeReview') || 'Écrire un avis'}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            {existingReview ? `Modifier votre avis sur ${shopName}` : `Évaluer ${shopName}`}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{t('reviews.rating') || 'Note'}:</span>
-            <div className="flex items-center gap-1" onMouseLeave={() => setHover(0)}>
-              {[1,2,3,4,5].map(s => (
-                <button key={s} onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} className="p-0.5">
-                  <Star className={(hover || rating) >= s ? 'text-amber-500 fill-amber-500' : 'text-slate-300'} />
+        
+        <div className="py-6 space-y-6">
+          {existingReview && (
+            <div className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
+              Vous avez déjà laissé un avis sur cette boutique. Vous pouvez le modifier ici.
+            </div>
+          )}
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-sm font-medium text-slate-500">Quelle est votre note globale ?</p>
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="p-1 focus:outline-none transition-transform hover:scale-110"
+                >
+                  <Star
+                    className={cn(
+                      "w-10 h-10 transition-colors",
+                      (hoverRating || rating) >= star
+                        ? "fill-yellow-500 text-yellow-500"
+                        : "text-slate-300"
+                    )}
+                  />
                 </button>
               ))}
             </div>
           </div>
-          <Textarea rows={4} value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t('reviews.commentPlaceholder') || 'Décrivez votre expérience...'} />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>{t('reviews.cancel') || 'Annuler'}</Button>
-            <Button onClick={send} disabled={submitting}>{submitting ? (t('reviews.submitting') || 'Envoi...') : (t('reviews.submitReview') || 'Envoyer l\'avis')}</Button>
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Partagez votre expérience en détail (optionnel)
+            </label>
+            <Textarea
+              placeholder="Comment s'est passée votre interaction avec cette boutique ?"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="min-h-[120px] resize-none"
+            />
           </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Annuler
+          </Button>
+          <Button 
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6" 
+            onClick={handleSubmit}
+            disabled={isSubmitting || rating === 0}
+          >
+            {isSubmitting ? 'Envoi...' : existingReview ? 'Mettre à jour mon avis' : 'Publier l\'avis'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 export default ShopReviewModal;
