@@ -1,5 +1,7 @@
+import { megaCategoryKeysAr } from './generatedMegaCategoryKeys';
 
 export const arabicCategories = {
+  ...megaCategoryKeysAr,
   // Categories
   'categories.title': 'الفئات',
   'categories.shopByCategory': 'تسوق حسب الفئة',
@@ -158,6 +160,21 @@ export const arabicCategories = {
   'categories.sante-medical': 'الصحة والطب',
   'categories.jardinage-plantes': 'البستنة والنباتات',
   'categories.photographie-video': 'التصوير والفيديو',
+
+  // Téléphonie subcategories (missing keys)
+  'categories.accessoires-telephones': 'إكسسوارات الهواتف',
+  'categories.tablettes-appareils-mobiles': 'الأجهزة اللوحية والأجهزة المحمولة',
+  'categories.telephones-classiques-fixes': 'هواتف تقليدية وثابتة',
+  'categories.audio-mobile': 'الصوت المحمول',
+  'categories.batteries-charge': 'البطاريات والشحن',
+  'categories.reseau-communication': 'الشبكة والاتصالات',
+  'categories.reseau-communication-mobile': 'الشبكة والاتصالات',
+  'categories.operateurs-mobiles-en-algerie': 'مشغلو الهاتف المحمول في الجزائر',
+  'categories.operateurs-mobiles-algerie': 'مشغلو الهاتف المحمول في الجزائر',
+  'categories.pieces-reparation-telephone': 'قطع الغيار وإصلاح الهاتف',
+  'categories.marques-populaires-mobiles': 'العلامات الشعبية (المحمول)',
+  'categories.applications-services': 'التطبيقات والخدمات',
+  'categories.objets-connectes-mobile': 'الأجهزة المتصلة (المحمول)',
 
   // Subcategories - Informatique
   'categories.ordinateurs-portables': 'أجهزة الكمبيوتر المحمولة',

@@ -423,8 +423,13 @@ const AnnouncementDetailsPage: React.FC = () => {
         // 7. View Count
         const viewKey = `viewed_${id}`;
         if (!sessionStorage.getItem(viewKey)) {
-          sessionStorage.setItem(viewKey, '1');
-          await supabase.rpc('increment_view_count', { announcement_uuid: id }).catch(() => {});
+          const { error: viewError } = await supabase.rpc('increment_view_count', { announcement_uuid: id });
+          if (!viewError) {
+            sessionStorage.setItem(viewKey, '1');
+            setAnnouncement((prev) => prev ? { ...prev, views_count: (prev.views_count || 0) + 1 } : prev);
+          } else {
+            logger.error('View count increment error:', viewError);
+          }
         }
 
       } catch (error) {

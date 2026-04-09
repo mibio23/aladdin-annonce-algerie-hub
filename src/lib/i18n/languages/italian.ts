@@ -25,6 +25,7 @@ import { italianUserMenu } from './italian/userMenu';
 import { italianCreateAd } from './italian/createAd';
 import { italianCreateShop } from './italian/createShop';
 import { italianCategories } from './italian/categories';
+import { italianCategories as italianCategoriesGlobal } from '../categories/italianCategories';
 import { italianParrainage } from './italian/parrainage';
 import { italianPwa } from './italian/pwa';
 import { italianSearch } from './italian/search';
@@ -35,6 +36,8 @@ const italianTranslations = {
   // Search translations
   ...italianSearch,
   ...shop,
+  // Categories (global slugs)
+  ...italianCategoriesGlobal,
 
   'announcements.noPremiumAvailable': 'Nessun annuncio premium al momento.',
   'common.user': 'Utente',

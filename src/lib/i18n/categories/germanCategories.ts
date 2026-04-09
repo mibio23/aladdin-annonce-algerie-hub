@@ -1,4 +1,7 @@
+import { megaCategoryKeysDe } from './generatedMegaCategoryKeys';
+
 export const germanCategories = {
+  ...megaCategoryKeysDe,
   // Categories
   'categories.title': 'Kategorien',
   'categories.shopByCategory': 'Nach Kategorie einkaufen',
@@ -114,6 +117,21 @@ export const germanCategories = {
   'categories.art-antiquites': 'Kunst & Antiquitäten',
   'categories.collections-brocante': 'Sammlungen & Trödel',
   'categories.crypto-finances': 'Krypto & Finanzen',
+
+  // Téléphonie subcategories (missing keys)
+  'categories.accessoires-telephones': 'Telefonzubehör',
+  'categories.tablettes-appareils-mobiles': 'Tablets & Mobile Geräte',
+  'categories.telephones-classiques-fixes': 'Klassische & Festnetztelefone',
+  'categories.audio-mobile': 'Mobiles Audio',
+  'categories.batteries-charge': 'Batterien & Laden',
+  'categories.reseau-communication': 'Netzwerk & Kommunikation',
+  'categories.reseau-communication-mobile': 'Netzwerk & Kommunikation',
+  'categories.operateurs-mobiles-en-algerie': 'Mobilfunkanbieter in Algerien',
+  'categories.operateurs-mobiles-algerie': 'Mobilfunkanbieter in Algerien',
+  'categories.pieces-reparation-telephone': 'Telefonteile & Reparatur',
+  'categories.marques-populaires-mobiles': 'Beliebte Marken (Mobil)',
+  'categories.applications-services': 'Anwendungen & Dienste',
+  'categories.objets-connectes-mobile': 'Verbundene Objekte (Mobil)',
 
   // Subcategories - Informatique
   'categories.ordinateurs-portables': 'Laptops',

@@ -1,4 +1,7 @@
+import { megaCategoryKeysFr } from './generatedMegaCategoryKeys';
+
 export const frenchCategories = {
+  ...megaCategoryKeysFr,
   // Categories
   'categories.title': 'Catégories',
   'categories.shopByCategory': 'Acheter par Catégorie',

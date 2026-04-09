@@ -1,4 +1,7 @@
+import { megaCategoryKeysEs } from './generatedMegaCategoryKeys';
+
 export const spanishCategories = {
+  ...megaCategoryKeysEs,
   // Categories
   'categories.title': 'Categorías',
   'categories.shopByCategory': 'Comprar por Categoría',
@@ -114,6 +117,21 @@ export const spanishCategories = {
   'categories.art-antiquites': 'Arte y Antigüedades',
   'categories.collections-brocante': 'Colecciones y Mercadillo',
   'categories.crypto-finances': 'Cripto y Finanzas',
+
+  // Téléphonie subcategories (missing keys)
+  'categories.accessoires-telephones': 'Accesorios de teléfonos',
+  'categories.tablettes-appareils-mobiles': 'Tabletas y dispositivos móviles',
+  'categories.telephones-classiques-fixes': 'Teléfonos clásicos y fijos',
+  'categories.audio-mobile': 'Audio móvil',
+  'categories.batteries-charge': 'Baterías y carga',
+  'categories.reseau-communication': 'Red y comunicación',
+  'categories.reseau-communication-mobile': 'Red y comunicación',
+  'categories.operateurs-mobiles-en-algerie': 'Operadores móviles en Argelia',
+  'categories.operateurs-mobiles-algerie': 'Operadores móviles en Argelia',
+  'categories.pieces-reparation-telephone': 'Piezas y reparación de teléfonos',
+  'categories.marques-populaires-mobiles': 'Marcas populares (móviles)',
+  'categories.applications-services': 'Aplicaciones y servicios',
+  'categories.objets-connectes-mobile': 'Objetos conectados (móvil)',
 
   // Bricolage & Matériaux subcategories
   'categories.outils': 'Herramientas',

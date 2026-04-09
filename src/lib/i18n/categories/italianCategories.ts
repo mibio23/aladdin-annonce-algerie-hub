@@ -1,4 +1,7 @@
+import { megaCategoryKeysIt } from './generatedMegaCategoryKeys';
+
 export const italianCategories = {
+  ...megaCategoryKeysIt,
   // Categories
   'categories.title': 'Categorie',
   'categories.shopByCategory': 'Acquista per Categoria',
@@ -46,4 +49,19 @@ export const italianCategories = {
   'categories.a-donner': 'Da Regalare',
   'categories.echanges-communautaires': 'Scambi Comunitari',
   'categories.gastronomie-produits-terroir': 'Gastronomia & Prodotti del Territorio',
+  
+  // Téléphonie subcategories (missing keys)
+  'categories.accessoires-telephones': 'Accessori telefoni',
+  'categories.tablettes-appareils-mobiles': 'Tablet e dispositivi mobili',
+  'categories.telephones-classiques-fixes': 'Telefoni classici e fissi',
+  'categories.audio-mobile': 'Audio mobile',
+  'categories.batteries-charge': 'Batterie e ricarica',
+  'categories.reseau-communication': 'Rete e comunicazione',
+  'categories.reseau-communication-mobile': 'Rete e comunicazione',
+  'categories.operateurs-mobiles-en-algerie': 'Operatori mobili in Algeria',
+  'categories.operateurs-mobiles-algerie': 'Operatori mobili in Algeria',
+  'categories.pieces-reparation-telephone': 'Ricambi e riparazione telefono',
+  'categories.marques-populaires-mobiles': 'Marche popolari (mobile)',
+  'categories.applications-services': 'Applicazioni e servizi',
+  'categories.objets-connectes-mobile': 'Oggetti connessi (mobile)',
 };
