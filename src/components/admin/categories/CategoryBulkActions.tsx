@@ -118,6 +118,7 @@ const CategoryBulkActions: React.FC = () => {
     };
 
     setOperations(prev => [newOperation, ...prev]);
+    setIsProcessing(true);
 
     // Simulation de l'exportation
     try {
@@ -167,6 +168,8 @@ const CategoryBulkActions: React.FC = () => {
             }
           : op
       ));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -181,6 +184,7 @@ const CategoryBulkActions: React.FC = () => {
     };
 
     setOperations(prev => [newOperation, ...prev]);
+    setIsProcessing(true);
 
     try {
       const categories = [
@@ -229,6 +233,73 @@ const CategoryBulkActions: React.FC = () => {
             }
           : op
       ));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleBulkUpdate = async () => {
+    if (!selectedOperation) return;
+
+    const labels: Record<string, string> = {
+      "update-slugs": "Régénération des slugs",
+      "update-counts": "Recalcul des compteurs",
+      "update-seo": "Optimisation SEO",
+      "update-images": "Optimisation des images",
+    };
+
+    const operationLabel = labels[selectedOperation] || "Mise à jour";
+    const newOperation: BulkOperation = {
+      id: Date.now().toString(),
+      type: 'update',
+      status: 'running',
+      progress: 0,
+      message: `${operationLabel} en cours...`,
+      createdAt: new Date(),
+    };
+
+    setOperations(prev => [newOperation, ...prev]);
+    setIsProcessing(true);
+
+    try {
+      for (let i = 0; i <= 100; i += 20) {
+        await new Promise(resolve => setTimeout(resolve, 180));
+        setOperations(prev => prev.map(op =>
+          op.id === newOperation.id
+            ? { ...op, progress: i }
+            : op
+        ));
+      }
+
+      setOperations(prev => prev.map(op =>
+        op.id === newOperation.id
+          ? {
+              ...op,
+              status: 'completed',
+              progress: 100,
+              message: `${operationLabel} terminée`,
+              completedAt: new Date(),
+            }
+          : op
+      ));
+
+      toast({
+        title: "Mise à jour terminée",
+        description: `${operationLabel} exécutée avec succès`,
+      });
+    } catch {
+      setOperations(prev => prev.map(op =>
+        op.id === newOperation.id
+          ? {
+              ...op,
+              status: 'error',
+              message: `Erreur durant ${operationLabel.toLowerCase()}`,
+              completedAt: new Date(),
+            }
+          : op
+      ));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -315,7 +386,7 @@ const CategoryBulkActions: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleExportCategories} className="w-full">
+              <Button onClick={handleExportCategories} className="w-full" disabled={isProcessing}>
                 <Download className="w-4 h-4 mr-2" />
                 Exporter toutes les catégories
               </Button>
@@ -337,8 +408,9 @@ const CategoryBulkActions: React.FC = () => {
                 </Select>
               </div>
               <Button 
-                disabled={!selectedOperation}
+                disabled={!selectedOperation || isProcessing}
                 className="w-full"
+                onClick={handleBulkUpdate}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Exécuter la mise à jour
@@ -353,7 +425,7 @@ const CategoryBulkActions: React.FC = () => {
                   des sous-catégories pertinentes basées sur l'intelligence artificielle.
                 </p>
               </div>
-              <Button onClick={handleAutoGenerate} className="w-full">
+              <Button onClick={handleAutoGenerate} className="w-full" disabled={isProcessing}>
                 <Settings className="w-4 h-4 mr-2" />
                 Générer automatiquement
               </Button>

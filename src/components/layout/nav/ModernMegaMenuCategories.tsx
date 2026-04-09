@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { LocalizedLink } from "@/utils/linkUtils";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
-import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory } from "@/data/categoryTypes";
 import { ChevronRight, Loader2, Search, Globe, ChevronLeft } from "lucide-react";
+import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
 
 
 // Fonction pour obtenir la traduction d'une catégorie (sans utiliser les anciennes traductions codées en dur)
@@ -21,8 +21,11 @@ const getCategoryTranslation = (category: any, language: string, t: (key: string
 
 const ModernMegaMenuCategories: React.FC = () => {
   const { t, language, isRTL } = useSafeI18nWithRouter();
-  const categories = getCategoryMenu(language) as MenuCategory[];
-  const isLoading = false;
+  const { data: categoriesFromSupabase = [], isLoading } = useCategories(language);
+  const categories = React.useMemo(
+    () => mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase) as MenuCategory[],
+    [language, categoriesFromSupabase]
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [hoveredSubcategory, setHoveredSubcategory] = useState<string | null>(null);

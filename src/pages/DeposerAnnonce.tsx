@@ -22,8 +22,7 @@ import { MenuCategory } from '@/data/categoryTypes';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { logger } from '@/utils/silentLogger';
-import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
-import { useCategories } from '@/services/supabaseCategoriesService';
+import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
 import { educationLoisirsFr } from '@/data/categories/megaMenuStructures/educationLoisirs/fr';
 import { immobilierMaisonFr } from '@/data/categories/megaMenuStructures/immobilierMaison/fr';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
@@ -335,22 +334,7 @@ const DeposerAnnonce = () => {
 
   // Synchronisation de l'ordre des catégories avec le menu de navigation
   const menuCategories = useMemo(() => {
-    const officialMenu = getCategoryMenu(language);
-    const supabaseData = categoryMenuFromSupabase || [];
-    
-    return officialMenu.map(officialCat => {
-      const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
-      
-      // If we found a Supabase category, use its UUID. 
-      // Otherwise, keep the officialCat.id (which might be a slug) but we'll try to resolve it later.
-      return {
-        ...officialCat,
-        id: supabaseCat?.id || officialCat.id,
-        subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
-          ? supabaseCat.subcategories 
-          : officialCat.subcategories
-      };
-    });
+    return mergeOfficialAndSupabaseCategories(language, categoryMenuFromSupabase || []);
   }, [categoryMenuFromSupabase, language]);
 
   const categories = useMemo(() => {

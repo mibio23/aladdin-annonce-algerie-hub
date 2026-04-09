@@ -1,6 +1,7 @@
 // Service Supabase pour la gestion des catégories avec cache React Query
 import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
 import { MenuCategory } from '@/data/categoryTypes';
+import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
 import { createIcon } from '@/utils/iconMapper';
 import { cacheService, categoryCacheKeys } from '@/services/cacheService';
 import { supabase } from '@/integrations/supabase/client';
@@ -176,6 +177,34 @@ export const fetchCategoriesFromSupabase = async (language: string = 'fr'): Prom
     logger.error('Erreur critique lors du chargement des catégories:', error);
     throw error;
   }
+};
+
+export const mergeOfficialAndSupabaseCategories = (
+  language: string,
+  supabaseCategories: MenuCategory[] = []
+): MenuCategory[] => {
+  const officialMenu = getCategoryMenu(language);
+  if (!supabaseCategories.length) return officialMenu;
+
+  const bySlug = new Map(supabaseCategories.map((category) => [category.slug, category]));
+
+  const merged = officialMenu.map((officialCategory) => {
+    const supabaseCategory = bySlug.get(officialCategory.slug);
+    if (!supabaseCategory) return officialCategory;
+    return {
+      ...officialCategory,
+      ...supabaseCategory,
+      subcategories:
+        supabaseCategory.subcategories && supabaseCategory.subcategories.length > 0
+          ? supabaseCategory.subcategories
+          : officialCategory.subcategories,
+    };
+  });
+
+  const officialSlugs = new Set(officialMenu.map((category) => category.slug));
+  const supabaseOnlyCategories = supabaseCategories.filter((category) => !officialSlugs.has(category.slug));
+
+  return [...merged, ...supabaseOnlyCategories];
 };
 
 // Hook pour récupérer les catégories avec cache optimisé

@@ -19,8 +19,7 @@ import { SimpleSubCategory, getSubcategoriesByCategoryId } from '@/data/subcateg
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { logger } from '@/utils/silentLogger';
-import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
-import { useCategories } from '@/services/supabaseCategoriesService';
+import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
 import { MenuCategory } from '@/data/categoryTypes';
 import { CATEGORY_REFERENCE_IMAGES } from '@/data/categoryReferenceImages';
 import { invalidateCache } from '@/hooks/useAnnouncements';
@@ -556,20 +555,7 @@ const CreateAnnouncementPage: React.FC = () => {
 
   // Synchronisation de l'ordre des catégories avec le menu de navigation
   const menuCategories = useMemo(() => {
-    const officialMenu = getCategoryMenu(language);
-    const supabaseData = fetchedCategoriesFromSupabase || [];
-    
-    return officialMenu.map(officialCat => {
-      const supabaseCat = supabaseData.find(c => c.slug === officialCat.slug);
-      return {
-        ...officialCat,
-        // Use the Supabase UUID as id when available, otherwise keep the slug
-        id: supabaseCat?.id || officialCat.id,
-        subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
-          ? supabaseCat.subcategories 
-          : officialCat.subcategories
-      };
-    });
+    return mergeOfficialAndSupabaseCategories(language, fetchedCategoriesFromSupabase || []);
   }, [fetchedCategoriesFromSupabase, language]);
 
   const categories = useMemo(() => {

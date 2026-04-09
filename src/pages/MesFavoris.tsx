@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
+import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
 
 type Favorite = {
   id: string; // favorite id
@@ -41,7 +41,8 @@ const MesFavoris = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const menuCategories = getCategoryMenu(language);
+  const { data: categoriesFromSupabase = [] } = useCategories(language);
+  const menuCategories = mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase);
 
   useEffect(() => {
     const fetchFavorites = async () => {

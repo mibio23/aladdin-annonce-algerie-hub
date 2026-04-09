@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { logger } from '@/utils/silentLogger';
 
 interface Announcement {
   id: string;
+  global_listing_number?: number | null;
   title: string;
   description?: string;
   price: number;
@@ -40,6 +42,7 @@ interface Announcement {
 
 const AnnouncementManagement = () => {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -69,6 +72,7 @@ const AnnouncementManagement = () => {
       // Transform data to match Announcement interface
       const transformedData = data?.map(item => ({
         id: item.id,
+        global_listing_number: (item as any).global_listing_number ?? (item as any).global_announcement_number ?? null,
         title: item.title,
         description: item.description,
         price: item.price,
@@ -146,6 +150,13 @@ const AnnouncementManagement = () => {
     fetchAnnouncements();
   }, [fetchAnnouncements]);
 
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q.trim()) {
+      setSearchTerm(q.trim());
+    }
+  }, [searchParams]);
+
   const updateAnnouncementStatus = async (id: string, isActive: boolean) => {
     try {
       const newStatus = isActive ? 'active' : 'expired'; // Map false to expired
@@ -202,14 +213,22 @@ const AnnouncementManagement = () => {
   };
 
   const filteredAnnouncements = announcements.filter(announcement => {
-    const term = searchTerm.toLowerCase();
+    const term = searchTerm.trim().toLowerCase();
+    const numericTerm = term.replace(/\D+/g, '');
+    const listingNumber = announcement.global_listing_number != null ? String(announcement.global_listing_number) : '';
     const idRaw = announcement.seller_public_user_id != null ? String(announcement.seller_public_user_id) : '';
     const idPadded = announcement.seller_public_user_id != null ? String(announcement.seller_public_user_id).padStart(14, '0') : '';
     const matchesSearch = announcement.title.toLowerCase().includes(term) ||
                          (announcement.profiles?.full_name || '').toLowerCase().includes(term) ||
                          (announcement.categories?.name || '').toLowerCase().includes(term) ||
-                         idRaw.includes(searchTerm) ||
-                         idPadded.includes(searchTerm);
+                         listingNumber.includes(term) ||
+                         idRaw.includes(term) ||
+                         idPadded.includes(term) ||
+                         (numericTerm.length > 0 && (
+                           listingNumber.includes(numericTerm) ||
+                           idRaw.includes(numericTerm) ||
+                           idPadded.includes(numericTerm)
+                         ));
     
     const matchesStatus = statusFilter === "all" || 
                          (statusFilter === "active" && announcement.is_active) ||
@@ -267,7 +286,7 @@ const AnnouncementManagement = () => {
         <h1 className="text-3xl font-bold">Gestion des Annonces</h1>
         <div className="flex space-x-2">
           <Input 
-            placeholder="Rechercher une annonce ou un ID utilisateur..." 
+            placeholder="Rechercher une annonce, un N° global ou un ID utilisateur..." 
             className="w-64"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -356,6 +375,11 @@ const AnnouncementManagement = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold">{announcement.title}
+                          {typeof announcement.global_listing_number === 'number' && (
+                            <Badge variant="outline" className="ml-2 font-mono">
+                              N° {announcement.global_listing_number}
+                            </Badge>
+                          )}
                           {announcement.seller_public_user_id != null && (
                             <>
                               <Badge variant="outline" className="ml-2 font-mono">

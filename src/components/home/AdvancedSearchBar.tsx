@@ -4,10 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { Search, LoaderCircle } from "lucide-react";
 import searchBackground from "@/assets/search-background.png";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
-import { useCategories } from "@/services/supabaseCategoriesService";
+import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
 import { MenuCategory } from "@/data/categoryTypes";
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
-import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { logger } from "@/utils/silentLogger";
 import { detectVehicleIntent } from "@/utils/vehicleIntentDetector";
 import { coerceWilayaCode, extractWilayaFromText } from "@/utils/distanceUtils";
@@ -43,20 +42,7 @@ const AdvancedSearchBar = React.memo(() => {
   
   // Catégories uniques synchronisées avec l'ordre du menu de navigation
   const uniqueCategories = useMemo(() => {
-    // 1. Récupérer l'ordre officiel depuis getCategoryMenu
-    const officialMenu = getCategoryMenu(language);
-    
-    // 2. Fusionner avec les données de Supabase si nécessaire, tout en respectant l'ordre de officialMenu
-    return officialMenu.map(officialCat => {
-      const supabaseCat = categoryMenuFromSupabase.find(c => c.slug === officialCat.slug);
-      // On privilégie les sous-catégories de Supabase si elles existent, sinon on garde celles du menu local
-      return {
-        ...officialCat,
-        subcategories: (supabaseCat?.subcategories && supabaseCat.subcategories.length > 0) 
-          ? supabaseCat.subcategories 
-          : officialCat.subcategories
-      };
-    });
+    return mergeOfficialAndSupabaseCategories(language, categoryMenuFromSupabase);
   }, [categoryMenuFromSupabase, language]);
 
   const selectedCategoryData = useMemo(() => 

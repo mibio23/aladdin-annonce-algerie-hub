@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
-import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
+import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 
 interface CategoryBreadcrumbsProps {
@@ -21,8 +21,12 @@ const CategoryBreadcrumbs: React.FC<CategoryBreadcrumbsProps> = ({
 }) => {
   const { t, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
+  const { data: categoriesFromSupabase = [] } = useCategories(language);
 
-  const menuCategories = getCategoryMenu(language);
+  const menuCategories = React.useMemo(
+    () => mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase),
+    [language, categoriesFromSupabase]
+  );
   const canonicalCategorySlug =
     categorySlug === "vehicules" || categorySlug === "vehicules-camions-motos"
       ? "vehicules-equipements"

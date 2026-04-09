@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { Search, Clock, TrendingUp, Tag } from 'lucide-react';
 // Dépendance aux catégories neutralisée
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
-import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { safeStringify } from '@/utils/safeStringify';
+import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
 
 interface SmartSearchSuggestionsProps {
   query: string;
@@ -58,6 +58,7 @@ const useSearchHistory = () => {
 
 const SmartSearchSuggestions = ({ query, onSuggestionSelect, isVisible }: SmartSearchSuggestionsProps) => {
   const { t, language } = useSafeI18nWithRouter();
+  const { data: categoriesFromSupabase = [] } = useCategories(language);
   const { history, addToHistory } = useSearchHistory();
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
@@ -82,10 +83,10 @@ const SmartSearchSuggestions = ({ query, onSuggestionSelect, isVisible }: SmartS
         if (Array.isArray(c?.subcategories)) visit(c.subcategories);
       }
     };
-    const cats = getCategoryMenu(language) as any[];
+    const cats = mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase) as any[];
     visit(cats);
     return names;
-  }, [language]);
+  }, [language, categoriesFromSupabase]);
 
   useEffect(() => {
     if (query.length > 1 && isVisible) {

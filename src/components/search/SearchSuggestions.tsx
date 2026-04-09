@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
-import { getCategoryMenu } from '@/data/megaMenu/categoryMenu';
 import { useSmartSearch } from '@/hooks/useSmartSearch';
 import type { MenuCategory } from '@/data/categoryTypes';
 import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
+import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
 
 interface SearchSuggestionsProps {
   query: string;
@@ -35,13 +35,14 @@ const SearchSuggestions = ({ query, onSuggestionSelect, isVisible }: SearchSugge
   const [internalVisible, setInternalVisible] = useState(false);
   const { getPersonalizedSuggestions, getTrendingKeywords } = useSmartSearch();
   const { language } = useSafeI18nWithRouter();
+  const { data: categoriesFromSupabase = [] } = useCategories(language);
 
   const allSuggestions = useMemo(() => {
-    const localizedCategories = getCategoryMenu(language) as (MenuCategory | { name: string; subcategories?: any[] })[];
+    const localizedCategories = mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase) as (MenuCategory | { name: string; subcategories?: any[] })[];
     const categoryNames = extractCategoryNames(localizedCategories);
     const combined = [...POPULAR_SUGGESTIONS, ...categoryNames];
     return [...new Set(combined)];
-  }, [language]);
+  }, [language, categoriesFromSupabase]);
 
   useEffect(() => {
     const loadSuggestions = async () => {

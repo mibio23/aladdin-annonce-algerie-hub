@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,7 @@ interface UserProfile {
 
 const UserManagement = () => {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -108,6 +110,13 @@ const UserManagement = () => {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q.trim()) {
+      setSearchTerm(q.trim());
+    }
+  }, [searchParams]);
 
   const filteredUsers = users.filter(user => {
     const term = searchTerm.toLowerCase();

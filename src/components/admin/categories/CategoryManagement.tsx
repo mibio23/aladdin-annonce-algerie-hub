@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,10 @@ import CategoryEditor from "./CategoryEditor";
 import CategoryTreeView from "./CategoryTreeView";
 import CategoryBulkActions from "./CategoryBulkActions";
 import { toast } from "@/components/ui/use-toast";
+import { MenuCategory } from "@/data/categoryTypes";
+import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/utils/silentLogger";
+import { mergeOfficialAndSupabaseCategories, useCategories, useInvalidateCategories } from "@/services/supabaseCategoriesService";
 
 interface CategoryData {
   id: string;
@@ -28,133 +32,195 @@ interface CategoryData {
 }
 
 const CategoryManagement = () => {
-  const [categories, setCategories] = useState<CategoryData[]>([
-    { 
-      id: "1", 
-      name: "Immobilier", 
-      slug: "immobilier", 
-      description: "Vente et location de biens immobiliers",
-      parentId: undefined,
-      children: [
-        { id: "1-1", name: "Vente", slug: "vente", parentId: "1", children: [], isActive: true, sortOrder: 1, announcementCount: 456 },
-        { id: "1-2", name: "Location", slug: "location", parentId: "1", children: [], isActive: true, sortOrder: 2, announcementCount: 778 }
-      ],
-      isActive: true, 
-      sortOrder: 1, 
-      announcementCount: 1234,
-      seoTitle: "Annonces Immobilier Algérie - Vente et Location",
-      seoDescription: "Trouvez votre bien immobilier en Algérie",
-      metaTags: ["immobilier", "vente", "location", "algérie"]
-    },
-    { 
-      id: "2", 
-      name: "Véhicules", 
-      slug: "vehicules", 
-      description: "Voitures, motos et véhicules utilitaires",
-      parentId: undefined,
-      children: [
-        { id: "2-1", name: "Voitures", slug: "voitures", parentId: "2", children: [], isActive: true, sortOrder: 1, announcementCount: 567 },
-        { id: "2-2", name: "Motos", slug: "motos", parentId: "2", children: [], isActive: true, sortOrder: 2, announcementCount: 234 },
-        { id: "2-3", name: "Utilitaires", slug: "utilitaires", parentId: "2", children: [], isActive: true, sortOrder: 3, announcementCount: 91 }
-      ],
-      isActive: true, 
-      sortOrder: 2, 
-      announcementCount: 892,
-      seoTitle: "Véhicules Occasion Algérie - Voitures et Motos",
-      seoDescription: "Achat et vente de véhicules d'occasion en Algérie",
-      metaTags: ["véhicules", "voitures", "motos", "occasion"]
-    },
-    { 
-      id: "3", 
-      name: "Électronique", 
-      slug: "electronique", 
-      description: "Appareils électroniques et high-tech",
-      parentId: undefined,
-      children: [
-        { id: "3-1", name: "Smartphones", slug: "smartphones", parentId: "3", children: [], isActive: true, sortOrder: 1, announcementCount: 234 },
-        { id: "3-2", name: "Ordinateurs", slug: "ordinateurs", parentId: "3", children: [], isActive: true, sortOrder: 2, announcementCount: 189 },
-        { id: "3-3", name: "TV & Audio", slug: "tv-audio", parentId: "3", children: [], isActive: true, sortOrder: 3, announcementCount: 144 }
-      ],
-      isActive: true, 
-      sortOrder: 3, 
-      announcementCount: 567,
-      seoTitle: "Électronique Algérie - Smartphones, PC, TV",
-      seoDescription: "Achat et vente d'appareils électroniques en Algérie",
-      metaTags: ["électronique", "smartphones", "ordinateurs", "tv"]
-    },
-    { 
-      id: "4", 
-      name: "Mode", 
-      slug: "mode", 
-      description: "Vêtements, chaussures et accessoires",
-      parentId: undefined,
-      children: [
-        { id: "4-1", name: "Femme", slug: "femme", parentId: "4", children: [], isActive: true, sortOrder: 1, announcementCount: 178 },
-        { id: "4-2", name: "Homme", slug: "homme", parentId: "4", children: [], isActive: true, sortOrder: 2, announcementCount: 123 },
-        { id: "4-3", name: "Enfant", slug: "enfant", parentId: "4", children: [], isActive: true, sortOrder: 3, announcementCount: 44 }
-      ],
-      isActive: true, 
-      sortOrder: 4, 
-      announcementCount: 345,
-      seoTitle: "Mode & Vêtements Algérie - Femme, Homme, Enfant",
-      seoDescription: "Vêtements et accessoires de mode en Algérie",
-      metaTags: ["mode", "vêtements", "chaussures", "accessoires"]
-    },
-    { 
-      id: "5", 
-      name: "Emploi", 
-      slug: "emploi", 
-      description: "Offres d'emploi et recrutement",
-      parentId: undefined,
-      children: [
-        { id: "5-1", name: "CDI", slug: "cdi", parentId: "5", children: [], isActive: true, sortOrder: 1, announcementCount: 345 },
-        { id: "5-2", name: "CDD", slug: "cdd", parentId: "5", children: [], isActive: true, sortOrder: 2, announcementCount: 234 },
-        { id: "5-3", name: "Freelance", slug: "freelance", parentId: "5", children: [], isActive: true, sortOrder: 3, announcementCount: 99 }
-      ],
-      isActive: true, 
-      sortOrder: 5, 
-      announcementCount: 678,
-      seoTitle: "Emploi Algérie - Offres de travail et recrutement",
-      seoDescription: "Trouvez votre emploi idéal en Algérie",
-      metaTags: ["emploi", "travail", "recrutement", "carrière"]
-    },
-  ]);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [maxDepth, setMaxDepth] = useState(3);
+  const [maxCategoriesPerLevel, setMaxCategoriesPerLevel] = useState(50);
+  const [autoSlug, setAutoSlug] = useState(true);
+  const [autoValidation, setAutoValidation] = useState(true);
+  const [autoSave, setAutoSave] = useState(false);
+  const [totalAnnouncementsExact, setTotalAnnouncementsExact] = useState(0);
 
   const [editingCategory, setEditingCategory] = useState<CategoryData | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState("list");
+  const [isSaving, setIsSaving] = useState(false);
+  const { data: categoriesFromSupabase = [] } = useCategories('fr');
+  const invalidateCategories = useInvalidateCategories();
 
-  const handleSaveCategory = (categoryData: any) => {
-    if (editingCategory) {
-      // Mise à jour
-      setCategories(prev => updateCategoryInTree(prev, editingCategory.id, categoryData));
-      toast({
-        title: "Catégorie mise à jour",
-        description: `La catégorie "${categoryData.name}" a été mise à jour avec succès`
-      });
-    } else {
-      // Création
-      const newCategory: CategoryData = {
-        ...categoryData,
-        id: Date.now().toString(),
-        children: [],
-        announcementCount: 0
+  const isUUID = (value?: string) =>
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
+  const buildTreeFromMenu = (
+    items: Array<{ name: string; slug: string; subcategories?: Array<{ name: string; slug: string; subcategories?: unknown[] }> }>,
+    parentPath: string | undefined,
+    isRoot: boolean,
+    rootCounts: Map<string, number>,
+    subCounts: Map<string, number>
+  ): CategoryData[] => {
+    return items.map((item, index) => {
+      const nodeId = typeof (item as { id?: unknown }).id === "string" && (item as { id?: string }).id
+        ? (item as { id: string }).id
+        : (parentPath ? `${parentPath}/${item.slug}` : item.slug);
+      const children = buildTreeFromMenu(
+        (item.subcategories || []) as Array<{ name: string; slug: string; subcategories?: Array<{ name: string; slug: string; subcategories?: unknown[] }> }>,
+        nodeId,
+        false,
+        rootCounts,
+        subCounts
+      );
+
+      return {
+        id: nodeId,
+        name: item.name,
+        slug: item.slug,
+        description: undefined,
+        parentId: parentPath,
+        children,
+        isActive: true,
+        sortOrder: index + 1,
+        announcementCount: isRoot ? (rootCounts.get(item.slug) || 0) : (subCounts.get(item.slug) || 0),
       };
-      
-      if (categoryData.parentId) {
-        setCategories(prev => addChildToCategory(prev, categoryData.parentId, newCategory));
-      } else {
-        setCategories(prev => [...prev, newCategory]);
+    });
+  };
+
+  const loadCategories = useCallback(async () => {
+      setIsLoading(true);
+      try {
+        const menu = mergeOfficialAndSupabaseCategories('fr', categoriesFromSupabase as MenuCategory[]);
+
+        const [announcementTotalRes, rootCategoryCountRes, subCategoryCountRes] = await Promise.all([
+          supabase.from('announcements_public').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+          (supabase as any)
+            .from('announcements_public')
+            .select('category_slug, count:id')
+            .eq('status', 'active'),
+          (supabase as any)
+            .from('announcements_public')
+            .select('subcategory_id, count:id')
+            .eq('status', 'active')
+            .not('subcategory_id', 'is', null),
+        ]);
+
+        const rootCounts = new Map<string, number>();
+        const subCounts = new Map<string, number>();
+
+        const rootRows = ((rootCategoryCountRes as any)?.data || []) as Array<{ category_slug?: string; count?: number }>;
+        rootRows.forEach((row) => {
+          if (typeof row?.category_slug === 'string') {
+            rootCounts.set(row.category_slug, Number(row.count || 0));
+          }
+        });
+
+        const subRows = ((subCategoryCountRes as any)?.data || []) as Array<{ subcategory_id?: string; count?: number }>;
+        subRows.forEach((row) => {
+          if (typeof row?.subcategory_id === 'string') {
+            subCounts.set(row.subcategory_id, Number(row.count || 0));
+          }
+        });
+
+        const tree = buildTreeFromMenu(
+          menu as Array<{ name: string; slug: string; subcategories?: Array<{ name: string; slug: string; subcategories?: unknown[] }> }>,
+          undefined,
+          true,
+          rootCounts,
+          subCounts
+        );
+        setCategories(tree);
+        setTotalAnnouncementsExact(announcementTotalRes.count || 0);
+      } catch (error) {
+        logger.error('Erreur chargement catégories admin:', error);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les catégories officielles",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
-      
+    }, [categoriesFromSupabase]);
+
+  useEffect(() => {
+    void loadCategories();
+  }, [loadCategories]);
+
+  const handleSaveCategory = async (categoryData: Partial<CategoryData>) => {
+    const parentId = categoryData.parentId && String(categoryData.parentId).trim() ? String(categoryData.parentId) : null;
+    if (parentId && !isUUID(parentId)) {
       toast({
-        title: "Catégorie créée",
-        description: `La catégorie "${categoryData.name}" a été créée avec succès`
+        title: "Catégorie parente invalide",
+        description: "Sélectionnez une catégorie parente synchronisée avec la base",
+        variant: "destructive",
       });
+      return;
     }
-    
-    setIsEditorOpen(false);
-    setEditingCategory(null);
+
+    setIsSaving(true);
+    try {
+      if (editingCategory) {
+        if (!isUUID(editingCategory.id)) {
+          toast({
+            title: "Modification non autorisée",
+            description: "Cette catégorie locale n'est pas encore synchronisée en base",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error } = await supabase
+          .from("categories")
+          .update({
+            name: categoryData.name || editingCategory.name,
+            slug: categoryData.slug || editingCategory.slug,
+            description: categoryData.description ?? editingCategory.description ?? null,
+            parent_id: parentId,
+            position_order: Number(categoryData.sortOrder ?? editingCategory.sortOrder ?? 0),
+            is_active: categoryData.isActive ?? editingCategory.isActive,
+            icon: categoryData.icon ?? null,
+          } as never)
+          .eq("id", editingCategory.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Catégorie mise à jour",
+          description: `La catégorie "${categoryData.name || editingCategory.name}" a été mise à jour`,
+        });
+      } else {
+        const insertPayload = {
+          id: crypto.randomUUID(),
+          name: categoryData.name || "",
+          slug: categoryData.slug || "",
+          description: categoryData.description ?? null,
+          parent_id: parentId,
+          position_order: Number(categoryData.sortOrder ?? 0),
+          is_active: categoryData.isActive ?? true,
+        };
+
+        const { error } = await supabase.from("categories").insert(insertPayload as never);
+        if (error) throw error;
+
+        toast({
+          title: "Catégorie créée",
+          description: `La catégorie "${categoryData.name}" a été créée avec succès`,
+        });
+      }
+
+      invalidateCategories("fr");
+      await loadCategories();
+      setIsEditorOpen(false);
+      setEditingCategory(null);
+    } catch (error) {
+      logger.error("Erreur sauvegarde catégorie:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer la catégorie",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleEditCategory = (category: CategoryData) => {
@@ -162,28 +228,159 @@ const CategoryManagement = () => {
     setIsEditorOpen(true);
   };
 
-  const handleDeleteCategory = (categoryId: string) => {
-    setCategories(prev => removeCategoryFromTree(prev, categoryId));
-    toast({
-      title: "Catégorie supprimée",
-      description: "La catégorie a été supprimée avec succès"
-    });
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!isUUID(categoryId)) {
+      toast({
+        title: "Suppression non autorisée",
+        description: "Cette catégorie locale n'est pas encore synchronisée en base",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.from("categories").delete().eq("id", categoryId);
+
+      if (error) {
+        const { error: archiveError } = await supabase
+          .from("categories")
+          .update({ is_active: false } as never)
+          .eq("id", categoryId);
+        if (archiveError) throw archiveError;
+        toast({
+          title: "Catégorie désactivée",
+          description: "Suppression impossible (relations existantes), catégorie archivée",
+        });
+      } else {
+        toast({
+          title: "Catégorie supprimée",
+          description: "La catégorie a été supprimée avec succès",
+        });
+      }
+
+      invalidateCategories("fr");
+      await loadCategories();
+    } catch (error) {
+      logger.error("Erreur suppression catégorie:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la catégorie",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleToggleStatus = (categoryId: string, isActive: boolean) => {
-    setCategories(prev => updateCategoryInTree(prev, categoryId, { isActive }));
-    toast({
-      title: isActive ? "Catégorie activée" : "Catégorie désactivée",
-      description: "Le statut de la catégorie a été mis à jour"
-    });
+  const handleToggleStatus = async (categoryId: string, isActive: boolean) => {
+    if (!isUUID(categoryId)) {
+      toast({
+        title: "Action non autorisée",
+        description: "Cette catégorie locale n'est pas encore synchronisée en base",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("categories")
+        .update({ is_active: isActive } as never)
+        .eq("id", categoryId);
+      if (error) throw error;
+
+      toast({
+        title: isActive ? "Catégorie activée" : "Catégorie désactivée",
+        description: "Le statut de la catégorie a été mis à jour",
+      });
+
+      invalidateCategories("fr");
+      await loadCategories();
+    } catch (error) {
+      logger.error("Erreur changement statut catégorie:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le statut",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleMoveCategory = () => {
-    // Logique de déplacement des catégories
-    toast({
-      title: "Catégorie déplacée",
-      description: "La hiérarchie a été mise à jour"
-    });
+  const removeCategoryById = (items: CategoryData[], categoryId: string): { tree: CategoryData[]; removed: CategoryData | null } => {
+    let removed: CategoryData | null = null;
+
+    const next = items
+      .map((item) => {
+        if (item.id === categoryId) {
+          removed = item;
+          return null;
+        }
+        if (item.children.length === 0) return item;
+        const childResult = removeCategoryById(item.children, categoryId);
+        if (childResult.removed) removed = childResult.removed;
+        return { ...item, children: childResult.tree };
+      })
+      .filter(Boolean) as CategoryData[];
+
+    return { tree: next, removed };
+  };
+
+  const handleMoveCategory = async (categoryId: string, newParentId?: string) => {
+    if (newParentId && newParentId === categoryId) {
+      toast({
+        title: "Déplacement invalide",
+        description: "Une catégorie ne peut pas être déplacée dans sa propre sous-catégorie",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isUUID(categoryId)) {
+      toast({
+        title: "Action non autorisée",
+        description: "Cette catégorie locale n'est pas encore synchronisée en base",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (newParentId && !isUUID(newParentId)) {
+      toast({
+        title: "Parent invalide",
+        description: "Le parent sélectionné doit être synchronisé en base",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("categories")
+        .update({ parent_id: newParentId || null } as never)
+        .eq("id", categoryId);
+      if (error) throw error;
+
+      toast({
+        title: "Catégorie déplacée",
+        description: "La hiérarchie a été mise à jour",
+      });
+
+      invalidateCategories("fr");
+      await loadCategories();
+    } catch (error) {
+      logger.error("Erreur déplacement catégorie:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de déplacer la catégorie",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Fonctions utilitaires pour manipuler l'arbre de catégories
@@ -203,15 +400,12 @@ const CategoryManagement = () => {
   };
 
   const removeCategoryFromTree = (categories: CategoryData[], categoryId: string): CategoryData[] => {
-    return categories.filter(category => {
-      if (category.id === categoryId) {
-        return false;
-      }
-      if (category.children.length > 0) {
-        category.children = removeCategoryFromTree(category.children, categoryId);
-      }
-      return true;
-    });
+    return categories
+      .filter(category => category.id !== categoryId)
+      .map((category) => ({
+        ...category,
+        children: category.children.length > 0 ? removeCategoryFromTree(category.children, categoryId) : category.children,
+      }));
   };
 
   const addChildToCategory = (categories: CategoryData[], parentId: string, newCategory: CategoryData): CategoryData[] => {
@@ -246,15 +440,24 @@ const CategoryManagement = () => {
     return flat;
   };
 
-  const totalCategories = getAllCategoriesFlat(categories).length;
-  const activeCategories = getAllCategoriesFlat(categories).filter(cat => cat.isActive).length;
-  const totalAnnouncements = getAllCategoriesFlat(categories).reduce((sum, cat) => sum + cat.announcementCount, 0);
+  const allCategoriesFlat = useMemo(() => getAllCategoriesFlat(categories), [categories]);
+  const totalCategories = allCategoriesFlat.length;
+  const activeCategories = allCategoriesFlat.filter(cat => cat.isActive).length;
+  const rootCategories = categories.length;
+  const subCategories = Math.max(0, totalCategories - rootCategories);
+
+  const handleSaveSettings = () => {
+    toast({
+      title: "Configuration enregistrée",
+      description: `Profondeur: ${maxDepth}, max/niveau: ${maxCategoriesPerLevel}`,
+    });
+  };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Gestion des Catégories</h1>
-        <Button onClick={() => { setEditingCategory(null); setIsEditorOpen(true); }}>
+        <Button onClick={() => { setEditingCategory(null); setIsEditorOpen(true); }} disabled={isSaving}>
           <Plus className="w-4 h-4 mr-2" />
           Nouvelle Catégorie
         </Button>
@@ -268,7 +471,7 @@ const CategoryManagement = () => {
             <FolderTree className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCategories}</div>
+            <div className="text-2xl font-bold">{isLoading ? "…" : totalCategories}</div>
             <p className="text-xs text-muted-foreground">{activeCategories} actives</p>
           </CardContent>
         </Card>
@@ -279,7 +482,7 @@ const CategoryManagement = () => {
             <FolderTree className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
+            <div className="text-2xl font-bold">{isLoading ? "…" : rootCategories}</div>
             <p className="text-xs text-muted-foreground">Niveau racine</p>
           </CardContent>
         </Card>
@@ -290,7 +493,7 @@ const CategoryManagement = () => {
             <FolderTree className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCategories - categories.length}</div>
+            <div className="text-2xl font-bold">{isLoading ? "…" : subCategories}</div>
             <p className="text-xs text-muted-foreground">Niveaux inférieurs</p>
           </CardContent>
         </Card>
@@ -301,7 +504,7 @@ const CategoryManagement = () => {
             <Eye className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAnnouncements.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{isLoading ? "…" : totalAnnouncementsExact.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Dans toutes les catégories</p>
           </CardContent>
         </Card>
@@ -341,30 +544,40 @@ const CategoryManagement = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Profondeur maximale de l'arborescence</Label>
-                  <Input type="number" defaultValue="3" />
+                  <Input
+                    type="number"
+                    value={maxDepth}
+                    min={1}
+                    onChange={(e) => setMaxDepth(Number(e.target.value || 1))}
+                  />
                 </div>
                 <div>
                   <Label>Nombre max de catégories par niveau</Label>
-                  <Input type="number" defaultValue="50" />
+                  <Input
+                    type="number"
+                    value={maxCategoriesPerLevel}
+                    min={1}
+                    onChange={(e) => setMaxCategoriesPerLevel(Number(e.target.value || 1))}
+                  />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <Switch defaultChecked />
+                  <Switch checked={autoSlug} onCheckedChange={setAutoSlug} />
                   <Label>Génération automatique des slugs</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch defaultChecked />
+                  <Switch checked={autoValidation} onCheckedChange={setAutoValidation} />
                   <Label>Validation automatique des nouvelles catégories</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch />
+                  <Switch checked={autoSave} onCheckedChange={setAutoSave} />
                   <Label>Sauvegarde automatique des modifications</Label>
                 </div>
               </div>
 
-              <Button>
+              <Button onClick={handleSaveSettings}>
                 <Database className="w-4 h-4 mr-2" />
                 Sauvegarder la configuration
               </Button>

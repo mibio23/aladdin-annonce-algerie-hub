@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ExternalLink, Flag, Pause, Play, RefreshCw, Trash2, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -50,6 +50,7 @@ const ModerationPanel = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,6 +94,13 @@ const ModerationPanel = () => {
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q.trim()) {
+      setSearchTerm(q.trim());
+    }
+  }, [searchParams]);
 
   const stats = useMemo(() => {
     const base = { total: reports.length, new: 0, in_progress: 0, resolved: 0, rejected: 0 };

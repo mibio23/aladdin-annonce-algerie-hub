@@ -17,7 +17,6 @@ import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from "@/components/ui/separator";
 import { CATEGORIES } from "@/data/categories";
-import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { mockVehicleAnnouncements } from '@/data/mock/vehicleAnnouncements';
@@ -29,6 +28,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/useAuth";
 import { cn } from "@/lib/utils";
 import SEOHead from "@/components/SEO/SEOHead";
+import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
 
 // Extended type definition to include all new fields
 type DetailedAnnouncement = Announcement & {
@@ -149,7 +149,11 @@ const AnnouncementDetailsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
   const [similarAnnouncements, setSimilarAnnouncements] = useState<AnnouncementType[]>([]);
-  const menuCategories = getCategoryMenu(currentLanguage);
+  const { data: categoriesFromSupabase = [] } = useCategories(currentLanguage);
+  const menuCategories = React.useMemo(
+    () => mergeOfficialAndSupabaseCategories(currentLanguage, categoriesFromSupabase),
+    [currentLanguage, categoriesFromSupabase]
+  );
   const { isFavorite, toggleFavorite, fetchFavorites } = useFavorites();
 
   useEffect(() => {

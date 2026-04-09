@@ -1,17 +1,26 @@
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { Loader2, Image, Palette, Plane } from "lucide-react";
 import React from "react";
 import { LocalizedLink } from "@/utils/linkUtils";
+import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
 import "@/styles/modern-menu.css";
 
 const MegaMenuCategories = () => {
   const { t, language } = useSafeI18nWithRouter();
-  const categoryMenu = getCategoryMenu(language);
-  const isLoading = false;
+  const { data: categoriesFromSupabase = [], isLoading } = useCategories(language);
+  const categoryMenu = React.useMemo(
+    () => mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase),
+    [language, categoriesFromSupabase]
+  );
   const [activeIndex, setActiveIndex] = React.useState(0);
   const activeCategory = categoryMenu[activeIndex];
+
+  React.useEffect(() => {
+    if (activeIndex >= categoryMenu.length) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, categoryMenu.length]);
 
   if (isLoading) {
     return (
