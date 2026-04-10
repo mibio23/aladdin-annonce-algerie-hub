@@ -7,17 +7,39 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { safeStringify } from '@/utils/safeStringify';
 import { logger } from '@/utils/silentLogger';
+import { supabase } from '@/integrations/supabase/client';
+import { fetchCategoriesFromSupabase } from '@/services/supabaseCategoriesService';
+import { useAuth } from '@/contexts/useAuth';
+
+type OfflineAnnouncement = {
+  id: string;
+  title: string | null;
+  price: number | null;
+  currency: string | null;
+  category_slug: string | null;
+  subcategory_id: string | null;
+  created_at: string | null;
+  image_url: string | null;
+  view_count: number | null;
+};
+
+type OfflineFavorite = {
+  type: 'announcement' | 'shop' | 'pro';
+  target_id: string;
+  created_at: string | null;
+};
 
 interface CachedData {
-  announcements: any[];
-  categories: any[];
-  favorites: any[];
+  announcements: OfflineAnnouncement[];
+  categories: Array<{ id: string; slug: string; name: string; subcategories?: unknown[] }>;
+  favorites: OfflineFavorite[];
   lastSync: string;
   version: string;
 }
 
 export const OfflineMode: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [cachedData, setCachedData] = useState<CachedData | null>(null);
   const [storageUsage, setStorageUsage] = useState<{ used: number; total: number } | null>(null);
@@ -56,37 +78,82 @@ export const OfflineMode: React.FC = () => {
     setSyncProgress(0);
 
     try {
-      // Simulate progressive sync
-      const steps = [
-        { name: 'Catégories', progress: 25 },
-        { name: 'Annonces', progress: 50 },
-        { name: 'Favoris', progress: 75 },
-        { name: 'Finalisation', progress: 100 },
+      setSyncProgress(20);
+      const [announcementsRes, categoriesRes, announcementFavoritesRes, shopFavoritesRes, proFavoritesRes] = await Promise.all([
+        supabase
+          .from('announcements_public')
+          .select('id,title,price,currency,category_slug,subcategory_id,created_at,image_url,view_count')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(300),
+        fetchCategoriesFromSupabase('fr'),
+        user
+          ? supabase
+              .from('announcement_favorites')
+              .select('announcement_id, created_at')
+              .eq('user_id', user.id)
+          : Promise.resolve({ data: [] as Array<{ announcement_id: string; created_at: string | null }>, error: null }),
+        user
+          ? supabase
+              .from('shop_favorites')
+              .select('shop_id, created_at')
+              .eq('user_id', user.id)
+          : Promise.resolve({ data: [] as Array<{ shop_id: string; created_at: string | null }>, error: null }),
+        user
+          ? supabase
+              .from('pro_favorites')
+              .select('pro_id, created_at')
+              .eq('user_id', user.id)
+          : Promise.resolve({ data: [] as Array<{ pro_id: string; created_at: string | null }>, error: null }),
+      ]);
+
+      setSyncProgress(70);
+
+      if (announcementsRes.error) throw announcementsRes.error;
+      if (announcementFavoritesRes.error) throw announcementFavoritesRes.error;
+      if (shopFavoritesRes.error) throw shopFavoritesRes.error;
+      if (proFavoritesRes.error) throw proFavoritesRes.error;
+
+      const favorites: OfflineFavorite[] = [
+        ...((announcementFavoritesRes.data || []).map((fav) => ({
+          type: 'announcement' as const,
+          target_id: fav.announcement_id,
+          created_at: fav.created_at,
+        }))),
+        ...((shopFavoritesRes.data || []).map((fav) => ({
+          type: 'shop' as const,
+          target_id: fav.shop_id,
+          created_at: fav.created_at,
+        }))),
+        ...((proFavoritesRes.data || []).map((fav) => ({
+          type: 'pro' as const,
+          target_id: fav.pro_id,
+          created_at: fav.created_at,
+        }))),
       ];
 
-      for (const step of steps) {
-        setSyncProgress(step.progress);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Here you would fetch actual data from Supabase
-        // For demo purposes, we're just simulating
-      }
+      const categoriesFlat = categoriesRes.map((cat) => ({
+        id: cat.id,
+        slug: cat.slug,
+        name: cat.name,
+        subcategories: cat.subcategories || [],
+      }));
 
-      // Save to local storage
       const syncedData: CachedData = {
-        announcements: [], // Would contain actual data
-        categories: [],
-        favorites: [],
+        announcements: (announcementsRes.data || []) as OfflineAnnouncement[],
+        categories: categoriesFlat,
+        favorites,
         lastSync: new Date().toISOString(),
-        version: '1.0.0',
+        version: '2.0.0',
       };
 
       localStorage.setItem('aladdin_offline_data', safeStringify(syncedData));
       setCachedData(syncedData);
+      setSyncProgress(100);
 
       toast({
         title: "Synchronisation terminée",
-        description: "Vos données sont maintenant à jour",
+        description: `${syncedData.announcements.length} annonces, ${syncedData.categories.length} catégories, ${syncedData.favorites.length} favoris`,
       });
     } catch (error) {
       logger.error('Sync error:', error);
@@ -98,8 +165,9 @@ export const OfflineMode: React.FC = () => {
     } finally {
       setIsSyncing(false);
       setSyncProgress(0);
+      checkStorageUsage();
     }
-  }, [isOnline, toast]);
+  }, [checkStorageUsage, isOnline, toast, user]);
 
   useEffect(() => {
     const handleOnline = () => {

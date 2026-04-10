@@ -33,6 +33,7 @@ interface Banner {
   id: string
   title: string | null
   description: string | null
+  link_url: string | null
   is_active: boolean | null
   created_at: string | null
   end_at: string | null
@@ -110,11 +111,12 @@ const AdminUserDetails = () => {
 
       if (p) setProfile(p as unknown as Profile)
 
-      if (p?.user_id) {
+      const ownerIds = [p?.user_id, p?.id].filter((v): v is string => Boolean(v))
+      if (ownerIds.length > 0) {
         const { data: b } = await supabase
           .from("advertising_banners")
-          .select("id, title, description, is_active, created_at, end_at")
-          .eq("created_by", p.user_id)
+          .select("id, title, description, link_url, is_active, created_at, end_at")
+          .in("created_by", ownerIds)
           .order("created_at", { ascending: false })
         setBanners((b || []) as Banner[])
 
@@ -122,7 +124,7 @@ const AdminUserDetails = () => {
           const { count } = await supabase
             .from("announcements")
             .select("*", { count: "exact", head: true })
-            .eq("user_id", p.user_id)
+            .in("user_id", ownerIds)
           setAnnouncementsCount(count || 0)
         } catch {
           setAnnouncementsCount(0)
@@ -147,8 +149,13 @@ const AdminUserDetails = () => {
       })
 
       if (error) {
-        console.error("Error fetching audit logs:", error)
-        setAuditLogs([])
+        const { data: fallbackData } = await supabase
+          .from("security_audit_log")
+          .select("id, created_at, action_type, resource_type, resource_id, metadata, user_id, session_id")
+          .or(`resource_id.eq.${profile.id},metadata->>profile_id.eq.${profile.id}`)
+          .order("created_at", { ascending: false })
+          .limit(50)
+        setAuditLogs((fallbackData || []) as SecurityLog[])
       } else {
         setAuditLogs((data || []) as SecurityLog[])
       }
@@ -181,19 +188,38 @@ const AdminUserDetails = () => {
       setActing(true)
       const nextLocked = !profile.profile_locked
       const sessionId = (typeof crypto !== "undefined" && "randomUUID" in crypto) ? crypto.randomUUID() : String(Date.now())
-      const { error } = await supabase.rpc("admin_set_profile_locked", {
+      const { error: rpcError } = await supabase.rpc("admin_set_profile_locked", {
         p_profile_id: profile.id,
         p_locked: nextLocked,
         p_reason: reason || null,
         p_note: note || null,
         p_session_id: sessionId
       })
-      if (error) {
-        toast({ title: "Erreur", description: "Impossible de mettre à jour l'état du compte", variant: "destructive" })
-        return
+
+      if (rpcError) {
+        const { error: directError } = await supabase
+          .from("profiles")
+          .update({ profile_locked: nextLocked })
+          .eq("id", profile.id)
+
+        if (directError) {
+          toast({
+            title: "Erreur",
+            description: `Impossible de mettre à jour l'état du compte (${rpcError.message || directError.message})`,
+            variant: "destructive"
+          })
+          return
+        }
+
+        await logModeration(nextLocked ? "account_suspended" : "account_reactivated", "profile", profile.id, {
+          reason: reason || null,
+          note: note || null,
+          fallback: "direct_profiles_update"
+        })
       }
       toast({ title: profile.profile_locked ? "Compte réactivé" : "Compte désactivé", description: "État du compte mis à jour" })
       await fetchData()
+      await fetchAuditLogs()
     } finally {
       setActing(false)
     }
@@ -231,19 +257,20 @@ const AdminUserDetails = () => {
   }
 
   const hideAllBanners = async () => {
-    if (!profile?.user_id) return
+    const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
+    if (ownerIds.length === 0) return
     if (!window.confirm("Masquer toutes les bannières de cet utilisateur ?")) return
     try {
       setActing(true)
       const { error } = await supabase
         .from("advertising_banners")
         .update({ is_active: false })
-        .eq("created_by", profile.user_id)
+        .in("created_by", ownerIds)
       if (error) {
         toast({ title: "Erreur", description: "Impossible de masquer les bannières", variant: "destructive" })
         return
       }
-      await logModeration("banners_hidden", "advertising_banners", String(profile.user_id), { scope: "all_for_user" })
+      await logModeration("banners_hidden", "advertising_banners", String(profile.user_id || profile.id), { scope: "all_for_user" })
       toast({ title: "Bannières masquées", description: "Toutes les bannières ont été désactivées" })
       await fetchData()
     } finally {
@@ -252,19 +279,20 @@ const AdminUserDetails = () => {
   }
 
   const showAllBanners = async () => {
-    if (!profile?.user_id) return
+    const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
+    if (ownerIds.length === 0) return
     if (!window.confirm("Réactiver toutes les bannières de cet utilisateur ?")) return
     try {
       setActing(true)
       const { error } = await supabase
         .from("advertising_banners")
         .update({ is_active: true })
-        .eq("created_by", profile.user_id)
+        .in("created_by", ownerIds)
       if (error) {
         toast({ title: "Erreur", description: "Impossible de réactiver les bannières", variant: "destructive" })
         return
       }
-      await logModeration("banners_shown", "advertising_banners", String(profile.user_id), { scope: "all_for_user" })
+      await logModeration("banners_shown", "advertising_banners", String(profile.user_id || profile.id), { scope: "all_for_user" })
       toast({ title: "Bannières réactivées", description: "Toutes les bannières ont été activées" })
       await fetchData()
     } finally {
@@ -273,19 +301,20 @@ const AdminUserDetails = () => {
   }
 
   const hideAllAnnouncements = async () => {
-    if (!profile?.user_id) return
+    const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
+    if (ownerIds.length === 0) return
     if (!window.confirm("Masquer toutes les annonces publiées par cet utilisateur ?")) return
     try {
       setActing(true)
       const { error } = await supabase
         .from("announcements")
         .update({ status: "deleted" })
-        .eq("user_id", profile.user_id)
+        .in("user_id", ownerIds)
       if (error) {
         toast({ title: "Erreur", description: "Impossible de masquer les annonces", variant: "destructive" })
         return
       }
-      await logModeration("announcements_hidden", "announcements", String(profile.user_id), { scope: "all_for_user" })
+      await logModeration("announcements_hidden", "announcements", String(profile.user_id || profile.id), { scope: "all_for_user" })
       toast({ title: "Annonces masquées", description: "Toutes les annonces ont été mises en 'deleted'" })
       await fetchData()
     } finally {
@@ -294,19 +323,20 @@ const AdminUserDetails = () => {
   }
 
   const showAllAnnouncements = async () => {
-    if (!profile?.user_id) return
+    const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
+    if (ownerIds.length === 0) return
     if (!window.confirm("Réactiver toutes les annonces publiées par cet utilisateur ?")) return
     try {
       setActing(true)
       const { error } = await supabase
         .from("announcements")
         .update({ status: "active" })
-        .eq("user_id", profile.user_id)
+        .in("user_id", ownerIds)
       if (error) {
         toast({ title: "Erreur", description: "Impossible de réactiver les annonces", variant: "destructive" })
         return
       }
-      await logModeration("announcements_shown", "announcements", String(profile.user_id), { scope: "all_for_user" })
+      await logModeration("announcements_shown", "announcements", String(profile.user_id || profile.id), { scope: "all_for_user" })
       toast({ title: "Annonces réactivées", description: "Toutes les annonces ont été remises en 'active'" })
       await fetchData()
     } finally {
@@ -399,9 +429,9 @@ const AdminUserDetails = () => {
                 </Button>
               </>
             )}
-            <Badge variant="outline" className="flex items-center gap-1">
+            <Badge variant={profile.profile_locked ? "secondary" : "outline"} className="flex items-center gap-1">
               <ShieldCheck className="w-3 h-3" />
-              Compte actif
+              {profile.profile_locked ? "Compte désactivé" : "Compte actif"}
             </Badge>
             {profile.created_at && (
               <Badge variant="outline" className="flex items-center gap-1">
@@ -444,7 +474,19 @@ const AdminUserDetails = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={b.is_active ? "default" : "secondary"}>{b.is_active ? "Active" : "Inactive"}</Badge>
-                    <Button variant="outline" size="sm" onClick={() => window.open(`/annonce/${b.id}`, "_blank")}>Voir</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (b.link_url) {
+                          window.open(b.link_url, "_blank", "noopener,noreferrer")
+                          return
+                        }
+                        window.open("/admin/banners", "_blank", "noopener,noreferrer")
+                      }}
+                    >
+                      Voir
+                    </Button>
                   </div>
                 </div>
               ))}
