@@ -306,6 +306,7 @@ export const createAd = {
   "createAd.includedAccessories": "Included Accessories",
   "createAd.dimensionsAndWeight": "Dimensions & Weight",
   "createAd.details": "Details",
+  "createAd.type": "Type",
   "createAd.originalPrice": "Original Price",
   "createAd.securityDisclaimer": "Secure payment not included (In-person transaction recommended)",
   "createAd.sellerInfo": "Seller Information",
@@ -343,6 +344,9 @@ export const createAd = {
   "createAd.bike.frameMaterial": "Frame Material",
   "createAd.bike.electric": "Electric Bike",
   "createAd.bike.motorized": "Motorized Bike",
+  "createAd.bike.suspension": "Suspension",
+  "createAd.bike.brakes": "Brakes",
+  "createAd.bike.gears": "Gears",
 
   // Boat
   "createAd.boat.title": "Boat Details",

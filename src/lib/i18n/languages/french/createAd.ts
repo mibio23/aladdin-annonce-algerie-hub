@@ -300,6 +300,7 @@ export const createAd = {
   "createAd.includedAccessories": "Accessoires inclus",
   "createAd.dimensionsAndWeight": "Dimensions & Poids",
   "createAd.details": "Détails",
+  "createAd.type": "Type",
   "createAd.originalPrice": "Prix original",
   "createAd.securityDisclaimer": "Paiement sécurisé non inclus (Transaction en main propre recommandée)",
   "createAd.sellerInfo": "Information Vendeur",
@@ -339,6 +340,9 @@ export const createAd = {
   "createAd.bike.frameMaterial": "Matériau du cadre",
   "createAd.bike.electric": "Vélo électrique",
   "createAd.bike.motorized": "Vélo motorisé",
+  "createAd.bike.suspension": "Suspension",
+  "createAd.bike.brakes": "Freins",
+  "createAd.bike.gears": "Vitesses",
 
   // Boat
   "createAd.boat.title": "Détails Bateau",

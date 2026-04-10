@@ -10,7 +10,6 @@ import AnnouncementContactModal from "@/components/announcements/AnnouncementCon
 import AnnouncementCard from "@/components/announcements/AnnouncementCard";
 import { Announcement as AnnouncementType } from "@/hooks/useAnnouncements";
 import { useToast } from "@/hooks/use-toast";
-import ReviewsSection from "@/components/reviews/ReviewsSection";
 import { Announcement } from "@/data/types/homePageTypes";
 import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
@@ -337,6 +336,7 @@ const AnnouncementDetailsPage: React.FC = () => {
         
         const subId = announcementData.subcategory_id;
         let subName = subId || '';
+        let subSlug = '';
         if (subId) {
           const findInSubs = (subs: any[]): string => {
             for (const s of subs) {
@@ -348,7 +348,45 @@ const AnnouncementDetailsPage: React.FC = () => {
             }
             return '';
           };
-          subName = findInSubs(categoryFromMenu?.subcategories || []) || findInSubs(menuCategories.flatMap(c => c.subcategories || [])) || subId;
+          const subNameFromMenu =
+            findInSubs(categoryFromMenu?.subcategories || []) ||
+            findInSubs(menuCategories.flatMap(c => c.subcategories || []));
+
+          const findSlugInSubs = (subs: any[]): string => {
+            for (const s of subs) {
+              if (s.id === subId || s.slug === subId) return s.slug || '';
+              if (s.subcategories) {
+                const found = findSlugInSubs(s.subcategories);
+                if (found) return found;
+              }
+            }
+            return '';
+          };
+
+          const subSlugFromMenu =
+            findSlugInSubs(categoryFromMenu?.subcategories || []) ||
+            findSlugInSubs(menuCategories.flatMap(c => c.subcategories || []));
+
+          if (subNameFromMenu) {
+            subName = subNameFromMenu;
+            subSlug = subSlugFromMenu;
+          } else {
+            const { data: subcategoryRecord } = await supabase
+              .from('categories')
+              .select('name, slug')
+              .eq('id', subId)
+              .maybeSingle();
+
+            if (subcategoryRecord?.name) {
+              const translationKey = subcategoryRecord.slug ? `categories.${subcategoryRecord.slug}` : '';
+              const translatedSubcategoryName = translationKey ? t(translationKey) : '';
+              subName =
+                translatedSubcategoryName && translatedSubcategoryName !== translationKey && !translatedSubcategoryName.startsWith('categories.')
+                  ? translatedSubcategoryName
+                  : subcategoryRecord.name;
+              subSlug = subcategoryRecord.slug || '';
+            }
+          }
         }
 
         // 4. Merge
@@ -366,6 +404,7 @@ const AnnouncementDetailsPage: React.FC = () => {
           category: categoryName,
           categorySlug: typeof (announcementData as any).category_slug === 'string' ? (announcementData as any).category_slug : undefined,
           subcategory: subName || legacySubId,
+          subcategory_slug: subSlug || undefined,
           imageUrl: announcementData.image_url || (announcementData.images && announcementData.images[0]),
           imageUrls: announcementData.image_urls || announcementData.images || (announcementData.image_url ? [announcementData.image_url] : []),
           isOnline: announcementData.status === 'active',
@@ -438,7 +477,17 @@ const AnnouncementDetailsPage: React.FC = () => {
 
       } catch (error) {
         logger.error("Fetch Error:", error);
-        toast({ title: t('common.error'), description: "Impossible de charger les détails de l'annonce" });
+        toast({
+          title: t('common.error'),
+          description: ({
+            fr: "Impossible de charger les détails de l'annonce",
+            en: "Unable to load announcement details",
+            es: "No se pueden cargar los detalles del anuncio",
+            it: "Impossibile caricare i dettagli dell'annuncio",
+            de: "Anzeigendetails konnten nicht geladen werden",
+            ar: "تعذر تحميل تفاصيل الإعلان",
+          } as Record<string, string>)[currentLanguage || 'fr'] || "Impossible de charger les détails de l'annonce"
+        });
       } finally {
         setLoading(false);
       }
@@ -509,6 +558,19 @@ const AnnouncementDetailsPage: React.FC = () => {
     if (normalized.includes('facture')) {
       return t('createAd.invoice', isRTL ? 'فاتورة' : raw);
     }
+    if (normalized.includes('garantie') || normalized.includes('warranty')) {
+      return t('createAd.warranty', isRTL ? 'ضمان' : raw);
+    }
+    if (normalized.includes('boite') || normalized.includes('box')) {
+      return translateStaticLabel({
+        fr: normalized.includes('sans') ? 'Sans boîte' : "Boîte d'origine",
+        en: normalized.includes('without') || normalized.includes('sans') ? 'Without box' : 'Original box',
+        es: normalized.includes('without') || normalized.includes('sans') ? 'Sin caja' : 'Caja original',
+        it: normalized.includes('without') || normalized.includes('sans') ? 'Senza scatola' : 'Scatola originale',
+        de: normalized.includes('without') || normalized.includes('sans') ? 'Ohne Verpackung' : 'Originalverpackung',
+        ar: normalized.includes('without') || normalized.includes('sans') ? 'بدون علبة' : 'العلبة الأصلية',
+      });
+    }
     if (normalized.includes('credit') || normalized.includes('credit')) {
       return t('createAd.papers.credit', isRTL ? 'قرض' : raw);
     }
@@ -535,7 +597,14 @@ const AnnouncementDetailsPage: React.FC = () => {
     if (price === null || price === undefined || price === 0) {
       return (
         <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-200 px-3 py-1 text-sm font-semibold">
-          {t('createAd.priceByContact') || 'Prix par contact'}
+          {({
+            fr: 'Prix sur demande',
+            en: 'Price on request',
+            es: 'Precio a consultar',
+            it: 'Prezzo su richiesta',
+            de: 'Preis auf Anfrage',
+            ar: 'السعر عند الطلب',
+          } as Record<string, string>)[currentLanguage || 'fr'] || 'Prix sur demande'}
         </Badge>
       );
     }
@@ -554,6 +623,295 @@ const AnnouncementDetailsPage: React.FC = () => {
       month: 'long',
       year: 'numeric'
     });
+  };
+
+  const translateConditionLabel = (rawCondition?: string | null) => {
+    if (!rawCondition) return '';
+
+    const normalized = rawCondition.trim().toLowerCase();
+    const conditionKeyMap: Record<string, string> = {
+      neuf: 'announcements.condition.new',
+      new: 'announcements.condition.new',
+      like_new: 'announcements.condition.likeNew',
+      comme_neuf: 'announcements.condition.likeNew',
+      tres_bon_etat: 'announcements.condition.tresBon',
+      'tres-bon-etat': 'announcements.condition.tresBon',
+      bon_etat: 'announcements.condition.bon',
+      'bon-etat': 'announcements.condition.bon',
+      good: 'announcements.condition.bon',
+      acceptable: 'announcements.condition.correct',
+      correct: 'announcements.condition.correct',
+      etat_correct: 'announcements.condition.correct',
+      'etat-moyen': 'announcements.condition.correct',
+      fair: 'announcements.condition.correct',
+      usage: 'announcements.condition.poor',
+      poor: 'announcements.condition.poor',
+      pour_pieces: 'announcements.condition.poor',
+      'pour-pieces': 'announcements.condition.poor',
+    };
+
+    const translationKey = conditionKeyMap[normalized];
+    if (translationKey) {
+      const translated = t(translationKey);
+      if (translated && translated !== translationKey) return translated;
+    }
+
+    return rawCondition
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const normalizeLookupValue = (value?: string | null) =>
+    (value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+
+  const humanizeStoredValue = (value?: string | null) => {
+    if (!value) return '';
+    return value
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const translateByKeyCandidates = (candidates: string[], fallback?: string | null) => {
+    for (const key of candidates) {
+      const translated = t(key);
+      if (translated && translated !== key && !translated.startsWith('createAd.') && !translated.startsWith('categories.')) {
+        return translated;
+      }
+    }
+    return fallback || '';
+  };
+
+  const translateStaticLabel = (labels: Record<string, string>) => {
+    return labels[currentLanguage || 'fr'] || labels.fr || Object.values(labels)[0] || '';
+  };
+
+  const translateVehicleFuelLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const keyMap: Record<string, string> = {
+      essence: 'createAd.vehicle.fuel.essence',
+      petrol: 'createAd.vehicle.fuel.essence',
+      gasolina: 'createAd.vehicle.fuel.essence',
+      benzine: 'createAd.vehicle.fuel.essence',
+      diesel: 'createAd.vehicle.fuel.diesel',
+      gasoil: 'createAd.vehicle.fuel.diesel',
+      electrique: 'createAd.vehicle.fuel.electric',
+      electric: 'createAd.vehicle.fuel.electric',
+      electricite: 'createAd.vehicle.fuel.electric',
+      hybride: 'createAd.vehicle.fuel.hybrid',
+      hybrid: 'createAd.vehicle.fuel.hybrid',
+      gpl: 'createAd.vehicle.fuel.lpg',
+      lpg: 'createAd.vehicle.fuel.lpg',
+    };
+    return translateByKeyCandidates(keyMap[normalized] ? [keyMap[normalized]] : [], humanizeStoredValue(rawValue));
+  };
+
+  const translateGearboxLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const keyMap: Record<string, string> = {
+      manuelle: 'createAd.vehicle.gearbox.manual',
+      manuel: 'createAd.vehicle.gearbox.manual',
+      manual: 'createAd.vehicle.gearbox.manual',
+      automatique: 'createAd.vehicle.gearbox.automatic',
+      automatic: 'createAd.vehicle.gearbox.automatic',
+      auto: 'createAd.vehicle.gearbox.automatic',
+    };
+    return translateByKeyCandidates(keyMap[normalized] ? [keyMap[normalized]] : [], humanizeStoredValue(rawValue));
+  };
+
+  const translateRealEstatePropertyTypeLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const keyMap: Record<string, string[]> = {
+      appartement: ['createAd.realEstate.type.apartment'],
+      apartment: ['createAd.realEstate.type.apartment'],
+      maison: ['createAd.realEstate.type.house'],
+      house: ['createAd.realEstate.type.house'],
+      villa: ['createAd.realEstate.type.villa'],
+      studio: ['createAd.realEstate.type.studio'],
+      niveau_villa: ['createAd.realEstate.type.villaLevel'],
+      villa_level: ['createAd.realEstate.type.villaLevel'],
+      bungalow: ['createAd.realEstate.type.bungalow'],
+      local: ['createAd.realEstate.type.commercial'],
+      commercial: ['createAd.realEstate.type.commercial'],
+      bureau: ['createAd.realEstate.type.office'],
+      office: ['createAd.realEstate.type.office'],
+      hangar: ['createAd.realEstate.type.hangar'],
+      entrepot: ['createAd.realEstate.type.warehouse'],
+      warehouse: ['createAd.realEstate.type.warehouse'],
+      usine: ['createAd.realEstate.type.factory'],
+      factory: ['createAd.realEstate.type.factory'],
+      garage_ferme: ['createAd.realEstate.type.garageClosed'],
+      garage_closed: ['createAd.realEstate.type.garageClosed'],
+      place_parking: ['createAd.realEstate.type.parkingSpot'],
+      parking_spot: ['createAd.realEstate.type.parkingSpot'],
+      box: ['createAd.realEstate.type.box'],
+    };
+    return translateByKeyCandidates(keyMap[normalized] || [], humanizeStoredValue(rawValue));
+  };
+
+  const translateRealEstateViewLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const keyMap: Record<string, string[]> = {
+      mer: ['createAd.realEstate.viewType.sea'],
+      sea: ['createAd.realEstate.viewType.sea'],
+      jardin: ['createAd.realEstate.viewType.garden'],
+      garden: ['createAd.realEstate.viewType.garden'],
+      rue: ['createAd.realEstate.viewType.street'],
+      street: ['createAd.realEstate.viewType.street'],
+      montagne: ['createAd.realEstate.viewType.mountain'],
+      mountain: ['createAd.realEstate.viewType.mountain'],
+    };
+    return translateByKeyCandidates(keyMap[normalized] || [], humanizeStoredValue(rawValue));
+  };
+
+  const translateRealEstateZoningLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const keyMap: Record<string, string[]> = {
+      residentiel: ['createAd.realEstate.zoning.residential'],
+      residential: ['createAd.realEstate.zoning.residential'],
+      commercial: ['createAd.realEstate.zoning.commercial'],
+      industriel: ['createAd.realEstate.zoning.industrial'],
+      industrial: ['createAd.realEstate.zoning.industrial'],
+      agricole: ['createAd.realEstate.zoning.agricultural'],
+      agricultural: ['createAd.realEstate.zoning.agricultural'],
+    };
+    return translateByKeyCandidates(keyMap[normalized] || [], humanizeStoredValue(rawValue));
+  };
+
+  const translateRealEstateSpecificationLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const keyCandidates = [
+      `createAd.realEstate.specs.${normalized}`,
+      `createAd.realEstate.${normalized}`,
+      normalized === 'garage_parking' ? 'createAd.realEstate.garageParking' : '',
+      normalized === 'balcon_terrasse' ? 'createAd.realEstate.balconyTerrace' : '',
+      normalized === 'wifi_internet' ? 'createAd.realEstate.wifi' : '',
+      normalized === 'permis_construire' ? 'createAd.realEstate.permit' : '',
+    ].filter(Boolean);
+    return translateByKeyCandidates(keyCandidates, humanizeStoredValue(rawValue));
+  };
+
+  const translateColorLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const colorMap: Record<string, Record<string, string>> = {
+      noir: { fr: 'Noir', en: 'Black', es: 'Negro', it: 'Nero', de: 'Schwarz', ar: 'أسود' },
+      black: { fr: 'Noir', en: 'Black', es: 'Negro', it: 'Nero', de: 'Schwarz', ar: 'أسود' },
+      blanc: { fr: 'Blanc', en: 'White', es: 'Blanco', it: 'Bianco', de: 'Weiß', ar: 'أبيض' },
+      white: { fr: 'Blanc', en: 'White', es: 'Blanco', it: 'Bianco', de: 'Weiß', ar: 'أبيض' },
+      gris: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'رمادي' },
+      gray: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'رمادي' },
+      grey: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'رمادي' },
+      argent: { fr: 'Argent', en: 'Silver', es: 'Plateado', it: 'Argento', de: 'Silber', ar: 'فضي' },
+      silver: { fr: 'Argent', en: 'Silver', es: 'Plateado', it: 'Argento', de: 'Silber', ar: 'فضي' },
+      bleu: { fr: 'Bleu', en: 'Blue', es: 'Azul', it: 'Blu', de: 'Blau', ar: 'أزرق' },
+      blue: { fr: 'Bleu', en: 'Blue', es: 'Azul', it: 'Blu', de: 'Blau', ar: 'أزرق' },
+      rouge: { fr: 'Rouge', en: 'Red', es: 'Rojo', it: 'Rosso', de: 'Rot', ar: 'أحمر' },
+      red: { fr: 'Rouge', en: 'Red', es: 'Rojo', it: 'Rosso', de: 'Rot', ar: 'أحمر' },
+      vert: { fr: 'Vert', en: 'Green', es: 'Verde', it: 'Verde', de: 'Grün', ar: 'أخضر' },
+      green: { fr: 'Vert', en: 'Green', es: 'Verde', it: 'Verde', de: 'Grün', ar: 'أخضر' },
+      jaune: { fr: 'Jaune', en: 'Yellow', es: 'Amarillo', it: 'Giallo', de: 'Gelb', ar: 'أصفر' },
+      yellow: { fr: 'Jaune', en: 'Yellow', es: 'Amarillo', it: 'Giallo', de: 'Gelb', ar: 'أصفر' },
+      marron: { fr: 'Marron', en: 'Brown', es: 'Marrón', it: 'Marrone', de: 'Braun', ar: 'بني' },
+      brown: { fr: 'Marron', en: 'Brown', es: 'Marrón', it: 'Marrone', de: 'Braun', ar: 'بني' },
+      beige: { fr: 'Beige', en: 'Beige', es: 'Beige', it: 'Beige', de: 'Beige', ar: 'بيج' },
+      rose: { fr: 'Rose', en: 'Pink', es: 'Rosa', it: 'Rosa', de: 'Rosa', ar: 'وردي' },
+      pink: { fr: 'Rose', en: 'Pink', es: 'Rosa', it: 'Rosa', de: 'Rosa', ar: 'وردي' },
+      violet: { fr: 'Violet', en: 'Purple', es: 'Morado', it: 'Viola', de: 'Lila', ar: 'بنفسجي' },
+      purple: { fr: 'Violet', en: 'Purple', es: 'Morado', it: 'Viola', de: 'Lila', ar: 'بنفسجي' },
+      orange: { fr: 'Orange', en: 'Orange', es: 'Naranja', it: 'Arancione', de: 'Orange', ar: 'برتقالي' },
+    };
+    return colorMap[normalized]?.[currentLanguage || 'fr'] || humanizeStoredValue(rawValue);
+  };
+
+  const translateAnnouncementTypeLabel = (rawValue?: string | null) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const localizedMap: Record<string, Record<string, string>> = {
+      normal: {
+        fr: 'Standard',
+        en: 'Standard',
+        es: 'Estándar',
+        it: 'Standard',
+        de: 'Standard',
+        ar: 'عادي',
+      },
+      premium: {
+        fr: 'Premium',
+        en: 'Premium',
+        es: 'Premium',
+        it: 'Premium',
+        de: 'Premium',
+        ar: 'مميز',
+      },
+      featured: {
+        fr: 'À la une',
+        en: 'Featured',
+        es: 'Destacado',
+        it: 'In evidenza',
+        de: 'Hervorgehoben',
+        ar: 'مميز',
+      },
+      urgent: {
+        fr: 'Urgent',
+        en: 'Urgent',
+        es: 'Urgente',
+        it: 'Urgente',
+        de: 'Dringend',
+        ar: 'مستعجل',
+      },
+    };
+
+    return localizedMap[normalized]?.[currentLanguage || 'fr'] || humanizeStoredValue(rawValue);
+  };
+
+  const translateFreeValueLabel = (
+    rawValue?: string | null,
+    kind?: 'sellingReason' | 'packaging' | 'accessory' | 'equipment' | 'document'
+  ) => {
+    const normalized = normalizeLookupValue(rawValue);
+    const dictionaries: Record<string, Record<string, string>> = {
+      upgrade: { fr: 'Mise à niveau', en: 'Upgrade', es: 'Actualización', it: 'Aggiornamento', de: 'Upgrade', ar: 'ترقية' },
+      renouvellement: { fr: 'Renouvellement', en: 'Renewal', es: 'Renovación', it: 'Rinnovo', de: 'Erneuerung', ar: 'تجديد' },
+      no_longer_needed: { fr: 'Plus nécessaire', en: 'No longer needed', es: 'Ya no es necesario', it: 'Non più necessario', de: 'Nicht mehr benötigt', ar: 'لم أعد بحاجة إليه' },
+      urgent_sale: { fr: 'Vente urgente', en: 'Urgent sale', es: 'Venta urgente', it: 'Vendita urgente', de: 'Dringender Verkauf', ar: 'بيع مستعجل' },
+      demenagement: { fr: 'Déménagement', en: 'Moving', es: 'Mudanza', it: 'Trasloco', de: 'Umzug', ar: 'انتقال' },
+      liquidation: { fr: 'Liquidation', en: 'Clearance', es: 'Liquidación', it: 'Liquidazione', de: 'Räumungsverkauf', ar: 'تصفية' },
+      fermeture: { fr: 'Fermeture', en: 'Closure', es: 'Cierre', it: 'Chiusura', de: 'Schließung', ar: 'إغلاق' },
+      avec_boite: { fr: 'Avec boîte', en: 'With box', es: 'Con caja', it: 'Con scatola', de: 'Mit Verpackung', ar: 'مع العلبة' },
+      sans_boite: { fr: 'Sans boîte', en: 'Without box', es: 'Sin caja', it: 'Senza scatola', de: 'Ohne Verpackung', ar: 'بدون علبة' },
+      boite_origine: { fr: "Boîte d'origine", en: 'Original box', es: 'Caja original', it: 'Scatola originale', de: 'Originalverpackung', ar: 'العلبة الأصلية' },
+      original_box: { fr: "Boîte d'origine", en: 'Original box', es: 'Caja original', it: 'Scatola originale', de: 'Originalverpackung', ar: 'العلبة الأصلية' },
+      scelle: { fr: 'Scellé', en: 'Sealed', es: 'Sellado', it: 'Sigillato', de: 'Versiegelt', ar: 'مختوم' },
+      sealed: { fr: 'Scellé', en: 'Sealed', es: 'Sellado', it: 'Sigillato', de: 'Versiegelt', ar: 'مختوم' },
+      chargeur: { fr: 'Chargeur', en: 'Charger', es: 'Cargador', it: 'Caricatore', de: 'Ladegerät', ar: 'شاحن' },
+      charger: { fr: 'Chargeur', en: 'Charger', es: 'Cargador', it: 'Caricatore', de: 'Ladegerät', ar: 'شاحن' },
+      cable: { fr: 'Câble', en: 'Cable', es: 'Cable', it: 'Cavo', de: 'Kabel', ar: 'كابل' },
+      ecouteurs: { fr: 'Écouteurs', en: 'Earphones', es: 'Auriculares', it: 'Auricolari', de: 'Kopfhörer', ar: 'سماعات' },
+      headphones: { fr: 'Casque', en: 'Headphones', es: 'Auriculares', it: 'Cuffie', de: 'Kopfhörer', ar: 'سماعات رأس' },
+      telecommande: { fr: 'Télécommande', en: 'Remote control', es: 'Mando a distancia', it: 'Telecomando', de: 'Fernbedienung', ar: 'جهاز تحكم' },
+      remote: { fr: 'Télécommande', en: 'Remote control', es: 'Mando a distancia', it: 'Telecomando', de: 'Fernbedienung', ar: 'جهاز تحكم' },
+      batterie: { fr: 'Batterie', en: 'Battery', es: 'Batería', it: 'Batteria', de: 'Akku', ar: 'بطارية' },
+      battery: { fr: 'Batterie', en: 'Battery', es: 'Batería', it: 'Batteria', de: 'Akku', ar: 'بطارية' },
+      coque: { fr: 'Coque', en: 'Case', es: 'Funda', it: 'Cover', de: 'Hülle', ar: 'غطاء' },
+      case: { fr: 'Coque', en: 'Case', es: 'Funda', it: 'Cover', de: 'Hülle', ar: 'غطاء' },
+      housse: { fr: 'Housse', en: 'Cover', es: 'Funda', it: 'Custodia', de: 'Schutzhülle', ar: 'حافظة' },
+      facture: { fr: 'Facture', en: 'Invoice', es: 'Factura', it: 'Fattura', de: 'Rechnung', ar: 'فاتورة' },
+      invoice: { fr: 'Facture', en: 'Invoice', es: 'Factura', it: 'Fattura', de: 'Rechnung', ar: 'فاتورة' },
+      garantie: { fr: 'Garantie', en: 'Warranty', es: 'Garantía', it: 'Garanzia', de: 'Garantie', ar: 'ضمان' },
+      warranty: { fr: 'Garantie', en: 'Warranty', es: 'Garantía', it: 'Garanzia', de: 'Garantie', ar: 'ضمان' },
+      manuel: { fr: 'Manuel', en: 'Manual', es: 'Manual', it: 'Manuale', de: 'Handbuch', ar: 'دليل' },
+      manual: { fr: 'Manuel', en: 'Manual', es: 'Manual', it: 'Manuale', de: 'Handbuch', ar: 'دليل' },
+    };
+
+    if (kind === 'document') {
+      const translatedDocument = formatDocumentLabel(rawValue || '');
+      if (translatedDocument && translatedDocument !== rawValue) return translatedDocument;
+    }
+
+    return dictionaries[normalized]?.[currentLanguage || 'fr'] || humanizeStoredValue(rawValue);
   };
 
   const localizeLabel = (s: string | undefined, language: string, kind?: string) => {
@@ -821,6 +1179,8 @@ const AnnouncementDetailsPage: React.FC = () => {
   }
 
   // Logic to find category name and slug
+  const isUUID = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
   const rawCategoryId = typeof announcement.category_id === "string" ? announcement.category_id : "";
   const rawCategorySlug =
     typeof announcement.categorySlug === "string" && announcement.categorySlug.trim()
@@ -873,6 +1233,14 @@ const AnnouncementDetailsPage: React.FC = () => {
 
   const resolvedSubcategoryName = (() => {
     const subId = announcement.subcategory_id || announcement.subcategory;
+    const fallbackSubcategoryName =
+      typeof announcement.subcategory === "string" && announcement.subcategory.trim()
+        ? announcement.subcategory.trim()
+        : "";
+    const explicitSubcategorySlug =
+      typeof (announcement as any).subcategory_slug === "string" && (announcement as any).subcategory_slug.trim()
+        ? (announcement as any).subcategory_slug.trim()
+        : "";
     if (!subId || subId === rawCategoryId) return "";
     
     // Try to find in menu
@@ -889,6 +1257,21 @@ const AnnouncementDetailsPage: React.FC = () => {
 
     const subFromMenu = findInMenu(menuCategories);
     if (subFromMenu) return subFromMenu.name;
+
+    if (explicitSubcategorySlug) {
+      const translatedBySlug = t(`categories.${explicitSubcategorySlug}`);
+      if (
+        translatedBySlug &&
+        translatedBySlug !== `categories.${explicitSubcategorySlug}` &&
+        !translatedBySlug.startsWith('categories.')
+      ) {
+        return translatedBySlug;
+      }
+    }
+
+    if (fallbackSubcategoryName && fallbackSubcategoryName !== subId && !isUUID(fallbackSubcategoryName)) {
+      return fallbackSubcategoryName;
+    }
     
     // Fallback translation
     const key = `categories.${subId}`;
@@ -898,6 +1281,8 @@ const AnnouncementDetailsPage: React.FC = () => {
     }
     
     // Fallback formatting
+    if (isUUID(subId)) return "";
+
     return subId
       .split("-")
       .filter(Boolean)
@@ -907,7 +1292,13 @@ const AnnouncementDetailsPage: React.FC = () => {
 
   const resolvedSubcategorySlug = (() => {
     const subId = announcement.subcategory_id || announcement.subcategory;
+    const explicitSubcategorySlug =
+      typeof (announcement as any).subcategory_slug === "string" && (announcement as any).subcategory_slug.trim()
+        ? (announcement as any).subcategory_slug.trim()
+        : "";
     if (!subId) return "";
+
+    if (explicitSubcategorySlug) return explicitSubcategorySlug;
     
     if (categoryFromMenu) {
       const direct = categoryFromMenu.subcategories?.find((s: any) => s.id === subId || s.slug === subId);
@@ -983,11 +1374,13 @@ const AnnouncementDetailsPage: React.FC = () => {
         }}
       />
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
+        <Breadcrumb className="mb-5">
+          <BreadcrumbList className="flex-wrap gap-y-2 text-xs md:text-sm text-gray-500">
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to={getLocalizedPath("/")}>{t("breadcrumb.home")}</Link>
+                <Link to={getLocalizedPath("/")} className="transition-colors hover:text-gray-700">
+                  {t("breadcrumb.home")}
+                </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             {announcement.category_id ? (
@@ -995,7 +1388,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to={getLocalizedPath(`/category/${resolvedCategorySlug}`)}>
+                    <Link to={getLocalizedPath(`/category/${resolvedCategorySlug}`)} className="transition-colors hover:text-gray-700">
                       {resolvedCategoryName}
                     </Link>
                   </BreadcrumbLink>
@@ -1007,7 +1400,10 @@ const AnnouncementDetailsPage: React.FC = () => {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to={getLocalizedPath(`/category/${resolvedCategorySlug}/${resolvedSubcategorySlug}`)}>
+                    <Link
+                      to={getLocalizedPath(`/category/${resolvedCategorySlug}/${resolvedSubcategorySlug}`)}
+                      className="font-medium text-gray-600 transition-colors hover:text-gray-800"
+                    >
                       {resolvedSubcategoryName}
                     </Link>
                   </BreadcrumbLink>
@@ -1032,11 +1428,16 @@ const AnnouncementDetailsPage: React.FC = () => {
 
             {/* Main Description */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                    {announcement.title} {resolvedSubcategoryName && <span className="text-gray-400 font-normal">| {resolvedSubcategoryName}</span>}
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                    {announcement.title}
                   </h1>
+                  {resolvedSubcategoryName && (
+                    <p className="mt-1 text-2xl md:text-[2rem] font-normal leading-tight text-gray-400 break-words">
+                      {resolvedSubcategoryName}
+                    </p>
+                  )}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
@@ -1079,39 +1480,37 @@ const AnnouncementDetailsPage: React.FC = () => {
 
               {showBikeSpecsBlock && (
                 <div className="bg-gray-50 rounded-xl border border-gray-100 p-4">
-                  <h3 className="text-lg font-bold mb-3">
-                    {currentLanguage === 'ar' ? 'مواصفات الدراجة' : 'Spécifications Vélo'}
-                  </h3>
+                  <h3 className="text-lg font-bold mb-3">{t('createAd.bike.title')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                     {bike.frameSize && (
-                      <div>{currentLanguage === 'ar' ? 'حجم الإطار' : 'Taille cadre'}: {bike.frameSize}</div>
+                      <div>{t('createAd.bike.frameSize')}: {bike.frameSize}</div>
                     )}
                     {bike.wheelResolved && (
-                      <div>{currentLanguage === 'ar' ? 'حجم العجلة' : 'Taille roue'}: {localizeLabel(bike.wheelResolved, currentLanguage, 'wheel')}</div>
+                      <div>{t('createAd.bike.wheelSize')}: {localizeLabel(bike.wheelResolved, currentLanguage, 'wheel')}</div>
                     )}
                     {typeof bike.isElectric === 'boolean' && (
-                      <div>{currentLanguage === 'ar' ? 'كهربائي' : 'Électrique'}: {bike.isElectric ? (currentLanguage === 'ar' ? 'نعم' : 'Oui') : (currentLanguage === 'ar' ? 'لا' : 'Non')}</div>
+                      <div>{t('createAd.bike.electric')}: {bike.isElectric ? t('createAd.yes') : t('createAd.no')}</div>
                     )}
                     {typeof bike.isMotorized === 'boolean' && (
-                      <div>{currentLanguage === 'ar' ? 'مزودة بمحرك' : 'Motorisé'}: {bike.isMotorized ? (currentLanguage === 'ar' ? 'نعم' : 'Oui') : (currentLanguage === 'ar' ? 'لا' : 'Non')}</div>
+                      <div>{t('createAd.bike.motorized')}: {bike.isMotorized ? t('createAd.yes') : t('createAd.no')}</div>
                     )}
                     {bike.frameMaterial && (
-                      <div>{currentLanguage === 'ar' ? 'مادة الإطار' : 'Matériau cadre'}: {localizeLabel(bike.frameMaterial, currentLanguage, 'material')}</div>
+                      <div>{t('createAd.bike.frameMaterial')}: {localizeLabel(bike.frameMaterial, currentLanguage, 'material')}</div>
                     )}
                     {bike.suspension && (
-                      <div>{currentLanguage === 'ar' ? 'التعليق' : 'Suspension'}: {localizeLabel(bike.suspension, currentLanguage, 'suspension')}</div>
+                      <div>{t('createAd.bike.suspension')}: {localizeLabel(bike.suspension, currentLanguage, 'suspension')}</div>
                     )}
                     {bike.brake && (
-                      <div>{currentLanguage === 'ar' ? 'نوع الفرامل' : 'Freins'}: {localizeLabel(bike.brake, currentLanguage, 'brake')}</div>
+                      <div>{t('createAd.bike.brakes')}: {localizeLabel(bike.brake, currentLanguage, 'brake')}</div>
                     )}
                     {bike.gears && (
-                      <div>{currentLanguage === 'ar' ? 'عدد السرعات' : 'Vitesses'}: {localizeLabel(bike.gears, currentLanguage, 'gears')}</div>
+                      <div>{t('createAd.bike.gears')}: {localizeLabel(bike.gears, currentLanguage, 'gears')}</div>
                     )}
                     {bike.bikeType && (
-                      <div>{currentLanguage === 'ar' ? 'نوع الدراجة' : 'Type vélo'}: {localizeLabel(bike.bikeType, currentLanguage, 'bikeType')}</div>
+                      <div>{t('createAd.bike.type')}: {localizeLabel(bike.bikeType, currentLanguage, 'bikeType')}</div>
                     )}
                     {bike.weight && (
-                      <div>{currentLanguage === 'ar' ? 'الوزن' : 'Poids'}: {localizeLabel(bike.weight, currentLanguage, 'weight')}</div>
+                      <div>{t('createAd.weight')}: {localizeLabel(bike.weight, currentLanguage, 'weight')}</div>
                     )}
                   </div>
                 </div>
@@ -1141,14 +1540,18 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {resolvedSubcategoryName && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.subcategory') || 'Sous-catégorie'}</dt>
-                          <dd className="font-medium">{resolvedSubcategoryName}</dd>
+                          <dd className="font-medium">
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
+                              {resolvedSubcategoryName}
+                            </span>
+                          </dd>
                         </div>
                       )}
                       {/* Real Estate Fields */}
                       {announcement.property_type && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.realEstate.propertyType')}</dt>
-                          <dd className="font-medium capitalize">{t(`createAd.realEstate.type.${announcement.property_type}`) || announcement.property_type}</dd>
+                          <dd className="font-medium">{translateRealEstatePropertyTypeLabel(announcement.property_type)}</dd>
                         </div>
                       )}
                       {announcement.surface && (
@@ -1196,13 +1599,13 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {announcement.payment_period && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.realEstate.paymentPeriod')}</dt>
-                          <dd className="font-medium">{t(`createAd.realEstate.payment.${announcement.payment_period}`) || announcement.payment_period}</dd>
+                          <dd className="font-medium">{translateByKeyCandidates([`createAd.realEstate.payment.${normalizeLookupValue(announcement.payment_period)}`], humanizeStoredValue(announcement.payment_period))}</dd>
                         </div>
                       )}
                       {announcement.zoning && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.realEstate.zoning')}</dt>
-                          <dd className="font-medium">{t(`createAd.realEstate.zoning.${announcement.zoning}`) || announcement.zoning}</dd>
+                          <dd className="font-medium">{translateRealEstateZoningLabel(announcement.zoning)}</dd>
                         </div>
                       )}
                       {announcement.facades && (
@@ -1220,7 +1623,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {announcement.view_type && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.realEstate.view')}</dt>
-                          <dd className="font-medium">{announcement.view_type}</dd>
+                          <dd className="font-medium">{translateRealEstateViewLabel(announcement.view_type)}</dd>
                         </div>
                       )}
 
@@ -1241,7 +1644,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                           <dt className="text-gray-500">{t('createAd.condition')}</dt>
                           <dd className="font-medium">
                             <Badge variant="outline" className="capitalize">
-                              {announcement.condition.replace('_', ' ')}
+                              {translateConditionLabel(announcement.condition)}
                             </Badge>
                           </dd>
                         </div>
@@ -1249,7 +1652,37 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {announcement.color && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.color')}</dt>
-                          <dd className="font-medium">{announcement.color}</dd>
+                          <dd className="font-medium">{translateColorLabel(announcement.color)}</dd>
+                        </div>
+                      )}
+                      {announcement.selling_reason && (
+                        <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
+                          <dt className="text-gray-500">
+                            {translateStaticLabel({
+                              fr: 'Raison de vente',
+                              en: 'Reason for selling',
+                              es: 'Motivo de venta',
+                              it: 'Motivo della vendita',
+                              de: 'Verkaufsgrund',
+                              ar: 'سبب البيع',
+                            })}
+                          </dt>
+                          <dd className="font-medium">{translateFreeValueLabel(announcement.selling_reason, 'sellingReason')}</dd>
+                        </div>
+                      )}
+                      {announcement.packaging_info && (
+                        <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
+                          <dt className="text-gray-500">
+                            {translateStaticLabel({
+                              fr: 'Emballage',
+                              en: 'Packaging',
+                              es: 'Embalaje',
+                              it: 'Imballaggio',
+                              de: 'Verpackung',
+                              ar: 'التغليف',
+                            })}
+                          </dt>
+                          <dd className="font-medium">{translateFreeValueLabel(announcement.packaging_info, 'packaging')}</dd>
                         </div>
                       )}
                       {!isVehicleCategory && announcement.purchase_year && (
@@ -1275,13 +1708,13 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {vehicle.fuel && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.vehicle.fuel') || 'Carburant'}</dt>
-                          <dd className="font-medium">{vehicle.fuel}</dd>
+                          <dd className="font-medium">{translateVehicleFuelLabel(vehicle.fuel)}</dd>
                         </div>
                       )}
                       {vehicle.transmission && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.vehicle.gearbox') || 'Boîte de vitesse'}</dt>
-                          <dd className="font-medium">{vehicle.transmission}</dd>
+                          <dd className="font-medium">{translateGearboxLabel(vehicle.transmission)}</dd>
                         </div>
                       )}
                       {typeof vehicle.mileage === "number" && Number.isFinite(vehicle.mileage) && vehicle.mileage > 0 && (
@@ -1325,7 +1758,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {vehicle.equipment && vehicle.equipment.length > 0 && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.vehicle.options') || 'Équipements et options'}</dt>
-                          <dd className="font-medium">{vehicle.equipment.join(', ')}</dd>
+                          <dd className="font-medium">{vehicle.equipment.map((item) => translateFreeValueLabel(item, 'equipment')).join(', ')}</dd>
                         </div>
                       )}
                       {announcement.engine && (
@@ -1338,7 +1771,9 @@ const AnnouncementDetailsPage: React.FC = () => {
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.type', isRTL ? 'النوع' : 'Type')}</dt>
                           <dd className="font-medium">
-                            {isVehicleCategory ? translateVehicleDictionaryValue("type", announcement.type) : announcement.type}
+                            {isVehicleCategory
+                              ? translateVehicleDictionaryValue("type", announcement.type)
+                              : translateAnnouncementTypeLabel(announcement.type)}
                           </dd>
                         </div>
                       )}
@@ -1442,7 +1877,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                         <div className="flex flex-wrap gap-2">
                           {announcement.specifications.map((spec, idx) => (
                             <Badge key={idx} variant="outline" className="bg-white text-gray-700 border-gray-200">
-                              {t(`createAd.realEstate.specs.${spec}`) || spec}
+                              {translateRealEstateSpecificationLabel(spec)}
                             </Badge>
                           ))}
                         </div>
@@ -1454,7 +1889,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                         <div className="flex flex-wrap gap-2">
                           {announcement.papers.map((paper, idx) => (
                             <Badge key={idx} variant="outline" className="bg-white text-gray-700 border-gray-200">
-                              {formatDocumentLabel(paper)}
+                              {translateFreeValueLabel(paper, 'document')}
                             </Badge>
                           ))}
                         </div>
@@ -1473,9 +1908,9 @@ const AnnouncementDetailsPage: React.FC = () => {
                       <div className={`bg-gray-50 p-3 rounded-lg ${isRTL ? "text-right" : ""}`}>
                         <span className={`block text-xs text-gray-500 mb-1 flex items-center gap-1 ${isRTL ? "flex-row-reverse justify-end" : ""}`}><Package className="w-3 h-3" /> {t('createAd.includedAccessories')}</span>
                         <div className="flex flex-wrap gap-2">
-                          {announcement.included_accessories.map((acc, idx) => (
+                              {announcement.included_accessories.map((acc, idx) => (
                             <Badge key={idx} variant="secondary" className="bg-white text-gray-700 border-gray-200">
-                              {acc}
+                                  {translateFreeValueLabel(acc, 'accessory')}
                             </Badge>
                           ))}
                         </div>
@@ -1496,10 +1931,6 @@ const AnnouncementDetailsPage: React.FC = () => {
 
             </div>
             
-            {/* Reviews Section */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <ReviewsSection reviewedUserId={announcement.user_id || "unknown"} />
-            </div>
           </div>
 
           {/* RIGHT COLUMN - Sticky Price Card & Seller Info */}
@@ -1565,7 +1996,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       className="w-full py-6 text-lg font-semibold border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all hover:scale-[1.02]"
                     >
                       <MessageCircle className="w-5 h-5 mr-2" />
-                      Envoyer un message
+                      {t('common.sendMessage')}
                     </Button>
                   </div>
 
@@ -1692,7 +2123,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                   key={item.id} 
                   announcement={item} 
                   variant="compact"
-                  onView={(a) => window.location.href = `/fr/annonce/${a.id}`}
+                  onView={(a) => window.location.href = getLocalizedPath(`/annonce/${a.id}`)}
                 />
               ))}
             </div>
@@ -1705,7 +2136,7 @@ const AnnouncementDetailsPage: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-50 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-500">Prix</span>
+            <span className="text-xs text-gray-500">{t('createAd.price')}</span>
             <span className="text-xl font-bold text-primary">{formatPrice(announcement.price, announcement.currency)}</span>
           </div>
           <div className="flex-1 flex gap-2">

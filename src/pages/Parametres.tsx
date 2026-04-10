@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Settings, User, Bell, Shield, Globe, Palette, MapPin, Phone, UserCircle, Camera, Lock } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Settings, User, Bell, Shield, Globe, Palette, MapPin, Phone, UserCircle, Camera, Lock, AlertTriangle } from 'lucide-react';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { wilayas } from '@/data/wilayaData';
@@ -149,6 +150,21 @@ const Parametres = () => {
               </div>
             </CardHeader>
           </Card>
+
+          {profile?.profile_locked && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle className="flex items-center gap-2">
+                <span>Compte suspendu</span>
+                <Badge variant="destructive">Accès restreint</Badge>
+              </AlertTitle>
+              <AlertDescription>
+                Votre compte est temporairement suspendu pour non-respect des règles de publication.
+                Certaines fonctionnalités sont limitées. Pour un réexamen de votre dossier, contactez le support via
+                le centre d'aide avec votre identifiant utilisateur.
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-5">

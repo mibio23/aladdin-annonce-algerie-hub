@@ -3,12 +3,16 @@ import { LocalizedLink } from '@/utils/linkUtils';
 import { Package, MessageSquare, Heart, Calendar, Settings, User, ShoppingBag, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import NotificationDropdown from '@/components/notifications/NotificationDropdown';
 import QuickActions from '@/components/dashboard/QuickActions';
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
+import { useProfile } from '@/hooks/useProfile';
 
 const UserDashboard: React.FC = () => {
   const { t, isRTL } = useSafeI18nWithRouter();
+  const { profile } = useProfile();
   
   const dashboardItems = [
     {
@@ -58,6 +62,18 @@ const UserDashboard: React.FC = () => {
             {t('dashboard.subtitle')}
           </p>
         </div>
+
+        {profile?.profile_locked && (
+          <Alert variant="destructive" className="mb-8">
+            <AlertTitle className="flex items-center gap-2">
+              <span>Compte suspendu</span>
+              <Badge variant="destructive">Publication bloquée</Badge>
+            </AlertTitle>
+            <AlertDescription>
+              Votre compte est suspendu pour non-respect des règles de publication. L'accès à certaines actions est temporairement restreint.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Quick Access Icons */}
         <div className="mb-8">

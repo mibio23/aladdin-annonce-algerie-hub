@@ -8,9 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { logger } from '@/utils/silentLogger';
+import ConfirmDialog from "@/components/common/ConfirmDialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface UserProfile {
   id: string;
@@ -27,10 +30,14 @@ interface UserProfile {
   announcements_count?: number;
   last_sign_in_at?: string;
   is_premium?: boolean;
+  profile_locked?: boolean;
+  role?: "admin" | "moderator" | "user" | null;
+  is_protected_admin?: boolean;
 }
 
 const UserManagement = () => {
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +48,31 @@ const UserManagement = () => {
     premium: 0,
     new_today: 0
   });
+  const [pendingUserSuspension, setPendingUserSuspension] = useState<UserProfile | null>(null);
+  const [canManageSuspension, setCanManageSuspension] = useState(false);
+
+  useEffect(() => {
+    const resolvePermission = async () => {
+      const emailNormalized = String((currentUser as any)?.email || "").trim().toLowerCase();
+      if (emailNormalized === "info18shopworld@gmail.com") {
+        setCanManageSuspension(true);
+        return;
+      }
+      if (!currentUser?.id) {
+        setCanManageSuspension(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUser.id);
+      const roles = (data || []).map((r: { role: "admin" | "moderator" | "user" }) => r.role);
+      setCanManageSuspension(roles.includes("admin") || roles.includes("moderator"));
+    };
+
+    void resolvePermission();
+  }, [currentUser]);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -54,6 +86,25 @@ const UserManagement = () => {
 
       if (profilesError) throw profilesError;
 
+      const profileUserIds = (profiles || [])
+        .map((p) => p.user_id)
+        .filter((v): v is string => Boolean(v));
+
+      let roleMap = new Map<string, "admin" | "moderator" | "user">();
+      if (profileUserIds.length > 0) {
+        const { data: rolesData } = await supabase
+          .from("user_roles")
+          .select("user_id, role")
+          .in("user_id", profileUserIds);
+
+        (rolesData || []).forEach((r: { user_id: string; role: "admin" | "moderator" | "user" }) => {
+          const current = roleMap.get(r.user_id);
+          if (current === "admin") return;
+          if (current === "moderator" && r.role === "user") return;
+          roleMap.set(r.user_id, r.role);
+        });
+      }
+
       // For each user, count their banners
       const usersWithStats = await Promise.all(
         (profiles || []).map(async (profile) => {
@@ -61,6 +112,14 @@ const UserManagement = () => {
             .from('advertising_banners')
             .select('*', { count: 'exact' })
             .eq('created_by', profile.user_id || '');
+
+          const role = roleMap.get(profile.user_id || "") || null;
+          const emailNormalized = String((profile as any).email || "").trim().toLowerCase();
+          const isProtectedAdmin =
+            role === "admin" ||
+            role === "moderator" ||
+            emailNormalized === "info18shopworld@gmail.com" ||
+            (!!currentUser?.id && profile.user_id === currentUser.id);
 
           return {
             id: profile.id,
@@ -75,6 +134,9 @@ const UserManagement = () => {
             phone: (profile as any).phone || null,
             announcements_count: bannersCount || 0,
             is_premium: (bannersCount || 0) > 2, // Simple premium logic
+            profile_locked: profile.profile_locked || false,
+            role,
+            is_protected_admin: isProtectedAdmin,
           };
         })
       );
@@ -105,7 +167,7 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [currentUser?.id, toast]);
 
   useEffect(() => {
     fetchUsers();
@@ -144,6 +206,75 @@ const UserManagement = () => {
     });
   };
 
+  const toggleUserSuspension = async (targetUser: UserProfile) => {
+    if (!canManageSuspension) {
+      toast({
+        title: "Action non autorisée",
+        description: "Votre rôle ne permet pas de suspendre des comptes.",
+        variant: "destructive"
+      });
+      return;
+    }
+    if (targetUser.is_protected_admin) {
+      toast({
+        title: "Action bloquée",
+        description: "La suspension est désactivée pour les comptes administrateur/modérateur.",
+        variant: "destructive"
+      });
+      return;
+    }
+    try {
+      const nextLocked = !targetUser.profile_locked;
+      const sessionId = (typeof crypto !== "undefined" && "randomUUID" in crypto) ? crypto.randomUUID() : String(Date.now());
+
+      const { error: rpcError } = await supabase.rpc("admin_set_profile_locked", {
+        p_profile_id: targetUser.id,
+        p_locked: nextLocked,
+        p_reason: null,
+        p_note: "Action rapide depuis la liste utilisateurs",
+        p_session_id: sessionId
+      });
+
+      if (rpcError) {
+        const { error: directError } = await supabase
+          .from("profiles")
+          .update({ profile_locked: nextLocked })
+          .eq("id", targetUser.id);
+        if (directError) {
+          const needsDbFix = /ambiguous/i.test(rpcError.message || "");
+          toast({
+            title: "Erreur",
+            description: needsDbFix
+              ? "La fonction SQL de suspension doit être mise à jour (ambiguous id). Exécutez la migration corrective puis réessayez."
+              : `Impossible de modifier l'état du compte (RPC: ${rpcError.message} / Direct: ${directError.message})`,
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      toast({
+        title: nextLocked ? "Compte désactivé" : "Compte réactivé",
+        description: "L'état du compte a été mis à jour",
+      });
+      await fetchUsers();
+    } catch (error) {
+      logger.error("Error toggling user suspension:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier l'état du compte",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const confirmToggleUserSuspension = async () => {
+    if (!pendingUserSuspension) return;
+    const selected = pendingUserSuspension;
+    setPendingUserSuspension(null);
+    await toggleUserSuspension(selected);
+  };
+
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center">
@@ -154,6 +285,20 @@ const UserManagement = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <ConfirmDialog
+        isOpen={!!pendingUserSuspension}
+        onClose={() => setPendingUserSuspension(null)}
+        onConfirm={confirmToggleUserSuspension}
+        title={pendingUserSuspension?.profile_locked ? "Réactiver le compte ?" : "Désactiver le compte ?"}
+        description={
+          pendingUserSuspension?.profile_locked
+            ? "Ce compte utilisateur sera réactivé."
+            : "Ce compte utilisateur sera suspendu."
+        }
+        confirmText={pendingUserSuspension?.profile_locked ? "Réactiver" : "Désactiver"}
+        cancelText="Annuler"
+        variant="destructive"
+      />
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
         <div className="flex space-x-2">
@@ -325,6 +470,18 @@ const UserManagement = () => {
                             Premium
                           </Badge>
                         )}
+                        {user.profile_locked && (
+                          <Badge variant="destructive">
+                            <Ban className="w-3 h-3 mr-1" />
+                            Compte désactivé
+                          </Badge>
+                        )}
+                        {user.is_protected_admin && (
+                          <Badge variant="secondary">
+                            <Shield className="w-3 h-3 mr-1" />
+                            Compte protégé
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -340,27 +497,33 @@ const UserManagement = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => {
-                        toast({
-                          title: "Fonctionnalité à venir",
-                          description: "L'édition des utilisateurs sera bientôt disponible"
-                        });
-                      }}
+                      onClick={() => window.open(`/admin/users/${user.id}`, '_blank')}
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        toast({
-                          title: "Fonctionnalité à venir",
-                          description: "La suspension d'utilisateurs sera bientôt disponible"
-                        });
-                      }}
-                    >
-                      <Ban className="w-4 h-4" />
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant={user.profile_locked ? "secondary" : "destructive"} 
+                            size="sm"
+                            disabled={!!user.is_protected_admin || !canManageSuspension}
+                            onClick={() => setPendingUserSuspension(user)}
+                          >
+                            <Ban className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          {!canManageSuspension
+                            ? "Votre rôle ne permet pas la suspension de comptes"
+                            : user.is_protected_admin
+                              ? "Suspension non autorisée pour ce compte protégé"
+                              : user.profile_locked
+                                ? "Réactiver le compte"
+                                : "Désactiver le compte"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               ))

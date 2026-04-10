@@ -145,6 +145,151 @@ const toStringArrayOrUndefined = (value: unknown) => {
   return undefined;
 };
 
+const normalizeLookupValue = (value?: string | null) =>
+  (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+const normalizeVehicleFuelValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    essence: 'essence',
+    petrol: 'essence',
+    gasolina: 'essence',
+    diesel: 'diesel',
+    gasoil: 'diesel',
+    electrique: 'electrique',
+    electric: 'electrique',
+    electricite: 'electrique',
+    hybride: 'hybride',
+    hybrid: 'hybride',
+    gpl: 'gpl',
+    lpg: 'gpl',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeGearboxValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    manuelle: 'manuelle',
+    manuel: 'manuelle',
+    manual: 'manuelle',
+    automatique: 'automatique',
+    automatic: 'automatique',
+    auto: 'automatique',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeColorValue = (value?: string | null) => {
+  const trimmed = value?.trim();
+  if (!trimmed) return '';
+  const normalized = normalizeLookupValue(trimmed);
+  const map: Record<string, string> = {
+    black: 'noir',
+    noir: 'noir',
+    white: 'blanc',
+    blanc: 'blanc',
+    gray: 'gris',
+    grey: 'gris',
+    gris: 'gris',
+    silver: 'argent',
+    argent: 'argent',
+    blue: 'bleu',
+    bleu: 'bleu',
+    red: 'rouge',
+    rouge: 'rouge',
+    green: 'vert',
+    vert: 'vert',
+    yellow: 'jaune',
+    jaune: 'jaune',
+    brown: 'marron',
+    marron: 'marron',
+    beige: 'beige',
+    pink: 'rose',
+    rose: 'rose',
+    purple: 'violet',
+    violet: 'violet',
+    orange: 'orange',
+  };
+  return map[normalized] || trimmed;
+};
+
+const normalizeFreeValue = (
+  value?: string | null,
+  kind?: 'sellingReason' | 'packaging' | 'accessory' | 'equipment'
+) => {
+  const trimmed = value?.trim();
+  if (!trimmed) return '';
+  const normalized = normalizeLookupValue(trimmed);
+
+  if (kind === 'sellingReason') {
+    const map: Record<string, string> = {
+      upgrade: 'upgrade',
+      renouvellement: 'upgrade',
+      no_longer_needed: 'no_longer_needed',
+      plus_necessaire: 'no_longer_needed',
+      urgent_sale: 'urgent_sale',
+      vente_urgente: 'urgent_sale',
+      demenagement: 'demenagement',
+      moving: 'demenagement',
+      liquidation: 'liquidation',
+      fermeture: 'fermeture',
+      closure: 'fermeture',
+    };
+    return map[normalized] || trimmed;
+  }
+
+  if (kind === 'packaging') {
+    const map: Record<string, string> = {
+      avec_boite: 'avec_boite',
+      with_box: 'avec_boite',
+      sans_boite: 'sans_boite',
+      without_box: 'sans_boite',
+      boite_origine: 'boite_origine',
+      original_box: 'boite_origine',
+      scelle: 'scelle',
+      sealed: 'scelle',
+    };
+    return map[normalized] || trimmed;
+  }
+
+  if (kind === 'accessory' || kind === 'equipment') {
+    const map: Record<string, string> = {
+      chargeur: 'chargeur',
+      charger: 'chargeur',
+      cable: 'cable',
+      ecouteurs: 'ecouteurs',
+      headphones: 'headphones',
+      telecommande: 'telecommande',
+      remote: 'telecommande',
+      batterie: 'batterie',
+      battery: 'batterie',
+      coque: 'coque',
+      case: 'coque',
+      housse: 'housse',
+      facture: 'facture',
+      invoice: 'facture',
+      garantie: 'garantie',
+      warranty: 'garantie',
+      manuel: 'manuel',
+      manual: 'manuel',
+    };
+    return map[normalized] || trimmed;
+  }
+
+  return trimmed;
+};
+
+const normalizeFreeValueArray = (
+  values: string[] = [],
+  kind?: 'accessory' | 'equipment'
+) => values.map((value) => normalizeFreeValue(value, kind)).filter(Boolean);
+
 const buildVehicleDetailsInsert = (selectedAttributes: Record<string, string | string[]>) => {
   const brand = pickAttributeValue(selectedAttributes, ["brand", "marque", "vehicle_brand"]);
   const model = pickAttributeValue(selectedAttributes, ["model", "modele", "modèle", "vehicle_model"]);
@@ -223,13 +368,13 @@ const buildVehicleDetailsInsert = (selectedAttributes: Record<string, string | s
   if (typeof version === "string" && version.trim()) payload.version = version.trim();
   if (typeof registration_date === "string") payload.registration_date = registration_date;
   if (typeof purchase_year === "number") payload.purchase_year = purchase_year;
-  if (typeof fuel_type === "string" && fuel_type.trim()) payload.fuel_type = fuel_type.trim();
-  if (typeof gearbox === "string" && gearbox.trim()) payload.gearbox = gearbox.trim();
+  if (typeof fuel_type === "string" && fuel_type.trim()) payload.fuel_type = normalizeVehicleFuelValue(fuel_type) || fuel_type.trim();
+  if (typeof gearbox === "string" && gearbox.trim()) payload.gearbox = normalizeGearboxValue(gearbox) || gearbox.trim();
   if (typeof mileage === "number") payload.mileage = mileage;
   if (typeof fiscal_power === "string" && fiscal_power.trim()) payload.fiscal_power = fiscal_power.trim();
   if (typeof technical_control === "boolean") payload.technical_control = technical_control;
   if (typeof grey_card_crossed === "boolean") payload.grey_card_crossed = grey_card_crossed;
-  if (equipment) payload.equipment = equipment;
+  if (equipment) payload.equipment = normalizeFreeValueArray(equipment, 'equipment');
   return payload;
 };
 
@@ -253,7 +398,7 @@ const buildAnnouncementColumnsFromAttributes = (selectedAttributes: Record<strin
   const payload: Record<string, any> = {};
   if (typeof brand === "string" && brand.trim()) payload.brand = brand.trim();
   if (typeof model === "string" && model.trim()) payload.model = model.trim();
-  if (typeof color === "string" && color.trim()) payload.color = color.trim();
+  if (typeof color === "string" && color.trim()) payload.color = normalizeColorValue(color) || color.trim();
   if (typeof purchaseYear === "number") payload.purchase_year = purchaseYear;
   if (typeof hasInvoice === "boolean") payload.has_invoice = hasInvoice;
   if (typeof warrantyDuration === "string" && warrantyDuration.trim()) payload.warranty_duration = warrantyDuration.trim();
@@ -262,8 +407,8 @@ const buildAnnouncementColumnsFromAttributes = (selectedAttributes: Record<strin
   if (typeof exchangePossible === "boolean") payload.exchange_possible = exchangePossible;
   if (typeof deliveryAvailable === "boolean") payload.delivery_available = deliveryAvailable;
   if (typeof deliveryFees === "number") payload.delivery_fees = deliveryFees;
-  if (typeof sellingReason === "string" && sellingReason.trim()) payload.selling_reason = sellingReason.trim();
-  if (typeof packagingInfo === "string" && packagingInfo.trim()) payload.packaging_info = packagingInfo.trim();
+  if (typeof sellingReason === "string" && sellingReason.trim()) payload.selling_reason = normalizeFreeValue(sellingReason, 'sellingReason') || sellingReason.trim();
+  if (typeof packagingInfo === "string" && packagingInfo.trim()) payload.packaging_info = normalizeFreeValue(packagingInfo, 'packaging') || packagingInfo.trim();
   return payload;
 };
 
@@ -799,6 +944,22 @@ const DeposerAnnonce = () => {
         }
       }
 
+      const resolveSubcategoryUUID = async (rawValue: string | null): Promise<string | null> => {
+        if (!rawValue) return null;
+        if (isUUID(rawValue)) return rawValue;
+
+        const normalizedSlug = subcategorySlug || rawValue;
+        const { data: rows } = await supabase
+          .from("categories")
+          .select("id, parent_id, slug")
+          .eq("slug", normalizedSlug)
+          .limit(10);
+
+        if (!rows || rows.length === 0) return null;
+        const directChild = rows.find((row) => row.parent_id === finalCategoryId);
+        return (directChild?.id || rows[0].id) as string;
+      };
+
       // Final UUID resolution for category_id
       let finalCategoryId = formData.category_id;
       if (!isUUID(finalCategoryId)) {
@@ -808,10 +969,14 @@ const DeposerAnnonce = () => {
         if (resolvedCat?.id && isUUID(resolvedCat.id)) {
           finalCategoryId = resolvedCat.id;
         } else {
-          // One last attempt: find by slug in menuCategories then resolve UUID
-          const menuCat = menuCategories.find(c => c.slug === finalCategoryId || c.id === finalCategoryId);
-          if (menuCat?.id && isUUID(menuCat.id)) {
-            finalCategoryId = menuCat.id;
+          // One last attempt: query Supabase directly
+          const { data: catRows } = await supabase
+            .from("categories")
+            .select("id, slug")
+            .eq("slug", finalCategoryId)
+            .limit(1);
+          if (catRows?.[0]?.id && isUUID(catRows[0].id)) {
+            finalCategoryId = catRows[0].id;
           }
         }
       }
@@ -820,7 +985,29 @@ const DeposerAnnonce = () => {
       if (!isUUID(finalCategoryId)) {
         toast({
           title: t('common.error') || "Erreur",
-          description: "Erreur de configuration de catégorie. Veuillez patienter pendant le chargement des données ou réessayer.",
+          description: "Erreur de configuration de catégorie (UUID introuvable). Veuillez recharger la page.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const finalSubcategoryId = await resolveSubcategoryUUID(selectedSubcategory ?? null);
+
+      if (finalSubcategoryId && !isUUID(finalSubcategoryId)) {
+        toast({
+          title: "Erreur de catégorie",
+          description: `La sous-catégorie sélectionnée est invalide (${finalSubcategoryId}). Veuillez recharger la page.`,
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!isUUID(finalCategoryId)) {
+        toast({
+          title: "Erreur de catégorie",
+          description: `La catégorie principale sélectionnée est invalide (${finalCategoryId}). Veuillez recharger la page.`,
+          variant: "destructive"
         });
         setLoading(false);
         return;
@@ -834,7 +1021,7 @@ const DeposerAnnonce = () => {
         condition: formData.condition,
         category_id: finalCategoryId,
         category_slug: menuCategories.find(c => c.id === finalCategoryId || c.slug === finalCategoryId)?.slug || null,
-        subcategory_id: subcategorySlug ?? selectedSubcategory ?? null,
+        subcategory_id: finalSubcategoryId,
         wilaya: formData.wilaya,
         commune: formData.commune || null,
         address: formData.location, // Mapping location to address

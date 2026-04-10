@@ -186,25 +186,39 @@ export const mergeOfficialAndSupabaseCategories = (
   const officialMenu = getCategoryMenu(language);
   if (!supabaseCategories.length) return officialMenu;
 
-  const bySlug = new Map(supabaseCategories.map((category) => [category.slug, category]));
+  const mergeCategoryTrees = (
+    officialCategories: MenuCategory[] = [],
+    remoteCategories: MenuCategory[] = []
+  ): MenuCategory[] => {
+    const remoteBySlug = new Map(remoteCategories.map((category) => [category.slug, category]));
 
-  const merged = officialMenu.map((officialCategory) => {
-    const supabaseCategory = bySlug.get(officialCategory.slug);
-    if (!supabaseCategory) return officialCategory;
-    return {
-      ...officialCategory,
-      ...supabaseCategory,
-      subcategories:
-        supabaseCategory.subcategories && supabaseCategory.subcategories.length > 0
-          ? supabaseCategory.subcategories
-          : officialCategory.subcategories,
-    };
-  });
+    const mergedOfficial = officialCategories.map((officialCategory) => {
+      const remoteCategory = remoteBySlug.get(officialCategory.slug);
+      if (!remoteCategory) return officialCategory;
 
-  const officialSlugs = new Set(officialMenu.map((category) => category.slug));
-  const supabaseOnlyCategories = supabaseCategories.filter((category) => !officialSlugs.has(category.slug));
+      return {
+        ...remoteCategory,
+        ...officialCategory,
+        id: remoteCategory.id || officialCategory.id,
+        slug: officialCategory.slug || remoteCategory.slug,
+        name: officialCategory.name || remoteCategory.name,
+        description: officialCategory.description || remoteCategory.description,
+        icon: officialCategory.icon || remoteCategory.icon,
+        href: officialCategory.href || remoteCategory.href,
+        subcategories: mergeCategoryTrees(
+          officialCategory.subcategories || [],
+          remoteCategory.subcategories || []
+        ),
+      };
+    });
 
-  return [...merged, ...supabaseOnlyCategories];
+    const officialSlugs = new Set(officialCategories.map((category) => category.slug));
+    const remoteOnly = remoteCategories.filter((category) => !officialSlugs.has(category.slug));
+
+    return [...mergedOfficial, ...remoteOnly];
+  };
+
+  return mergeCategoryTrees(officialMenu, supabaseCategories);
 };
 
 // Hook pour récupérer les catégories avec cache optimisé

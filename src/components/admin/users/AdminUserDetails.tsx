@@ -12,6 +12,8 @@ import { useAuth } from "@/contexts/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ConfirmDialog from "@/components/common/ConfirmDialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Profile {
   id: string
@@ -27,6 +29,7 @@ interface Profile {
   location?: string | null
   created_at?: string | null
   profile_locked?: boolean | null
+  role?: "admin" | "moderator" | "user" | null
 }
 
 interface Banner {
@@ -58,6 +61,13 @@ interface SecurityLogMetadata {
   [key: string]: unknown
 }
 
+type PendingAction =
+  | { key: "toggleAccount"; title: string; description: string; confirmText: string; variant: "destructive" | "default" }
+  | { key: "hideBanners"; title: string; description: string; confirmText: string; variant: "destructive" | "default" }
+  | { key: "showBanners"; title: string; description: string; confirmText: string; variant: "destructive" | "default" }
+  | { key: "hideAnnouncements"; title: string; description: string; confirmText: string; variant: "destructive" | "default" }
+  | { key: "showAnnouncements"; title: string; description: string; confirmText: string; variant: "destructive" | "default" }
+
 const AdminUserDetails = () => {
   const { id } = useParams<{ id: string }>()
   const { toast } = useToast()
@@ -72,6 +82,9 @@ const AdminUserDetails = () => {
   const [auditLogs, setAuditLogs] = useState<SecurityLog[]>([])
   const [auditLoading, setAuditLoading] = useState<boolean>(false)
   const [groupFilter, setGroupFilter] = useState<"account" | "banners" | "announcements" | null>(null)
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null)
+  const [isProtectedAdminAccount, setIsProtectedAdminAccount] = useState(false)
+  const [canManageSuspension, setCanManageSuspension] = useState(false)
 
   const logModeration = async (actionType: string, resourceType: string, resourceId: string | null, extra: Record<string, unknown> = {}) => {
     try {
@@ -110,6 +123,42 @@ const AdminUserDetails = () => {
         .single()
 
       if (p) setProfile(p as unknown as Profile)
+      const emailNormalized = String((p as { email?: string | null } | null)?.email || "").trim().toLowerCase()
+
+      let role: "admin" | "moderator" | "user" | null = null
+      if (p?.user_id) {
+        const { data: roleRows } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", p.user_id)
+        const roles = (roleRows || []).map((r: { role: "admin" | "moderator" | "user" }) => r.role)
+        if (roles.includes("admin")) role = "admin"
+        else if (roles.includes("moderator")) role = "moderator"
+        else if (roles.includes("user")) role = "user"
+      }
+      if (p) {
+        setProfile({ ...(p as unknown as Profile), role })
+      }
+      setIsProtectedAdminAccount(
+        role === "admin" ||
+        role === "moderator" ||
+        emailNormalized === "info18shopworld@gmail.com" ||
+        (!!user?.id && p?.user_id === user.id)
+      )
+
+      const actorEmailNormalized = String((user as any)?.email || "").trim().toLowerCase()
+      if (actorEmailNormalized === "info18shopworld@gmail.com") {
+        setCanManageSuspension(true)
+      } else if (user?.id) {
+        const { data: actorRoleRows } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+        const actorRoles = (actorRoleRows || []).map((r: { role: "admin" | "moderator" | "user" }) => r.role)
+        setCanManageSuspension(actorRoles.includes("admin") || actorRoles.includes("moderator"))
+      } else {
+        setCanManageSuspension(false)
+      }
 
       const ownerIds = [p?.user_id, p?.id].filter((v): v is string => Boolean(v))
       if (ownerIds.length > 0) {
@@ -133,7 +182,7 @@ const AdminUserDetails = () => {
     } finally {
       setLoading(false)
     }
-  }, [id])
+  }, [id, user?.id])
 
   useEffect(() => {
     fetchData()
@@ -181,9 +230,36 @@ const AdminUserDetails = () => {
     return auditLogs.filter(l => groupOf(l.action_type) === groupFilter)
   }, [auditLogs, groupFilter])
 
-  const toggleSuspendAccount = async () => {
+  const toggleSuspendAccount = async (skipConfirm = false) => {
     if (!profile) return
-    if (!window.confirm(profile.profile_locked ? "Réactiver ce compte ?" : "Désactiver/Suspendre ce compte ?")) return
+    if (!canManageSuspension) {
+      toast({
+        title: "Action non autorisée",
+        description: "Votre rôle ne permet pas de suspendre des comptes.",
+        variant: "destructive"
+      })
+      return
+    }
+    if (isProtectedAdminAccount) {
+      toast({
+        title: "Action bloquée",
+        description: "La suspension est désactivée pour les comptes administrateur/modérateur.",
+        variant: "destructive"
+      })
+      return
+    }
+    if (!skipConfirm) {
+      setPendingAction({
+        key: "toggleAccount",
+        title: profile.profile_locked ? "Réactiver le compte ?" : "Désactiver le compte ?",
+        description: profile.profile_locked
+          ? "Le compte utilisateur sera réactivé et l'accès sera restauré."
+          : "Le compte utilisateur sera suspendu immédiatement.",
+        confirmText: profile.profile_locked ? "Réactiver" : "Désactiver",
+        variant: "destructive",
+      })
+      return
+    }
     try {
       setActing(true)
       const nextLocked = !profile.profile_locked
@@ -203,9 +279,12 @@ const AdminUserDetails = () => {
           .eq("id", profile.id)
 
         if (directError) {
+          const needsDbFix = /ambiguous/i.test(rpcError.message || "")
           toast({
             title: "Erreur",
-            description: `Impossible de mettre à jour l'état du compte (${rpcError.message || directError.message})`,
+            description: needsDbFix
+              ? "La fonction SQL de suspension doit être mise à jour (ambiguous id). Exécutez la migration corrective puis réessayez."
+              : `Impossible de mettre à jour l'état du compte (RPC: ${rpcError.message} / Direct: ${directError.message})`,
             variant: "destructive"
           })
           return
@@ -256,10 +335,19 @@ const AdminUserDetails = () => {
     logModeration("email_sent", "profile", profile.id, { email: profile.email })
   }
 
-  const hideAllBanners = async () => {
+  const hideAllBanners = async (skipConfirm = false) => {
     const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
     if (ownerIds.length === 0) return
-    if (!window.confirm("Masquer toutes les bannières de cet utilisateur ?")) return
+    if (!skipConfirm) {
+      setPendingAction({
+        key: "hideBanners",
+        title: "Masquer toutes les bannières ?",
+        description: "Toutes les bannières de cet utilisateur seront désactivées.",
+        confirmText: "Masquer",
+        variant: "destructive",
+      })
+      return
+    }
     try {
       setActing(true)
       const { error } = await supabase
@@ -278,10 +366,19 @@ const AdminUserDetails = () => {
     }
   }
 
-  const showAllBanners = async () => {
+  const showAllBanners = async (skipConfirm = false) => {
     const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
     if (ownerIds.length === 0) return
-    if (!window.confirm("Réactiver toutes les bannières de cet utilisateur ?")) return
+    if (!skipConfirm) {
+      setPendingAction({
+        key: "showBanners",
+        title: "Réactiver toutes les bannières ?",
+        description: "Toutes les bannières de cet utilisateur seront réactivées.",
+        confirmText: "Réactiver",
+        variant: "default",
+      })
+      return
+    }
     try {
       setActing(true)
       const { error } = await supabase
@@ -300,10 +397,19 @@ const AdminUserDetails = () => {
     }
   }
 
-  const hideAllAnnouncements = async () => {
+  const hideAllAnnouncements = async (skipConfirm = false) => {
     const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
     if (ownerIds.length === 0) return
-    if (!window.confirm("Masquer toutes les annonces publiées par cet utilisateur ?")) return
+    if (!skipConfirm) {
+      setPendingAction({
+        key: "hideAnnouncements",
+        title: "Masquer toutes les annonces ?",
+        description: "Toutes les annonces de cet utilisateur passeront en statut supprimé.",
+        confirmText: "Masquer",
+        variant: "destructive",
+      })
+      return
+    }
     try {
       setActing(true)
       const { error } = await supabase
@@ -322,10 +428,19 @@ const AdminUserDetails = () => {
     }
   }
 
-  const showAllAnnouncements = async () => {
+  const showAllAnnouncements = async (skipConfirm = false) => {
     const ownerIds = [profile?.user_id, profile?.id].filter((v): v is string => Boolean(v))
     if (ownerIds.length === 0) return
-    if (!window.confirm("Réactiver toutes les annonces publiées par cet utilisateur ?")) return
+    if (!skipConfirm) {
+      setPendingAction({
+        key: "showAnnouncements",
+        title: "Réactiver toutes les annonces ?",
+        description: "Toutes les annonces de cet utilisateur seront remises en statut actif.",
+        confirmText: "Réactiver",
+        variant: "default",
+      })
+      return
+    }
     try {
       setActing(true)
       const { error } = await supabase
@@ -342,6 +457,17 @@ const AdminUserDetails = () => {
     } finally {
       setActing(false)
     }
+  }
+
+  const executePendingAction = async () => {
+    if (!pendingAction) return
+    const actionKey = pendingAction.key
+    setPendingAction(null)
+    if (actionKey === "toggleAccount") await toggleSuspendAccount(true)
+    if (actionKey === "hideBanners") await hideAllBanners(true)
+    if (actionKey === "showBanners") await showAllBanners(true)
+    if (actionKey === "hideAnnouncements") await hideAllAnnouncements(true)
+    if (actionKey === "showAnnouncements") await showAllAnnouncements(true)
   }
 
   if (loading) {
@@ -377,6 +503,16 @@ const AdminUserDetails = () => {
 
   return (
     <div className="p-6 space-y-6">
+      <ConfirmDialog
+        isOpen={!!pendingAction}
+        onClose={() => setPendingAction(null)}
+        onConfirm={executePendingAction}
+        title={pendingAction?.title || "Confirmer l'action"}
+        description={pendingAction?.description || ""}
+        confirmText={pendingAction?.confirmText || "Confirmer"}
+        cancelText="Annuler"
+        variant={pendingAction?.variant || "default"}
+      />
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={() => window.history.back()}>
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -539,14 +675,35 @@ const AdminUserDetails = () => {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant={profile.profile_locked ? "outline" : "destructive"} disabled={acting} onClick={toggleSuspendAccount}>
-              {profile.profile_locked ? (
-                <Undo2 className="w-4 h-4 mr-1" />
-              ) : (
-                <Ban className="w-4 h-4 mr-1" />
-              )}
-              {profile.profile_locked ? "Réactiver le compte" : "Désactiver le compte"}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+            <Button variant={profile.profile_locked ? "outline" : "destructive"} disabled={acting || isProtectedAdminAccount || !canManageSuspension} onClick={toggleSuspendAccount}>
+                    {profile.profile_locked ? (
+                      <Undo2 className="w-4 h-4 mr-1" />
+                    ) : (
+                      <Ban className="w-4 h-4 mr-1" />
+                    )}
+                    {profile.profile_locked ? "Réactiver le compte" : "Désactiver le compte"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {!canManageSuspension
+                    ? "Votre rôle ne permet pas la suspension de comptes"
+                    : isProtectedAdminAccount
+                      ? "Suspension non autorisée pour ce compte protégé"
+                      : profile.profile_locked
+                        ? "Réactiver le compte utilisateur"
+                        : "Désactiver le compte utilisateur"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            {!canManageSuspension && (
+              <Badge variant="secondary">Votre rôle ne permet pas la suspension</Badge>
+            )}
+            {isProtectedAdminAccount && (
+              <Badge variant="secondary">Suspension désactivée pour ce compte protégé</Badge>
+            )}
             <Button variant="outline" disabled={acting} onClick={resetPassword}>
               <Undo2 className="w-4 h-4 mr-1" />
               Réinitialiser mot de passe

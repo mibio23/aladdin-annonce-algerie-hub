@@ -521,6 +521,177 @@ const normalizeStringArray = (value: unknown): string[] => {
   return [];
 };
 
+const normalizeLookupValue = (value?: string | null) =>
+  (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+const normalizeVehicleFuelValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    essence: 'essence',
+    petrol: 'essence',
+    gasolina: 'essence',
+    benzine: 'essence',
+    diesel: 'diesel',
+    gasoil: 'diesel',
+    electrique: 'electrique',
+    electric: 'electrique',
+    electricite: 'electrique',
+    hybride: 'hybride',
+    hybrid: 'hybride',
+    gpl: 'gpl',
+    lpg: 'gpl',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeGearboxValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    manuelle: 'manuelle',
+    manuel: 'manuelle',
+    manual: 'manuelle',
+    automatique: 'automatique',
+    automatic: 'automatique',
+    auto: 'automatique',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeRealEstateTypeValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    appartement: 'appartement',
+    apartment: 'appartement',
+    maison: 'maison',
+    house: 'maison',
+    villa: 'villa',
+    studio: 'studio',
+    niveau_villa: 'niveau_villa',
+    villa_level: 'niveau_villa',
+    bungalow: 'bungalow',
+    local: 'local',
+    commercial: 'local',
+    bureau: 'bureau',
+    office: 'bureau',
+    hangar: 'hangar',
+    entrepot: 'entrepot',
+    warehouse: 'entrepot',
+    usine: 'usine',
+    factory: 'usine',
+    garage_ferme: 'garage_ferme',
+    garage_closed: 'garage_ferme',
+    place_parking: 'place_parking',
+    parking_spot: 'place_parking',
+    box: 'box',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeRealEstateViewValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    mer: 'sea',
+    sea: 'sea',
+    jardin: 'garden',
+    garden: 'garden',
+    rue: 'street',
+    street: 'street',
+    montagne: 'mountain',
+    mountain: 'mountain',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeRealEstateZoningValue = (value?: string | null) => {
+  const normalized = normalizeLookupValue(value);
+  const map: Record<string, string> = {
+    residentiel: 'residential',
+    residential: 'residential',
+    commercial: 'commercial',
+    industriel: 'industrial',
+    industrial: 'industrial',
+    agricole: 'agricultural',
+    agricultural: 'agricultural',
+  };
+  return map[normalized] || (value?.trim() || '');
+};
+
+const normalizeFreeValue = (
+  value?: string | null,
+  kind?: 'sellingReason' | 'packaging' | 'accessory' | 'equipment'
+) => {
+  const trimmed = value?.trim();
+  if (!trimmed) return '';
+  const normalized = normalizeLookupValue(trimmed);
+
+  if (kind === 'sellingReason') {
+    const map: Record<string, string> = {
+      upgrade: 'upgrade',
+      renouvellement: 'upgrade',
+      no_longer_needed: 'no_longer_needed',
+      plus_necessaire: 'no_longer_needed',
+      urgent_sale: 'urgent_sale',
+      vente_urgente: 'urgent_sale',
+      demenagement: 'demenagement',
+      moving: 'demenagement',
+      liquidation: 'liquidation',
+      fermeture: 'fermeture',
+      closure: 'fermeture',
+    };
+    return map[normalized] || trimmed;
+  }
+
+  if (kind === 'packaging') {
+    const map: Record<string, string> = {
+      avec_boite: 'avec_boite',
+      with_box: 'avec_boite',
+      sans_boite: 'sans_boite',
+      without_box: 'sans_boite',
+      boite_origine: 'boite_origine',
+      original_box: 'boite_origine',
+      scelle: 'scelle',
+      sealed: 'scelle',
+    };
+    return map[normalized] || trimmed;
+  }
+
+  if (kind === 'accessory' || kind === 'equipment') {
+    const map: Record<string, string> = {
+      chargeur: 'chargeur',
+      charger: 'chargeur',
+      cable: 'cable',
+      ecouteurs: 'ecouteurs',
+      headphones: 'headphones',
+      telecommande: 'telecommande',
+      remote: 'telecommande',
+      batterie: 'batterie',
+      battery: 'batterie',
+      coque: 'coque',
+      case: 'coque',
+      housse: 'housse',
+      facture: 'facture',
+      invoice: 'facture',
+      garantie: 'garantie',
+      warranty: 'garantie',
+      manuel: 'manuel',
+      manual: 'manuel',
+    };
+    return map[normalized] || trimmed;
+  }
+
+  return trimmed;
+};
+
+const normalizeFreeValueArray = (
+  values: string[] = [],
+  kind?: 'accessory' | 'equipment'
+) => values.map((value) => normalizeFreeValue(value, kind)).filter(Boolean);
+
 const CreateAnnouncementPage: React.FC = () => {
   const { t, language, isRTL } = useSafeI18nWithRouter();
   const navigate = useNavigate();
@@ -1432,15 +1603,90 @@ const CreateAnnouncementPage: React.FC = () => {
         if (typeof formData.bikeMotorized === 'boolean') obj.motorized = formData.bikeMotorized;
         return Object.keys(obj).length ? obj : undefined;
       })();
+
+      const isUUID = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
+      let finalCategoryId = formData.category_id;
+      if (!isUUID(finalCategoryId)) {
+        const directMenuMatch = menuCategories.find((c) => c.id === formData.category_id || c.slug === formData.category_id);
+        if (directMenuMatch?.id && isUUID(directMenuMatch.id)) {
+          finalCategoryId = directMenuMatch.id;
+        } else {
+          const { data: catRows } = await supabase
+            .from("categories")
+            .select("id, slug")
+            .eq("slug", formData.category_id)
+            .limit(1);
+          if (catRows?.[0]?.id && isUUID(catRows[0].id)) {
+            finalCategoryId = catRows[0].id;
+          }
+        }
+      }
+
+      if (!isUUID(finalCategoryId)) {
+        toast({
+          title: "Erreur",
+          description: "Catégorie invalide. Rechargez la page et réessayez.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const resolveSubcategoryUUID = async (rawValue: string | null): Promise<string | null> => {
+        if (!rawValue) return null;
+        if (isUUID(rawValue)) return rawValue;
+
+        const fromMenu = menuCategories
+          .flatMap((cat) => cat.subcategories || [])
+          .find((sub) => sub.id === rawValue || sub.slug === rawValue);
+        const slugCandidate = fromMenu?.slug || rawValue;
+
+        const { data: rows } = await supabase
+          .from("categories")
+          .select("id, parent_id, slug")
+          .eq("slug", slugCandidate)
+          .limit(10);
+
+        if (!rows || rows.length === 0) return null;
+        const directChild = rows.find((row) => row.parent_id === finalCategoryId);
+        return (directChild?.id || rows[0].id) as string;
+      };
+
+      const finalSubcategoryId = await resolveSubcategoryUUID(formData.subcategory_id || null);
+
+      if (finalSubcategoryId && !isUUID(finalSubcategoryId)) {
+        toast({
+          title: "Erreur de catégorie",
+          description: `La sous-catégorie sélectionnée est invalide (${finalSubcategoryId}). Veuillez recharger la page.`,
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!isUUID(finalCategoryId)) {
+        toast({
+          title: "Erreur de catégorie",
+          description: `La catégorie principale sélectionnée est invalide (${finalCategoryId}). Veuillez recharger la page.`,
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
       const announcementData = {
         title: formData.title,
         description: formData.description,
         price: formData.price ? parseFloat(formData.price) : null,
         currency: formData.currency,
         condition: mapConditionToDB(formData.condition),
-        category_id: formData.category_id,
-        category_slug: menuCategories.find(c => c.id === formData.category_id)?.slug || null,
-        subcategory_id: formData.subcategory_id || null,
+        category_id: finalCategoryId,
+        category_slug:
+          menuCategories.find(c => c.id === finalCategoryId || c.slug === formData.category_id)?.slug ||
+          menuCategories.find(c => c.id === formData.category_id)?.slug ||
+          null,
+        subcategory_id: finalSubcategoryId,
         user_id: user.id, 
         wilaya: formData.wilaya,
         commune: formData.commune,
@@ -1472,8 +1718,8 @@ const CreateAnnouncementPage: React.FC = () => {
         // Nouveaux champs - Historique et état
         has_invoice: formData.hasInvoice || false,
         warranty_duration: formData.warrantyDuration || null,
-        included_accessories: formData.includedAccessories && formData.includedAccessories.length > 0 ? formData.includedAccessories : null,
-        selling_reason: formData.sellingReason || null,
+        included_accessories: formData.includedAccessories && formData.includedAccessories.length > 0 ? normalizeFreeValueArray(formData.includedAccessories, 'accessory') : null,
+        selling_reason: normalizeFreeValue(formData.sellingReason, 'sellingReason') || null,
         
         // Nouveaux champs - Prix et négociation
         cash_discount: formData.cashDiscount ? parseFloat(formData.cashDiscount) || null : null,
@@ -1485,13 +1731,13 @@ const CreateAnnouncementPage: React.FC = () => {
         delivery_areas: formData.deliveryAreas && formData.deliveryAreas.length > 0 ? formData.deliveryAreas : null,
         delivery_fees: formData.deliveryFees ? parseFloat(formData.deliveryFees) || null : null,
         delivery_location_name: deliveryLocationNamePayload,
-        packaging_info: formData.packagingInfo || null,
+        packaging_info: normalizeFreeValue(formData.packagingInfo, 'packaging') || null,
         availability_date: formData.availabilityDate ? formData.availabilityDate : null,
         
         // Nouveaux champs - Visuels et documentation
         product_video: videoUrls.length > 0 ? videoUrls.join(', ') : null,
         detail_photos: detailPhotoUrls.length > 0 ? detailPhotoUrls : null,
-        documentation: formData.documentation && formData.documentation.length > 0 ? formData.documentation : null,
+        documentation: formData.documentation && formData.documentation.length > 0 ? formData.documentation.map((item) => normalizeLookupValue(item)).filter(Boolean) : null,
 
         // Champs Animaux
         animal_species: formData.animalsType || null,
@@ -1569,64 +1815,44 @@ const CreateAnnouncementPage: React.FC = () => {
          return;
       }
 
-      // Create logic continues here...
-      // L'ID de catégorie est maintenant un UUID provenant de Supabase
-      console.log('Traitement de l\'ID de catégorie:', formData.category_id);
-      const categoryId = formData.category_id;
-      
-      // Récupérer l'ID de la sous-catégorie si présente
-      let subcategoryId = null;
-      if (formData.subcategory_id) {
-        console.log('Traitement de l\'ID de sous-catégorie:', formData.subcategory_id);
-        subcategoryId = formData.subcategory_id;
+      const categoryIdForDb = finalCategoryId;
+      let subcategoryIdForDb = finalSubcategoryId;
+      const categoryLogicKey =
+        menuCategories.find(c => c.id === formData.category_id || c.slug === formData.category_id)?.slug ||
+        formData.category_id;
+      const subcategoryLogicKey = formData.subcategory_id || '';
+
+      console.log('Traitement de l\'ID de catégorie:', categoryIdForDb);
+      if (subcategoryIdForDb) {
+        console.log('Traitement de l\'ID de sous-catégorie:', subcategoryIdForDb);
       }
 
-      // VERIFICATION DE SECURITE: Vérifier que la catégorie existe dans la base de données
-      // Ceci évite l'erreur 409 (Conflict) si la catégorie locale n'existe pas dans Supabase
       const { count: categoryCount, error: categoryCheckError } = await supabase
         .from('categories')
         .select('id', { count: 'exact', head: true })
-        .eq('id', categoryId);
+        .eq('id', categoryIdForDb);
         
       if (categoryCheckError) {
         console.error('Erreur lors de la vérification de la catégorie:', categoryCheckError);
-        // On continue quand même, ça pourrait être une erreur réseau
       } else if (categoryCount === 0) {
-        console.error(`Catégorie introuvable dans la base de données: ${categoryId}`);
+        console.error(`Catégorie introuvable dans la base de données: ${categoryIdForDb}`);
         toast({
           title: "Erreur de catégorie",
-          description: `La catégorie sélectionnée (${categoryId}) n'est pas synchronisée avec le serveur. Veuillez contacter le support.`,
+          description: `La catégorie sélectionnée (${categoryIdForDb}) n'est pas synchronisée avec le serveur. Veuillez contacter le support.`,
         });
         setLoading(false);
         return;
       }
 
-      // Vérification de la sous-catégorie si elle existe
-      if (subcategoryId) {
-        const subcategoryIsUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(subcategoryId);
-        let subCount = 0;
-        let subCheckError = null;
+      if (subcategoryIdForDb) {
+        const { count: subCount, error: subCheckError } = await supabase
+          .from('categories')
+          .select('id', { count: 'exact', head: true })
+          .eq('id', subcategoryIdForDb);
 
-        if (subcategoryIsUuid) {
-          const { count, error } = await supabase
-            .from('categories')
-            .select('id', { count: 'exact', head: true })
-            .eq('id', subcategoryId);
-          subCount = count || 0;
-          subCheckError = error;
-        } else {
-          const { count, error } = await supabase
-            .from('categories')
-            .select('id', { count: 'exact', head: true })
-            .eq('slug', subcategoryId);
-          subCount = count || 0;
-          subCheckError = error;
-        }
-          
         if (!subCheckError && subCount === 0) {
-          console.warn(`Sous-catégorie introuvable dans la base de données: ${subcategoryId}. On l'ignore pour éviter l'erreur.`);
-          // On ignore la sous-catégorie pour permettre la création de l'annonce dans la catégorie parente
-          subcategoryId = null;
+          console.warn(`Sous-catégorie introuvable dans la base de données: ${subcategoryIdForDb}. On l'ignore pour éviter l'erreur.`);
+          subcategoryIdForDb = null;
         }
       }
 
@@ -1642,24 +1868,16 @@ const CreateAnnouncementPage: React.FC = () => {
         : 30;
       const premiumEndAt = new Date(Date.now() + premiumDays * 24 * 60 * 60 * 1000).toISOString();
 
-      // Create announcement - Using full data payload instead of minimal test data
       const insertPayload = {
          ...announcementData,
-         // Ensure required fields for insert are present
          created_at: new Date().toISOString(),
          status: 'active',
          contact_count: 0,
          view_count: 0,
          type: formData.isPremium ? 'premium' : 'normal',
          premium_end_at: formData.isPremium ? premiumEndAt : null,
-         
-         // Handle category/subcategory logic which might differ slightly from announcementData
-         category_id: categoryId,
-         subcategory_id: subcategoryId, // Explicitly use the verified subcategoryId
-
-         // Handle image fields carefully - prioritize image_urls but include fallback if needed
-         // announcementData already has images, image_urls, image_url
-         // We remove 'images' to avoid redundancy if it's not needed, sticking to image_urls
+         category_id: categoryIdForDb,
+         subcategory_id: subcategoryIdForDb,
          images: undefined, 
       };
 
@@ -1670,10 +1888,8 @@ const CreateAnnouncementPage: React.FC = () => {
       
       console.log('Sending insert payload:', insertPayload);
       
-      // 🚀 OPTIMISTIC UI : Afficher l'annonce instantanément dans l'UI
-      // Invalider le cache pour forcer le rafraîchissement
-      if (formData.category_id) {
-        invalidateCache(formData.category_id);
+      if (categoryLogicKey) {
+        invalidateCache(categoryLogicKey);
       }
       
       // Notifier les autres composants qu'une nouvelle annonce arrive
@@ -1700,7 +1916,7 @@ const CreateAnnouncementPage: React.FC = () => {
         
         // En cas d'erreur, notifier pour retirer l'annonce optimiste
         window.dispatchEvent(new CustomEvent('optimisticAnnouncementFailed', { 
-          detail: { categoryId: formData.category_id }
+          detail: { categoryId: categoryLogicKey || formData.category_id }
         }));
         
         throw error;
@@ -1709,15 +1925,15 @@ const CreateAnnouncementPage: React.FC = () => {
       _setCreatedAnnouncementId(data.id);
 
       // Pour Informatique & Électronique, certains sous-catégories sont des téléphones
-      const effectiveSubcategoryId = subcategoryId || '';
+      const effectiveSubcategoryId = subcategoryLogicKey || '';
 
-      const isPhone = PHONE_IDS.includes(categoryId) || 
-        (categoryId === 'informatique-electronique' && ['smartphones', 'telephones-classiques-fixes', 'tablettes-appareils-mobiles'].includes(formData.subcategory_id));
+      const isPhone = PHONE_IDS.includes(categoryLogicKey) || 
+        (categoryLogicKey === 'informatique-electronique' && ['smartphones', 'telephones-classiques-fixes', 'tablettes-appareils-mobiles'].includes(subcategoryLogicKey));
       
-      const isComputer = !isPhone && COMPUTER_IDS.includes(categoryId) && 
+      const isComputer = !isPhone && COMPUTER_IDS.includes(categoryLogicKey) && 
         !['accessoires-telephones', 'batteries-charge', 'audio-mobile'].includes(effectiveSubcategoryId);
 
-      const isFurniture = HOME_IDS.includes(categoryId);
+      const isFurniture = HOME_IDS.includes(categoryLogicKey);
 
       // Insert computer details
       if (isComputer) {
@@ -1777,7 +1993,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert bike details
-      if (BIKE_IDS.includes(categoryId)) {
+      if (BIKE_IDS.includes(categoryLogicKey)) {
          const { error: bikeError } = await supabase
            .from('bike_details')
            .insert({
@@ -1798,7 +2014,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert boat details
-      if (BOAT_IDS.includes(categoryId)) {
+      if (BOAT_IDS.includes(categoryLogicKey)) {
          const { error: boatError } = await supabase
            .from('boat_details')
            .insert({
@@ -1820,7 +2036,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert education and leisure details
-      if (EDUCATION_LOISIRS_IDS.includes(subcategoryId || categoryId)) {
+      if (EDUCATION_LOISIRS_IDS.includes(subcategoryLogicKey || categoryLogicKey)) {
          const { error: educationError } = await supabase
            .from('education_loisirs_details')
            .insert({
@@ -1857,7 +2073,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert construction details
-      if (CONSTRUCTION_IDS.includes(categoryId)) {
+      if (CONSTRUCTION_IDS.includes(categoryLogicKey)) {
          const { error: constructionError } = await supabase
            .from('construction_details')
            .insert({
@@ -1877,7 +2093,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert clothing details
-      if (CLOTHING_IDS.includes(categoryId)) {
+      if (CLOTHING_IDS.includes(categoryLogicKey)) {
          const { error: clothingError } = await supabase
            .from('clothing_details')
            .insert({
@@ -1896,7 +2112,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert vehicle details if category is vehicles
-      if (['vehicules', 'vehicules-equipements'].includes(categoryId)) {
+      if (['vehicules', 'vehicules-equipements'].includes(categoryLogicKey)) {
          const registrationDate = formData.vehicleRegistrationYear 
            ? `${formData.vehicleRegistrationYear}-${(formData.vehicleRegistrationMonth || '01').toString().padStart(2, '0')}-01`
            : null;
@@ -1911,10 +2127,10 @@ const CreateAnnouncementPage: React.FC = () => {
              registration_date: registrationDate,
              purchase_year: formData.purchaseYear ? parseInt(formData.purchaseYear) : null,
              mileage: formData.vehicleMileage ? parseInt(formData.vehicleMileage) : null,
-             fuel_type: formData.vehicleFuelType,
+             fuel_type: normalizeVehicleFuelValue(formData.vehicleFuelType) || null,
              fiscal_power: formData.vehicleFiscalPower,
-             gearbox: formData.vehicleGearbox,
-             equipment: Array.isArray(formData.vehicleEquipment) ? formData.vehicleEquipment : [],
+             gearbox: normalizeGearboxValue(formData.vehicleGearbox) || null,
+             equipment: Array.isArray(formData.vehicleEquipment) ? normalizeFreeValueArray(formData.vehicleEquipment, 'equipment') : [],
              technical_control: formData.vehicleTechnicalControl === 'true',
              grey_card_crossed: formData.vehicleGreyCardCrossed === 'true'
            });
@@ -1926,12 +2142,12 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert real estate details
-      if (REAL_ESTATE_LISTING_IDS.some(id => id === categoryId || id === subcategoryId)) {
+      if (REAL_ESTATE_LISTING_IDS.some(id => id === categoryLogicKey || id === subcategoryLogicKey)) {
          const { error: realEstateError } = await supabase
            .from('real_estate_details')
            .insert({
              announcement_id: data.id,
-             property_type: formData.realEstateType || null,
+             property_type: normalizeRealEstateTypeValue(formData.realEstateType) || null,
              surface: formData.realEstateSurface ? parseFloat(formData.realEstateSurface) : null,
              rooms: formData.realEstateRooms ? parseInt(formData.realEstateRooms) : null,
              bedrooms: formData.realEstateBedrooms ? parseInt(formData.realEstateBedrooms) : null,
@@ -1946,9 +2162,9 @@ const CreateAnnouncementPage: React.FC = () => {
              elevator: formData.realEstateSpecifications.includes('ascenseur'),
              balcony: formData.realEstateSpecifications.includes('balcon_terrasse'),
              terrace: formData.realEstateSpecifications.includes('balcon_terrasse'),
-             view_type: formData.realEstateView || null,
+             view_type: normalizeRealEstateViewValue(formData.realEstateView) || null,
              facades: formData.realEstateFacades ? parseInt(formData.realEstateFacades) : null,
-             zoning: formData.realEstateZoning || null,
+             zoning: normalizeRealEstateZoningValue(formData.realEstateZoning) || null,
              with_permit: formData.realEstateWithPermit || formData.realEstateSpecifications.includes('permis_construire'),
              capacity: formData.realEstateCapacity ? parseInt(formData.realEstateCapacity) : null,
              papers: Array.isArray(formData.realEstatePapers) ? formData.realEstatePapers : [],
@@ -1962,7 +2178,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert baby details
-      if (BABY_IDS.includes(categoryId)) {
+      if (BABY_IDS.includes(categoryLogicKey)) {
          const { error: babyError } = await supabase
            .from('baby_details')
            .insert({
@@ -1979,7 +2195,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert fashion details
-      if (FASHION_IDS.includes(categoryId)) {
+      if (FASHION_IDS.includes(categoryLogicKey)) {
          const { error: fashionError } = await supabase
            .from('fashion_details')
            .insert({
@@ -1997,7 +2213,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert bags details
-      if (BAGS_IDS.includes(categoryId)) {
+      if (BAGS_IDS.includes(categoryLogicKey)) {
          const { error: bagsError } = await supabase
            .from('bags_details')
            .insert({
@@ -2013,7 +2229,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert appliances details
-      if (APPLIANCES_IDS.includes(categoryId)) {
+      if (APPLIANCES_IDS.includes(categoryLogicKey)) {
          const { error: appliancesError } = await supabase
            .from('appliances_details')
            .insert({
@@ -2030,7 +2246,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert multimedia details
-      if (MULTIMEDIA_IDS.includes(categoryId)) {
+      if (MULTIMEDIA_IDS.includes(categoryLogicKey)) {
          const { error: multimediaError } = await supabase
            .from('multimedia_details')
            .insert({
@@ -2046,7 +2262,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert gaming details
-      if (GAMING_IDS.includes(categoryId)) {
+      if (GAMING_IDS.includes(categoryLogicKey)) {
          const { error: gamingError } = await supabase
            .from('gaming_details')
            .insert({
@@ -2062,7 +2278,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert hardware details
-      if (HARDWARE_IDS.includes(categoryId)) {
+      if (HARDWARE_IDS.includes(categoryLogicKey)) {
          const { error: hardwareError } = await supabase
            .from('hardware_details')
            .insert({
@@ -2077,7 +2293,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert agriculture details
-      if (AGRICULTURE_IDS.includes(categoryId)) {
+      if (AGRICULTURE_IDS.includes(categoryLogicKey)) {
          const { error: agricultureError } = await supabase
            .from('agriculture_details')
            .insert({
@@ -2092,7 +2308,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert parapharmacy details
-      if (PARAPHARMACY_IDS.includes(categoryId)) {
+      if (PARAPHARMACY_IDS.includes(categoryLogicKey)) {
          const { error: parapharmacyError } = await supabase
            .from('parapharmacy_details')
            .insert({
@@ -2107,7 +2323,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert beauty details
-      if (BEAUTY_IDS.includes(categoryId)) {
+      if (BEAUTY_IDS.includes(categoryLogicKey)) {
          const { error: beautyError } = await supabase
            .from('beauty_details')
            .insert({
@@ -2123,7 +2339,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert gastronomy details
-      if (GASTRONOMY_IDS.includes(categoryId)) {
+      if (GASTRONOMY_IDS.includes(categoryLogicKey)) {
          const { error: gastronomyError } = await supabase
            .from('gastronomy_details')
            .insert({
@@ -2141,7 +2357,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert crafts details
-      if (CRAFTS_IDS.includes(categoryId)) {
+      if (CRAFTS_IDS.includes(categoryLogicKey)) {
          const { error: craftsError } = await supabase
            .from('crafts_details')
            .insert({
@@ -2157,7 +2373,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert travel details
-      if (TRAVEL_IDS.includes(categoryId)) {
+      if (TRAVEL_IDS.includes(categoryLogicKey)) {
          const { error: travelError } = await supabase
            .from('travel_details')
            .insert({
@@ -2175,7 +2391,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert events details
-      if (EVENTS_IDS.includes(categoryId)) {
+      if (EVENTS_IDS.includes(categoryLogicKey)) {
          const { error: eventsError } = await supabase
            .from('event_details')
            .insert({
@@ -2191,7 +2407,7 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       // Insert jobs details
-      if (JOBS_IDS.includes(categoryId)) {
+      if (JOBS_IDS.includes(categoryLogicKey)) {
          const { error: jobsError } = await supabase
            .from('job_details')
            .insert({
@@ -5830,13 +6046,20 @@ const CreateAnnouncementPage: React.FC = () => {
                       {formData.vehicleFuelType && (
                         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                            <span className="text-slate-500 dark:text-slate-400 font-medium">{t('preview.fuel')}</span>
-                           <span className="font-bold text-slate-900 dark:text-white capitalize">{formData.vehicleFuelType}</span>
+                           <span className="font-bold text-slate-900 dark:text-white capitalize">
+                             {tr(`createAd.vehicle.fuel.${normalizeVehicleFuelValue(formData.vehicleFuelType)}`, formData.vehicleFuelType)}
+                           </span>
                         </div>
                       )}
                       {formData.vehicleGearbox && (
                         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                            <span className="text-slate-500 dark:text-slate-400 font-medium">{t('preview.gearbox')}</span>
-                           <span className="font-bold text-slate-900 dark:text-white capitalize">{formData.vehicleGearbox}</span>
+                           <span className="font-bold text-slate-900 dark:text-white capitalize">
+                             {tr(
+                               `createAd.vehicle.gearbox.${normalizeGearboxValue(formData.vehicleGearbox) === 'automatique' ? 'automatic' : 'manual'}`,
+                               formData.vehicleGearbox
+                             )}
+                           </span>
                         </div>
                       )}
                       {formData.vehicleFiscalPower && (

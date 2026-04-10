@@ -345,6 +345,9 @@ export const createAd = {
   "createAd.bike.frameMaterial": "مادة الإطار",
   "createAd.bike.electric": "دراجة كهربائية",
   "createAd.bike.motorized": "دراجة مزودة بمحرك",
+  "createAd.bike.suspension": "نظام التعليق",
+  "createAd.bike.brakes": "الفرامل",
+  "createAd.bike.gears": "السرعات",
 
   // Boat
   "createAd.boat.title": "تفاصيل القارب",
