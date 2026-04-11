@@ -131,14 +131,28 @@ const DeposerOffreMetier = () => {
     expires_at: ''
   });
 
-  const selectedWilayaCode = useMemo(() => {
-    const selected = wilayas.find(w => w.name === formData.wilaya);
-    return selected?.code != null ? String(selected.code) : '';
+  const selectedWilaya = useMemo(() => {
+    return (
+      wilayas.find((wilaya) =>
+        [wilaya.name, wilaya.name_fr, wilaya.name_ar]
+          .filter(Boolean)
+          .some((candidate) => candidate === formData.wilaya)
+      ) || null
+    );
   }, [formData.wilaya]);
+
+  const selectedWilayaCode = useMemo(() => {
+    return selectedWilaya?.code != null ? String(selectedWilaya.code) : '';
+  }, [selectedWilaya]);
 
   const availableCommunes = useMemo(() => {
     return selectedWilayaCode ? (communes[selectedWilayaCode] ?? []) : [];
   }, [selectedWilayaCode]);
+
+  const selectedCommuneFr = useMemo(() => {
+    const selected = availableCommunes.find((commune) => commune.fr === formData.commune || commune.ar === formData.commune);
+    return selected?.fr || formData.commune;
+  }, [availableCommunes, formData.commune]);
 
   // Vérifier si l'utilisateur est connecté
   useEffect(() => {
@@ -298,15 +312,15 @@ const DeposerOffreMetier = () => {
           specialty: formData.specialite,
           experience_level: formData.experience || null,
           years_experience: formData.years_experience ? parseInt(formData.years_experience as string, 10) : null,
-          availability: formData.disponibilite,
+          availability: formData.disponibilite || null,
           salary: (formData.salaire && Number.isFinite(Number.parseFloat(formData.salaire)))
             ? Number.parseFloat(formData.salaire)
             : null,
           currency: formData.devise,
           phone_numbers: formData.telephones.filter(tel => tel.trim() !== ''),
           email: formData.email,
-          wilaya: formData.wilaya,
-          commune: formData.commune,
+          wilaya: selectedWilaya?.name_fr || selectedWilaya?.name || formData.wilaya,
+          commune: selectedCommuneFr || null,
           location: formData.location,
           logo_url: logoUrl,
           images: images.length ? images : null,
@@ -504,7 +518,7 @@ const DeposerOffreMetier = () => {
                                   {metiers.map((metier) => (
                                     <SelectItem 
                                       key={metier.key} 
-                                      value={metier.value}
+                                      value={metier.key}
                                       onMouseEnter={() => setHoveredProfession(metier.key)}
                                       onMouseLeave={() => setHoveredProfession(null)}
                                     >
@@ -750,7 +764,7 @@ const DeposerOffreMetier = () => {
                               </SelectTrigger>
                               <SelectContent>
                                 {disponibilites.map((disp) => (
-                                  <SelectItem key={disp.key} value={disp.value}>
+                                  <SelectItem key={disp.key} value={disp.key}>
                                     {disp.value}
                                   </SelectItem>
                                 ))}

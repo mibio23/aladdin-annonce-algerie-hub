@@ -9,8 +9,6 @@ import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { useAuth } from "@/contexts/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
@@ -18,6 +16,8 @@ import AdaptiveImageCarousel from "@/components/common/AdaptiveImageCarousel";
 import ReportModal from "@/components/common/ReportModal";
 import JobOfferContactModal from "@/components/job_offer/JobOfferContactModal";
 import SEOHead from "@/components/SEO/SEOHead";
+import { wilayas } from "@/data/wilayaData";
+import { communes } from "@/data/communeData";
 
 interface JobOffer {
   id: string;
@@ -54,7 +54,7 @@ interface JobOffer {
 
 const JobOfferDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { t, isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL, language } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const { toast } = useToast();
   const { navigateWithLanguage, getLocalizedPath } = useLanguageNavigation();
@@ -76,44 +76,250 @@ const JobOfferDetailsPage = () => {
       .toLowerCase()
       .trim();
 
+  const localeByLanguage: Record<string, string> = {
+    fr: 'fr-FR',
+    en: 'en-US',
+    es: 'es-ES',
+    it: 'it-IT',
+    de: 'de-DE',
+    ar: 'ar-DZ',
+  };
+
+  const findWilaya = (value?: string | null) => {
+    if (!value) return null;
+    const normalized = normalizeToken(value);
+    return (
+      wilayas.find((entry) =>
+        [
+          entry.code.toString(),
+          entry.name,
+          entry.name_fr,
+          entry.name_ar,
+        ]
+          .filter(Boolean)
+          .some((candidate) => normalizeToken(String(candidate)) === normalized)
+      ) || null
+    );
+  };
+
+  const localizeWilayaOrCommune = (value?: string | null) => {
+    if (!value) return '-';
+    const wilayaMatch = findWilaya(value);
+    if (!wilayaMatch) return value;
+    return language === 'ar' ? wilayaMatch.name_ar || wilayaMatch.name_fr || wilayaMatch.name : wilayaMatch.name_fr || wilayaMatch.name;
+  };
+
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const replaceInsensitive = (source: string, search: string, replacement: string) => {
+    if (!search.trim()) return source;
+    return source.replace(new RegExp(escapeRegExp(search), 'gi'), replacement);
+  };
+
+  const findCommuneEntry = (communeValue?: string | null, wilayaValue?: string | null) => {
+    if (!communeValue) return null;
+    const normalizedCommune = normalizeToken(communeValue);
+    const wilayaMatch = findWilaya(wilayaValue || communeValue);
+    const scopedCommunes = wilayaMatch ? communes[String(wilayaMatch.code)] || [] : [];
+    const allCommunes = scopedCommunes.length ? scopedCommunes : Object.values(communes).flat();
+
+    return (
+      allCommunes.find((entry) =>
+        [entry.fr, entry.ar]
+          .filter(Boolean)
+          .some((candidate) => normalizeToken(String(candidate)) === normalizedCommune)
+      ) || null
+    );
+  };
+
+  const getCommuneLabel = (communeValue?: string | null, wilayaValue?: string | null) => {
+    if (!communeValue) return '-';
+    const communeMatch = findCommuneEntry(communeValue, wilayaValue);
+    if (!communeMatch) return communeValue;
+    return language === 'ar' ? communeMatch.ar || communeMatch.fr : communeMatch.fr;
+  };
+
+  const localizeFreeLocationText = (value?: string | null, wilayaValue?: string | null, communeValue?: string | null) => {
+    if (!value) return '-';
+    let localized = value;
+
+    const replacements = [
+      { from: 'Algerie', to: language === 'ar' ? 'الجزائر' : 'Algérie' },
+      { from: 'Algérie', to: language === 'ar' ? 'الجزائر' : 'Algérie' },
+      { from: 'Algeria', to: language === 'ar' ? 'الجزائر' : 'Algérie' },
+    ];
+
+    if (wilayaValue) {
+      const wilayaMatch = findWilaya(wilayaValue);
+      const localizedWilaya = localizeWilayaOrCommune(wilayaValue);
+      replacements.push({ from: wilayaValue, to: localizedWilaya });
+      if (wilayaMatch) {
+        [wilayaMatch.name, wilayaMatch.name_fr, wilayaMatch.name_ar]
+          .filter(Boolean)
+          .forEach((candidate) => replacements.push({ from: String(candidate), to: localizedWilaya }));
+      }
+    }
+
+    if (communeValue) {
+      const communeMatch = findCommuneEntry(communeValue, wilayaValue);
+      const localizedCommune = getCommuneLabel(communeValue, wilayaValue);
+      replacements.push({ from: communeValue, to: localizedCommune });
+      if (communeMatch) {
+        [communeMatch.fr, communeMatch.ar]
+          .filter(Boolean)
+          .forEach((candidate) => replacements.push({ from: String(candidate), to: localizedCommune }));
+      }
+    }
+
+    for (const replacement of replacements) {
+      localized = replaceInsensitive(localized, replacement.from, replacement.to);
+    }
+
+    return localized;
+  };
+
+  const formatOfferDate = (value?: string | null) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString(localeByLanguage[language] || 'fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
   const professionAliases: Record<string, string> = {
+    plumber: 'plumber',
     plombier: 'plumber',
+    electrician: 'electrician',
     electricien: 'electrician',
+    mechanic: 'mechanic',
     mecanicien: 'mechanic',
+    woodworker: 'woodworker',
     menuisier: 'woodworker',
+    painter: 'painter',
     peintre: 'painter',
+    mason: 'mason',
     macon: 'mason',
+    roofer: 'roofer',
     couvreur: 'roofer',
+    tiler: 'tiler',
     carreleur: 'tiler',
+    gardener: 'gardener',
     jardinier: 'gardener',
+    tailor: 'tailor',
     tailleur: 'tailor',
+    cook: 'cook',
     cuisinier: 'cook',
+    hairdresser: 'hairdresser',
     coiffeur: 'hairdresser',
+    beautician: 'beautician',
     estheticienne: 'beautician',
+    computertechnician: 'computerTechnician',
     informaticien: 'computerTechnician',
     'technicien informatique': 'computerTechnician',
     'technicien informatiques': 'computerTechnician',
     'maintenance informatique': 'computerTechnician',
+    chauffagiste: 'heatingTechnician',
+    heatingtechnician: 'heatingTechnician',
+    'reparateur appareils': 'applianceRepairman',
+    'reparateur electromenager': 'applianceRepairman',
+    appliancerepairman: 'applianceRepairman',
+    welder: 'welder',
+    soudeur: 'welder',
+    ironworker: 'ironworker',
+    ferronnier: 'ironworker',
+    glazier: 'glazier',
+    vitrier: 'glazier',
+    bodyworker: 'bodyworker',
+    carrossier: 'bodyworker',
+    cabinetmaker: 'cabinetmaker',
+    ebeniste: 'cabinetmaker',
+    upholsterer: 'upholsterer',
+    tapissier: 'upholsterer',
+    'air conditioning technician': 'airConditioningTechnician',
+    climaticien: 'airConditioningTechnician',
+    photographer: 'photographer',
+    photographe: 'photographer',
+    videographer: 'videographer',
+    videaste: 'videographer',
+    translator: 'translator',
+    traducteur: 'translator',
+    secretary: 'secretary',
+    secretaire: 'secretary',
+    accountant: 'accountant',
+    comptable: 'accountant',
+    privateteacher: 'privateTeacher',
+    'professeur particulier': 'privateTeacher',
+    otherprofessions: 'otherProfessions',
+    'autres metiers': 'otherProfessions',
   };
 
   const experienceAliases: Record<string, string> = {
+    beginner: 'beginner',
     debutant: 'beginner',
+    intermediate: 'intermediate',
     intermediaire: 'intermediate',
+    confirmed: 'confirmed',
     confirme: 'confirmed',
     expert: 'expert',
+    principiante: 'beginner',
+    anfanger: 'beginner',
+    مبتدئ: 'beginner',
+    intermedio: 'intermediate',
+    zwischenstufe: 'intermediate',
+    متوسط: 'intermediate',
+    erfahren: 'confirmed',
+    confermato: 'confirmed',
+    confirmado: 'confirmed',
+    خبير_مؤكد: 'confirmed',
+    experto: 'expert',
+    esperto: 'expert',
+    خبير: 'expert',
   };
 
   const availabilityAliases: Record<string, string> = {
+    fulltime: 'fullTime',
     'temps plein': 'fullTime',
     'plein temps': 'fullTime',
+    'tiempo completo': 'fullTime',
+    'tempo pieno': 'fullTime',
+    vollzeit: 'fullTime',
+    'دوام كامل': 'fullTime',
+    parttime: 'partTime',
     'temps partiel': 'partTime',
+    'tiempo parcial': 'partTime',
+    'tempo parziale': 'partTime',
+    teilzeit: 'partTime',
+    'دوام جزئي': 'partTime',
     weekend: 'weekend',
     'week end': 'weekend',
     'week-end': 'weekend',
+    'fin de semana': 'weekend',
+    'fine settimana': 'weekend',
+    wochenende: 'weekend',
+    'نهاية الاسبوع': 'weekend',
+    'نهاية الأسبوع': 'weekend',
     soiree: 'evenings',
     soirees: 'evenings',
+    evenings: 'evenings',
+    noche: 'evenings',
+    sera: 'evenings',
+    abends: 'evenings',
+    مساء: 'evenings',
     saisonnier: 'seasonal',
+    seasonal: 'seasonal',
+    estacional: 'seasonal',
+    stagionale: 'seasonal',
+    saisonal: 'seasonal',
+    موسمي: 'seasonal',
     occasionnel: 'occasional',
+    occasional: 'occasional',
+    ocasional: 'occasional',
+    occasionale: 'occasional',
+    gelegentlich: 'occasional',
+    عرضي: 'occasional',
   };
 
   const getProfessionLabel = (profession: string) => {
@@ -127,6 +333,14 @@ const JobOfferDetailsPage = () => {
       const aliasedKey = `jobOffer.professions.${alias}`;
       const aliased = t(aliasedKey);
       if (aliased !== aliasedKey) return aliased;
+    }
+
+    for (const [token, key] of Object.entries(professionAliases)) {
+      if (token && normalized.includes(token)) {
+        const aliasedKey = `jobOffer.professions.${key}`;
+        const aliased = t(aliasedKey);
+        if (aliased !== aliasedKey) return aliased;
+      }
     }
 
     return profession;
@@ -146,6 +360,14 @@ const JobOfferDetailsPage = () => {
       if (aliased !== aliasedKey) return aliased;
     }
 
+    for (const [token, key] of Object.entries(experienceAliases)) {
+      if (token && normalized.includes(token)) {
+        const aliasedKey = `jobOffer.experienceLevels.${key}`;
+        const aliased = t(aliasedKey);
+        if (aliased !== aliasedKey) return aliased;
+      }
+    }
+
     return experience;
   };
 
@@ -161,6 +383,14 @@ const JobOfferDetailsPage = () => {
       const aliasedKey = `jobOffer.availability.${alias}`;
       const aliased = t(aliasedKey);
       if (aliased !== aliasedKey) return aliased;
+    }
+
+    for (const [token, key] of Object.entries(availabilityAliases)) {
+      if (token && normalized.includes(token)) {
+        const aliasedKey = `jobOffer.availability.${key}`;
+        const aliased = t(aliasedKey);
+        if (aliased !== aliasedKey) return aliased;
+      }
     }
 
     return availability;
@@ -349,11 +579,12 @@ const JobOfferDetailsPage = () => {
                     <div className="flex items-center gap-4 text-blue-100 text-sm">
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        {offer.wilaya}{offer.commune ? `, ${offer.commune}` : ''}
+                        {localizeWilayaOrCommune(offer.wilaya)}
+                        {offer.commune ? `, ${getCommuneLabel(offer.commune, offer.wilaya)}` : ''}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {format(new Date(offer.created_at), 'dd MMM yyyy', { locale: fr })}
+                        {formatOfferDate(offer.created_at)}
                       </div>
                       {typeof offer.global_listing_number === "number" ? (
                         <div className="flex items-center gap-1">
@@ -476,19 +707,23 @@ const JobOfferDetailsPage = () => {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between py-2 border-b last:border-0">
                     <span className="text-muted-foreground">{t('jobOffer.wilaya')}</span>
-                    <span className="font-medium">{offer.wilaya}</span>
+                    <span className="font-medium">{localizeWilayaOrCommune(offer.wilaya)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b last:border-0">
                     <span className="text-muted-foreground">{t('jobOffer.commune')}</span>
-                    <span className="font-medium">{offer.commune || '-'}</span>
+                    <span className="font-medium">{getCommuneLabel(offer.commune, offer.wilaya)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b last:border-0">
                     <span className="text-muted-foreground">{t('profile.address')}</span>
-                    <span className="font-medium truncate max-w-[150px]" title={offer.address || ''}>{offer.address || '-'}</span>
+                    <span className="font-medium truncate max-w-[150px]" title={offer.address || ''}>
+                      {localizeFreeLocationText(offer.address, offer.wilaya, offer.commune)}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2 border-b last:border-0">
                     <span className="text-muted-foreground">{t('jobOffer.preciseLocation')}</span>
-                    <span className="font-medium truncate max-w-[150px]" title={offer.location || ''}>{offer.location || '-'}</span>
+                    <span className="font-medium truncate max-w-[150px]" title={offer.location || ''}>
+                      {localizeFreeLocationText(offer.location, offer.wilaya, offer.commune)}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
