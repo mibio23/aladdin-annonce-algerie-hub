@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 type Favorite = {
   id: string; // favorite id
@@ -41,8 +42,16 @@ const MesFavoris = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { getLocalizedPath } = useLanguageNavigation();
   const { data: categoriesFromSupabase = [] } = useCategories(language);
   const menuCategories = mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase);
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -83,8 +92,15 @@ const MesFavoris = () => {
       } catch (error) {
         logger.error('Error fetching favorites:', error);
         toast({
-          title: "Erreur",
-          description: "Impossible de charger vos favoris",
+          title: t('common.error'),
+          description: tr('mesFavoris.errorLoading', {
+            fr: 'Impossible de charger vos favoris',
+            en: 'Unable to load your favorites',
+            es: 'No se pudieron cargar tus favoritos',
+            it: 'Impossibile caricare i tuoi preferiti',
+            de: 'Ihre Favoriten konnten nicht geladen werden',
+            ar: 'تعذر تحميل المفضلة',
+          }),
           variant: "destructive"
         });
       } finally {
@@ -112,14 +128,28 @@ const MesFavoris = () => {
 
       setFavorites(prev => prev.filter(f => f.id !== id));
       toast({
-        title: "Succès",
-        description: "Favori supprimé"
+        title: t('common.success'),
+        description: tr('mesFavoris.favoriteRemoved', {
+          fr: 'Favori supprimé',
+          en: 'Favorite removed',
+          es: 'Favorito eliminado',
+          it: 'Preferito rimosso',
+          de: 'Favorit entfernt',
+          ar: 'تمت إزالة المفضلة',
+        })
       });
     } catch (error) {
       logger.error('Error removing favorite:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le favori",
+        title: t('common.error'),
+        description: tr('mesFavoris.errorRemovingFavorite', {
+          fr: 'Impossible de supprimer le favori',
+          en: 'Unable to remove the favorite',
+          es: 'No se pudo eliminar el favorito',
+          it: 'Impossibile rimuovere il preferito',
+          de: 'Favorit konnte nicht entfernt werden',
+          ar: 'تعذر إزالة المفضلة',
+        }),
         variant: "destructive"
       });
     }
@@ -137,7 +167,14 @@ const MesFavoris = () => {
       categoryFromMenu?.name ||
       (translatedCategory !== translationKey && !translatedCategory.startsWith('categories.') ? translatedCategory : '') ||
       t('createAd.category') ||
-      'Catégorie';
+      tr('createAd.category', {
+        fr: 'Catégorie',
+        en: 'Category',
+        es: 'Categoría',
+        it: 'Categoria',
+        de: 'Kategorie',
+        ar: 'الفئة',
+      });
 
     return (
     <Card className="hover:shadow-md transition-shadow">
@@ -180,11 +217,11 @@ const MesFavoris = () => {
                 {t('mesFavoris.addedOn')} {new Date(ann.created_at).toLocaleDateString()}
               </span>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => navigate(`/announcement/${ann.id}`)}>
+                <Button variant="outline" size="sm" onClick={() => navigate(getLocalizedPath(`/announcement/${ann.id}`))}>
                   <Eye className="h-4 w-4 mr-1" />
                   {t('mesFavoris.view')}
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/announcement/${ann.id}`)}>
+                <Button variant="outline" size="sm" onClick={() => navigate(getLocalizedPath(`/announcement/${ann.id}`))}>
                   <MessageCircle className="h-4 w-4 mr-1" />
                   {t('mesFavoris.contact')}
                 </Button>

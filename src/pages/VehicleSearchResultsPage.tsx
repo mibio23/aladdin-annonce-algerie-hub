@@ -188,6 +188,13 @@ const VehicleSearchResultsPage = () => {
   const { navigateWithLanguage, getLocalizedPath } = useLanguageNavigation();
   const { fetchFavorites, toggleFavorite, isFavorite } = useFavorites();
 
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
   // State
   const paramsKey = searchParams.toString();
   const filtersFromParams = useMemo<VehicleFilters>(() => {
@@ -321,8 +328,22 @@ const VehicleSearchResultsPage = () => {
           paper:
             typeof vd?.grey_card_crossed === 'boolean'
               ? vd.grey_card_crossed
-                ? 'Carte Grise Barrée'
-                : 'Carte Grise'
+                ? tr('createAd.vehicleGreyCardCrossed', {
+                    fr: 'Carte grise barrée',
+                    en: 'Grey card crossed out',
+                    es: 'Tarjeta gris tachada',
+                    it: 'Carta grigia barrata',
+                    de: 'Fahrzeugschein durchgestrichen',
+                    ar: 'البطاقة الرمادية مشطوبة',
+                  })
+                : tr('createAd.greyCard', {
+                    fr: 'Carte grise',
+                    en: 'Grey card',
+                    es: 'Tarjeta gris',
+                    it: 'Carta grigia',
+                    de: 'Fahrzeugschein',
+                    ar: 'البطاقة الرمادية',
+                  })
               : '',
           type: '',
         },
@@ -599,9 +620,23 @@ const VehicleSearchResultsPage = () => {
       ? `${vehicleSearchTitle} - ${filters.query}`
       : vehicleSearchTitle;
   const vehicleSearchPageDescription = activeBrandLabel
-    ? `Résultats de recherche véhicules pour ${activeBrandLabel} sur Aladdin Annonces Algérie.`
+    ? tr('vehicleSearch.page.brandDescription', {
+        fr: `Résultats de recherche véhicules pour ${activeBrandLabel} sur Aladdin Annonces Algérie.`,
+        en: `Vehicle search results for ${activeBrandLabel} on Aladdin Algeria Listings.`,
+        es: `Resultados de búsqueda de vehículos para ${activeBrandLabel} en Anuncios Aladdin Argelia.`,
+        it: `Risultati di ricerca veicoli per ${activeBrandLabel} su Annunci Aladdin Algeria.`,
+        de: `Fahrzeugsuchergebnisse für ${activeBrandLabel} auf Aladdin Anzeigen Algerien.`,
+        ar: `نتائج البحث عن المركبات لـ ${activeBrandLabel} على إعلانات علاء الدين الجزائر.`,
+      })
     : filters.query
-      ? `Résultats de recherche véhicules pour "${filters.query}" sur Aladdin Annonces Algérie.`
+      ? tr('vehicleSearch.page.queryDescription', {
+          fr: `Résultats de recherche véhicules pour "${filters.query}" sur Aladdin Annonces Algérie.`,
+          en: `Vehicle search results for "${filters.query}" on Aladdin Algeria Listings.`,
+          es: `Resultados de búsqueda de vehículos para "${filters.query}" en Anuncios Aladdin Argelia.`,
+          it: `Risultati di ricerca veicoli per "${filters.query}" su Annunci Aladdin Algeria.`,
+          de: `Fahrzeugsuchergebnisse für "${filters.query}" auf Aladdin Anzeigen Algerien.`,
+          ar: `نتائج البحث عن المركبات لـ "${filters.query}" على إعلانات علاء الدين الجزائر.`,
+        })
       : vehicleSearchSubtitle;
   const vehicleSearchPageUrl = `${getLocalizedPath('/search/vehicles')}${paramsKey ? `?${paramsKey}` : ''}`;
   const vehicleSearchBreadcrumbs = [
@@ -618,7 +653,7 @@ const VehicleSearchResultsPage = () => {
       '@type': 'ListItem',
       position: index + 1,
       url: `${window.location.origin}${getLocalizedPath(`/annonce/${item.id}`)}`,
-      name: item.title || `Véhicule ${index + 1}`,
+      name: item.title || `${tr('vehicleSearch.vehicle', { fr: 'Véhicule', en: 'Vehicle', es: 'Vehículo', it: 'Veicolo', de: 'Fahrzeug', ar: 'مركبة' })} ${index + 1}`,
     })),
   };
 
@@ -1101,7 +1136,7 @@ const VehicleSearchResultsPage = () => {
                       <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
                         {item.is_urgent ? (
                           <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
-                            Urgent
+                            {tr('common.urgent', { fr: 'Urgent', en: 'Urgent', es: 'Urgente', it: 'Urgente', de: 'Dringend', ar: 'عاجل' })}
                           </span>
                         ) : null}
                         {year ? (
@@ -1133,7 +1168,14 @@ const VehicleSearchResultsPage = () => {
                           {locationLabel}
                         </span>
                         <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
-                          {hasCreatedAt ? formatRelativeTime(createdAt) : 'Récent'}
+                          {hasCreatedAt ? formatRelativeTime(createdAt) : tr('common.recent', {
+                            fr: 'Récent',
+                            en: 'Recent',
+                            es: 'Reciente',
+                            it: 'Recente',
+                            de: 'Neu',
+                            ar: 'حديث',
+                          })}
                         </span>
                       </div>
                       {item.price ? (
@@ -1168,7 +1210,14 @@ const VehicleSearchResultsPage = () => {
                             <button
                               onClick={handleFavorite}
                               className="p-1 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-full transition-colors group/fav"
-                              title={t('mesFavoris.title') || 'Favoris'}
+                              title={tr('mesFavoris.title', {
+                                fr: 'Favoris',
+                                en: 'Favorites',
+                                es: 'Favoritos',
+                                it: 'Preferiti',
+                                de: 'Favoriten',
+                                ar: 'المفضلة',
+                              })}
                             >
                               <Heart
                                 className={[
@@ -1190,7 +1239,7 @@ const VehicleSearchResultsPage = () => {
                             <button
                               onClick={handleShare}
                               className="p-1 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-full transition-colors group/sh"
-                              title="Partager"
+                              title={tr('common.share', { fr: 'Partager', en: 'Share', es: 'Compartir', it: 'Condividi', de: 'Teilen', ar: 'مشاركة' })}
                             >
                               <Share2 className="w-4 h-4 text-blue-500 group-hover/sh:scale-110 transition-transform" />
                             </button>

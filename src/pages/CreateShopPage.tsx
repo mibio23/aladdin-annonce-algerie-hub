@@ -77,6 +77,13 @@ const CreateShopPage: React.FC = () => {
   const { getLocalizedPath } = useLanguageNavigation();
   const { t, isRTL, language } = useSafeI18nWithRouter();
 
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [hoveredShopStatus, setHoveredShopStatus] = useState<string | null>(null);
 
@@ -204,13 +211,13 @@ const CreateShopPage: React.FC = () => {
     localStorage.setItem('shop-draft', safeStringify(draftData));
     setLastSaved(new Date());
     toast({
-      title: (() => { const key = 'createShop.draftSaved'; const s = t(key); return s && s !== key ? s : 'Brouillon sauvegardé'; })(),
-      description: (() => { const key = 'createShop.draftSavedDesc'; const s = t(key); return s && s !== key ? s : 'Le brouillon a été sauvegardé.'; })(),
+      title: tr('createShop.draftSaved', { fr: 'Brouillon sauvegardé', en: 'Draft saved', es: 'Borrador guardado', it: 'Bozza salvata', de: 'Entwurf gespeichert', ar: 'تم حفظ المسودة' }),
+      description: tr('createShop.draftSavedDesc', { fr: 'Le brouillon a été sauvegardé.', en: 'The draft has been saved.', es: 'El borrador ha sido guardado.', it: 'La bozza è stata salvata.', de: 'Der Entwurf wurde gespeichert.', ar: 'تم حفظ المسودة.' }),
     });
-  }, [formData, toast, t]);
+  }, [formData, toast, tr]);
 
   const handleReset = useCallback(() => {
-    const confirmText = (() => { const key = 'createShop.confirmReset'; const s = t(key); return s && s !== key ? s : 'Êtes-vous sûr de vouloir réinitialiser tout le formulaire ?'; })();
+    const confirmText = tr('createShop.confirmReset', { fr: 'Êtes-vous sûr de vouloir réinitialiser tout le formulaire ?', en: 'Are you sure you want to reset the entire form?', es: '¿Seguro que deseas reiniciar todo el formulario?', it: 'Sei sicuro di voler reimpostare l’intero modulo?', de: 'Möchten Sie das gesamte Formular wirklich zurücksetzen?', ar: 'هل أنت متأكد من رغبتك في إعادة تعيين النموذج بالكامل؟' });
     if (!window.confirm(confirmText)) return;
     setFormData(INITIAL_FORM_DATA);
     setLogoFile(null);
@@ -221,10 +228,10 @@ const CreateShopPage: React.FC = () => {
     setLastSaved(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     toast({
-      title: (() => { const key = 'createShop.formReset'; const s = t(key); return s && s !== key ? s : 'Formulaire réinitialisé'; })(),
-      description: (() => { const key = 'createShop.formResetDesc'; const s = t(key); return s && s !== key ? s : 'Le formulaire a été réinitialisé.'; })(),
+      title: tr('createShop.formReset', { fr: 'Formulaire réinitialisé', en: 'Form reset', es: 'Formulario reiniciado', it: 'Modulo reimpostato', de: 'Formular zurückgesetzt', ar: 'تمت إعادة تعيين النموذج' }),
+      description: tr('createShop.formResetDesc', { fr: 'Le formulaire a été réinitialisé.', en: 'The form has been reset.', es: 'El formulario ha sido reiniciado.', it: 'Il modulo è stato reimpostato.', de: 'Das Formular wurde zurückgesetzt.', ar: 'تمت إعادة تعيين النموذج.' }),
     });
-  }, [INITIAL_FORM_DATA, clearDraft, t, toast]);
+  }, [INITIAL_FORM_DATA, clearDraft, toast, tr]);
   
   
   
@@ -262,14 +269,28 @@ const CreateShopPage: React.FC = () => {
     }
   }, [user, navigate, getLocalizedPath, loadDraft]);
 
-  const selectedWilayaCode = useMemo(() => {
-    const selected = wilayas.find(w => w.name === formData.wilaya);
-    return selected?.code != null ? String(selected.code) : '';
+  const selectedWilaya = useMemo(() => {
+    return (
+      wilayas.find((wilaya) =>
+        [wilaya.name, wilaya.name_fr, wilaya.name_ar]
+          .filter(Boolean)
+          .some((candidate) => candidate === formData.wilaya)
+      ) || null
+    );
   }, [formData.wilaya]);
+
+  const selectedWilayaCode = useMemo(() => {
+    return selectedWilaya?.code != null ? String(selectedWilaya.code) : '';
+  }, [selectedWilaya]);
 
   const availableCommunes = useMemo(() => {
     return selectedWilayaCode ? (communes[selectedWilayaCode] ?? []) : [];
   }, [selectedWilayaCode]);
+
+  const selectedCommuneFr = useMemo(() => {
+    const selected = availableCommunes.find((commune) => commune.fr === formData.commune || commune.ar === formData.commune);
+    return selected?.fr || formData.commune;
+  }, [availableCommunes, formData.commune]);
 
   // Gestion des changements dans les champs
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -457,7 +478,7 @@ const CreateShopPage: React.FC = () => {
     if (!isVideoEnabled) {
       toast({
         title: t('createShop.shopInfo.productVideos'),
-        description: t('createShop.shopInfo.videoUploadDisabled') || "L'upload de vidéos est désactivé",
+        description: tr('createShop.shopInfo.videoUploadDisabled', { fr: "L'upload de vidéos est désactivé", en: 'Video upload is disabled', es: 'La carga de vídeos está desactivada', it: 'Il caricamento dei video è disattivato', de: 'Das Hochladen von Videos ist deaktiviert', ar: 'رفع الفيديوهات معطل' }),
         variant: "destructive"
       });
       return;
@@ -590,8 +611,8 @@ const CreateShopPage: React.FC = () => {
         .insert({
           name: formData.name,
           description: formData.description,
-          wilaya: formData.wilaya,
-          commune: formData.commune,
+          wilaya: selectedWilaya?.name_fr || selectedWilaya?.name || formData.wilaya,
+          commune: selectedCommuneFr || null,
           shop_status: formData.shopStatus,
           phone_numbers: formData.phoneNumbers.filter(phone => phone.trim() !== ''),
           landline_phone: formData.landlinePhone,
@@ -907,7 +928,7 @@ const CreateShopPage: React.FC = () => {
                           <div className="mt-6 pt-4 border-t border-slate-200/60">
                              <Label className="text-sm font-medium mb-3 block flex items-center gap-2 text-purple-700">
                                 <MapPin className="h-4 w-4" />
-                                {t('professions.improvements.geolocalization') || 'Géolocalisation précise'}
+                                {tr('professions.improvements.geolocalization', { fr: 'Géolocalisation précise', en: 'Precise geolocation', es: 'Geolocalización precisa', it: 'Geolocalizzazione precisa', de: 'Genaue Geolokalisierung', ar: 'تحديد الموقع بدقة' })}
                              </Label>
                              <LocationPicker 
                                 initialLat={formData.gpsCoordinates.lat || 36.75} 
@@ -1536,7 +1557,7 @@ const CreateShopPage: React.FC = () => {
                         </div>
                         <div>
                           <h3 className={panelTitleClassName}>
-                            {t('createAd.delivery') || 'Livraison'}
+                            {tr('createAd.delivery', { fr: 'Livraison', en: 'Delivery', es: 'Entrega', it: 'Consegna', de: 'Lieferung', ar: 'التوصيل' })}
                           </h3>
                           <p className={panelSubTitleClassName}>{t('createShop.options.deliverySubtitle')}</p>
                         </div>
@@ -1545,7 +1566,7 @@ const CreateShopPage: React.FC = () => {
                         <div className={panelItemClassName}>
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label className="text-base font-semibold text-slate-700 dark:text-slate-300">{t('createAd.delivery') || 'Livraison'}</Label>
+                              <Label className="text-base font-semibold text-slate-700 dark:text-slate-300">{tr('createAd.delivery', { fr: 'Livraison', en: 'Delivery', es: 'Entrega', it: 'Consegna', de: 'Lieferung', ar: 'التوصيل' })}</Label>
                               <div onClick={(e) => e.stopPropagation()}>
                                 <Select
                                   onValueChange={(value) => {
@@ -1566,12 +1587,12 @@ const CreateShopPage: React.FC = () => {
                                   value={formData.deliveryOptions.method as 'hand_to_hand' | 'delivery_agency' | 'mobile_courier'}
                                 >
                                   <SelectTrigger className="text-base h-12 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-purple-300">
-                                    <SelectValue placeholder={t('createAd.delivery.select') || 'Choisir une option'} />
+                                    <SelectValue placeholder={tr('createAd.delivery.select', { fr: 'Choisir une option', en: 'Choose an option', es: 'Elegir una opción', it: 'Scegli un’opzione', de: 'Option wählen', ar: 'اختر خياراً' })} />
                                   </SelectTrigger>
                                   <SelectContent className="rounded-xl shadow-xl border-slate-100">
-                                    <SelectItem value="hand_to_hand">{t('createAd.delivery.methods.handToHand') || 'Remise en main propre'}</SelectItem>
-                                    <SelectItem value="delivery_agency">{t('createAd.delivery.methods.deliveryAgency') || 'Agence de livraison'}</SelectItem>
-                                    <SelectItem value="mobile_courier">{t('createAd.delivery.methods.mobileCourier') || 'Livreur ambulant'}</SelectItem>
+                                    <SelectItem value="hand_to_hand">{tr('createAd.delivery.methods.handToHand', { fr: 'Remise en main propre', en: 'Hand delivery', es: 'Entrega en mano', it: 'Consegna a mano', de: 'Persönliche Übergabe', ar: 'تسليم يدوي' })}</SelectItem>
+                                    <SelectItem value="delivery_agency">{tr('createAd.delivery.methods.deliveryAgency', { fr: 'Agence de livraison', en: 'Delivery agency', es: 'Agencia de entrega', it: 'Agenzia di consegna', de: 'Lieferagentur', ar: 'وكالة توصيل' })}</SelectItem>
+                                    <SelectItem value="mobile_courier">{tr('createAd.delivery.methods.mobileCourier', { fr: 'Livreur ambulant', en: 'Mobile courier', es: 'Repartidor móvil', it: 'Corriere mobile', de: 'Mobiler Kurier', ar: 'موصل متنقل' })}</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -1580,13 +1601,13 @@ const CreateShopPage: React.FC = () => {
                             {formData.deliveryOptions.method === 'delivery_agency' && (
                               <div className="space-y-2">
                                 <Label htmlFor="deliveryLocationName" className="text-base font-semibold text-slate-700 dark:text-slate-300">
-                                  {t('createAd.delivery.agencyName') || "Nom de l'agence"}
+                                  {tr('createAd.delivery.agencyName', { fr: "Nom de l'agence", en: 'Agency name', es: 'Nombre de la agencia', it: 'Nome dell’agenzia', de: 'Name der Agentur', ar: 'اسم الوكالة' })}
                                 </Label>
                                 <Input
                                   id="deliveryLocationName"
                                   value={formData.deliveryOptions.locationName}
                                   onChange={(e) => _handleNestedChange('deliveryOptions', 'locationName', e.target.value)}
-                                  placeholder={t('createAd.delivery.agencyPlaceholder') || "Ex: Yalidine, ZR Express..."}
+                                  placeholder={tr('createAd.delivery.agencyPlaceholder', { fr: 'Ex: Yalidine, ZR Express...', en: 'Ex: Yalidine, ZR Express...', es: 'Ej: Yalidine, ZR Express...', it: 'Es: Yalidine, ZR Express...', de: 'Z. B. Yalidine, ZR Express...', ar: 'مثال: Yalidine, ZR Express...' })}
                                   className="text-base h-12 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 shadow-sm transition-all duration-300 hover:shadow-md hover:border-purple-300"
                                 />
                               </div>

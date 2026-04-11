@@ -10,8 +10,8 @@ export const italianUserMenu = {
   "navigation.myFavoritesDesc": "Vedi i tuoi annunci salvati",
   "navigation.settings": "Impostazioni",
   "navigation.settingsDesc": "Configura il tuo account",
-  "navigation.productSearch": "Le mie Offerte di Servizi Professionali",
-  "navigation.productSearchDesc": "Gestisci le tue offerte di servizi e migliora le tue competenze",
+  "navigation.productSearch": "Le mie richieste di prodotti",
+  "navigation.productSearchDesc": "Gestisci le tue richieste di prodotti e le ricerche pubblicate",
   "navigation.logout": "Esci",
 
   // Richiesta di ricerca

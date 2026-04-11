@@ -6,8 +6,8 @@ export const userMenuTranslations = {
   "navigation.myShops": "Mis tiendas",
   "navigation.myFavorites": "Mis favoritos",
   "navigation.settings": "Configuración",
-  "navigation.productSearch": "Mis Ofertas de Servicios Profesionales",
-  "navigation.productSearchDesc": "Gestiona tus ofertas de servicios y mejora tus habilidades",
+  "navigation.productSearch": "Mis solicitudes de productos",
+  "navigation.productSearchDesc": "Gestiona tus solicitudes de productos y búsquedas publicadas",
   
   "navigation.logout": "Cerrar sesión",
 

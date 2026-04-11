@@ -68,7 +68,7 @@ const MyAnnouncementsPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { navigateWithLanguage } = useLanguageNavigation();
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -79,9 +79,11 @@ const MyAnnouncementsPage: React.FC = () => {
   const [selectedForPromotion, setSelectedForPromotion] = useState<string | null>(null);
   const [relaunchingId, setRelaunchingId] = useState<string | null>(null);
 
-  const translateOrFallback = (key: string, fallback: string) => {
+  const translateOrFallback = (key: string, fallback: string | Record<string, string>) => {
     const translated = t(key);
-    return translated && translated !== key ? translated : fallback;
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
   };
 
   const fetchAnnouncements = useCallback(async () => {
@@ -205,7 +207,14 @@ const MyAnnouncementsPage: React.FC = () => {
         title: translateOrFallback('common.success', 'Succès'),
         description: translateOrFallback(
           'mesAnnonces.relaunchSuccess',
-          `L'annonce est maintenant valable jusqu'au ${expiresAt.toLocaleDateString()}.`
+          {
+            fr: `L'annonce est maintenant valable jusqu'au ${expiresAt.toLocaleDateString()}.`,
+            en: `The listing is now valid until ${expiresAt.toLocaleDateString()}.`,
+            es: `El anuncio ahora es válido hasta el ${expiresAt.toLocaleDateString()}.`,
+            it: `L'annuncio è ora valido fino al ${expiresAt.toLocaleDateString()}.`,
+            de: `Die Anzeige ist jetzt bis zum ${expiresAt.toLocaleDateString()} gültig.`,
+            ar: `الإعلان صالح الآن حتى ${expiresAt.toLocaleDateString()}.`,
+          }
         ),
       });
       fetchAnnouncements();
@@ -215,7 +224,14 @@ const MyAnnouncementsPage: React.FC = () => {
         title: translateOrFallback('common.error', 'Erreur'),
         description: translateOrFallback(
           'mesAnnonces.relaunchError',
-          "Erreur lors de la relance de l'annonce"
+          {
+            fr: "Erreur lors de la relance de l'annonce",
+            en: 'Error while relaunching the listing',
+            es: 'Error al relanzar el anuncio',
+            it: "Errore durante il rilancio dell'annuncio",
+            de: 'Fehler beim erneuten Veröffentlichen der Anzeige',
+            ar: 'حدث خطأ أثناء إعادة نشر الإعلان',
+          }
         ),
         variant: 'destructive'
       });

@@ -5,7 +5,14 @@ import { Calendar, Shield, Lock, Users } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 
 const Authentification = () => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -208,8 +215,8 @@ const Authentification = () => {
               <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <p className="text-sm">
                   <strong>Email:</strong> security@aladdin.dz<br />
-                  <strong>Téléphone:</strong> +213 21 XX XX XX<br />
-                  <strong>Horaires:</strong> {t('authentification.contact.hours')}
+                  <strong>{tr('contact.info.phone.title', { fr: 'Téléphone', en: 'Phone', es: 'Teléfono', it: 'Telefono', de: 'Telefon', ar: 'الهاتف' })}:</strong> +213 21 XX XX XX<br />
+                  <strong>{tr('contact.info.hours.title', { fr: 'Horaires', en: 'Hours', es: 'Horarios', it: 'Orari', de: 'Zeiten', ar: 'الأوقات' })}:</strong> {t('authentification.contact.hours')}
                 </p>
               </div>
             </CardContent>

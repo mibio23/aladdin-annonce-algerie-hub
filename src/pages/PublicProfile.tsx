@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import ReviewsSection from '@/components/reviews/ReviewsSection';
 import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
+import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 interface PublicProfileData {
   id: string;
@@ -26,9 +27,17 @@ const PublicProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
+  const { getLocalizedPath } = useLanguageNavigation();
   const [profileData, setProfileData] = useState<PublicProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   const fetchProfile = useCallback(async () => {
     if (!userId) return;
@@ -43,7 +52,14 @@ const PublicProfile = () => {
         logger.error('Error fetching profile:', error);
         setProfileData({
           id: userId,
-          display_name: 'Utilisateur inconnu',
+          display_name: tr('publicProfile.unknownUser', {
+            fr: 'Utilisateur inconnu',
+            en: 'Unknown user',
+            es: 'Usuario desconocido',
+            it: 'Utente sconosciuto',
+            de: 'Unbekannter Benutzer',
+            ar: 'مستخدم غير معروف',
+          }),
           bio: undefined,
           avatar_url: undefined,
           created_at: new Date().toISOString()
@@ -54,8 +70,15 @@ const PublicProfile = () => {
     } catch (error) {
       logger.error('Error fetching profile:', error);
       toast({
-        title: 'Erreur',
-        description: "Impossible de charger ce profil",
+        title: t('common.error'),
+        description: tr('publicProfile.loadError', {
+          fr: 'Impossible de charger ce profil',
+          en: 'Unable to load this profile',
+          es: 'No se pudo cargar este perfil',
+          it: 'Impossibile caricare questo profilo',
+          de: 'Dieses Profil konnte nicht geladen werden',
+          ar: 'تعذر تحميل هذا الملف الشخصي',
+        }),
         variant: 'destructive',
       });
     } finally {
@@ -86,7 +109,14 @@ const PublicProfile = () => {
         .insert({
           participant_1_id: currentUser.id,
           participant_2_id: profileData.id,
-          title: `Conversation avec ${profileData?.display_name || 'Utilisateur'}`,
+          title: tr('publicProfile.conversationWith', {
+            fr: `Conversation avec ${profileData?.display_name || 'Utilisateur'}`,
+            en: `Conversation with ${profileData?.display_name || 'User'}`,
+            es: `Conversación con ${profileData?.display_name || 'Usuario'}`,
+            it: `Conversazione con ${profileData?.display_name || 'Utente'}`,
+            de: `Gespräch mit ${profileData?.display_name || 'Benutzer'}`,
+            ar: `محادثة مع ${profileData?.display_name || 'مستخدم'}`,
+          }),
           last_message_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -96,12 +126,19 @@ const PublicProfile = () => {
       if (error) throw error;
 
       // Rediriger vers la nouvelle conversation
-      window.location.href = `/messages?conversation=${newConversation.id}`;
+      window.location.href = getLocalizedPath(`/messages?conversation=${newConversation.id}`);
     } catch (error) {
       logger.error('Error starting conversation:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de démarrer la conversation",
+        title: t('common.error'),
+        description: tr('publicProfile.startConversationError', {
+          fr: 'Impossible de démarrer la conversation',
+          en: 'Unable to start the conversation',
+          es: 'No se pudo iniciar la conversación',
+          it: 'Impossibile avviare la conversazione',
+          de: 'Die Konversation konnte nicht gestartet werden',
+          ar: 'تعذر بدء المحادثة',
+        }),
         variant: 'destructive',
       });
     }
@@ -120,14 +157,37 @@ const PublicProfile = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <User className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h2 className="text-2xl font-bold mb-4">Profil non trouvé</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            {tr('publicProfile.notFound', {
+              fr: 'Profil non trouvé',
+              en: 'Profile not found',
+              es: 'Perfil no encontrado',
+              it: 'Profilo non trovato',
+              de: 'Profil nicht gefunden',
+              ar: 'الملف الشخصي غير موجود',
+            })}
+          </h2>
           <p className="text-muted-foreground mb-6">
-            Ce profil n'existe pas ou a été supprimé.
+            {tr('publicProfile.notFoundDesc', {
+              fr: "Ce profil n'existe pas ou a été supprimé.",
+              en: 'This profile does not exist or has been deleted.',
+              es: 'Este perfil no existe o ha sido eliminado.',
+              it: 'Questo profilo non esiste o è stato eliminato.',
+              de: 'Dieses Profil existiert nicht oder wurde gelöscht.',
+              ar: 'هذا الملف الشخصي غير موجود أو تم حذفه.',
+            })}
           </p>
           <LocalizedLink to="/">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour à l'accueil
+              {tr('categories.backToHome', {
+                fr: "Retour à l'accueil",
+                en: 'Back to home',
+                es: 'Volver al inicio',
+                it: 'Torna alla home',
+                de: 'Zur Startseite',
+                ar: 'العودة إلى الرئيسية',
+              })}
             </Button>
           </LocalizedLink>
         </div>
@@ -135,7 +195,14 @@ const PublicProfile = () => {
     );
   }
 
-  const userName = profileData.display_name || 'Utilisateur';
+  const userName = profileData.display_name || tr('publicProfile.user', {
+    fr: 'Utilisateur',
+    en: 'User',
+    es: 'Usuario',
+    it: 'Utente',
+    de: 'Benutzer',
+    ar: 'مستخدم',
+  });
   const userInitials = userName.charAt(0).toUpperCase();
   const memberSince = new Date(profileData.created_at);
 
@@ -147,7 +214,14 @@ const PublicProfile = () => {
           <div className="mb-6">
             <LocalizedLink to="/" className="inline-flex items-center text-muted-foreground hover:text-primary">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
+              {tr('common.back', {
+                fr: 'Retour',
+                en: 'Back',
+                es: 'Volver',
+                it: 'Indietro',
+                de: 'Zurück',
+                ar: 'رجوع',
+              })}
             </LocalizedLink>
           </div>
 

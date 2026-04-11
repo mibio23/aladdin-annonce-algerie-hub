@@ -187,8 +187,8 @@ const navigationDe = {
 
   // Navigation additional
   "navigation.backToDashboard": "Zurück zum Dashboard",
-  "navigation.productSearch": "Meine professionellen Dienstleistungsangebote",
-  "navigation.productSearchDesc": "Verwalten Sie Ihre Dienstleistungsangebote und verbessern Sie Ihre Fähigkeiten",
+  "navigation.productSearch": "Meine Produktsuchen",
+  "navigation.productSearchDesc": "Verwalten Sie Ihre Produktanfragen und veröffentlichten Suchen",
   
   "navigation.logout": "Abmelden",
 

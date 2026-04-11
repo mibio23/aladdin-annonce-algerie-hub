@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/useAuth";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { Button } from "@/components/ui/button";
+import { wilayas } from "@/data/wilayaData";
+import { communes } from "@/data/communeData";
 
 interface ShopCardInfoProps {
   shopId: string;
@@ -24,12 +26,52 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
   rating: initialRating = 0,
   votes: initialVotes = 0,
 }) => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const [rating, setRating] = useState(initialRating);
   const [votes, setVotes] = useState(initialVotes);
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === "string") return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
+  const normalizeText = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+  const findWilaya = (value?: string | null) => {
+    if (!value) return null;
+    const normalized = normalizeText(value);
+    return wilayas.find((entry) =>
+      [entry.code.toString(), entry.name, entry.name_fr, entry.name_ar]
+        .filter(Boolean)
+        .some((candidate) => normalizeText(String(candidate)) === normalized)
+    ) || null;
+  };
+
+  const localizedWilaya = (() => {
+    const match = findWilaya(wilaya);
+    if (!match) return wilaya;
+    return language === 'ar' ? match.name_ar || match.name_fr || match.name : match.name_fr || match.name;
+  })();
+
+  const localizedCommune = (() => {
+    if (!commune) return '';
+    const wilayaMatch = findWilaya(wilaya || commune);
+    const scopedCommunes = wilayaMatch ? communes[String(wilayaMatch.code)] || [] : [];
+    const allCommunes = scopedCommunes.length ? scopedCommunes : Object.values(communes).flat();
+    const normalized = normalizeText(commune);
+    const match = allCommunes.find((entry) =>
+      [entry.fr, entry.ar]
+        .filter(Boolean)
+        .some((candidate) => normalizeText(String(candidate)) === normalized)
+    );
+    if (!match) return commune;
+    return language === 'ar' ? match.ar || match.fr : match.fr;
+  })();
 
   // Charger le vote de l'utilisateur au chargement
   useEffect(() => {
@@ -147,7 +189,7 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
         <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
           <MapPin size={16} className="text-emerald-500 shrink-0" />
           <span className="truncate max-w-[200px]">
-            {wilaya}{commune ? ` - ${commune}` : ''}
+            {localizedWilaya}{localizedCommune ? ` - ${localizedCommune}` : ''}
           </span>
         </div>
 
@@ -173,7 +215,7 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
             ))}
           </div>
           <span className="text-xs text-slate-400">
-            ({votes} avis)
+            ({votes} {tr('viewShop.reviewsCount', { fr: 'avis', en: 'reviews', es: 'reseñas', it: 'recensioni', de: 'Bewertungen', ar: 'تقييمات' })})
           </span>
         </div>
       </div>

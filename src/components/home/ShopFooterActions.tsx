@@ -1,5 +1,6 @@
 import React from "react";
 import { Phone, MessageSquare, Share2, MessageCircle, Heart } from "lucide-react";
+import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
 interface ShopFooterActionsProps {
   isFavorite: boolean;
@@ -13,7 +14,17 @@ const ShopFooterActions: React.FC<ShopFooterActionsProps> = ({
   followersCount,
   onFavoriteToggle,
   onShareClick,
-}) => (
+}) => {
+  const { t, language } = useSafeI18nWithRouter();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === "string") return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
+  return (
   <div className="flex flex-col gap-3 mb-3 px-2">
     <div className="flex items-center justify-between gap-2">
       <button
@@ -30,7 +41,11 @@ const ShopFooterActions: React.FC<ShopFooterActionsProps> = ({
             className={`transition-all ${isFavorite ? "fill-current scale-110 animate-pulse" : "group-hover:scale-110"}`} 
           />
         </div>
-        <span>{isFavorite ? "Suivi" : "Suivre"}</span>
+        <span>
+          {isFavorite
+            ? tr('viewShop.following', { fr: 'Suivi', en: 'Following', es: 'Siguiendo', it: 'Seguito', de: 'Gefolgt', ar: 'متابَع' })
+            : tr('viewShop.follow', { fr: 'Suivre', en: 'Follow', es: 'Seguir', it: 'Segui', de: 'Folgen', ar: 'متابعة' })}
+        </span>
         {followersCount > 0 && (
           <span className={`ml-1 text-sm font-bold px-2 py-0.5 rounded-full ${
             isFavorite 
@@ -45,7 +60,7 @@ const ShopFooterActions: React.FC<ShopFooterActionsProps> = ({
       <button
         onClick={(e) => onShareClick(e, "Share")}
         className="p-3 text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-500 rounded-xl transition-colors bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700"
-        title="Partager"
+        title={tr('common.share', { fr: 'Partager', en: 'Share', es: 'Compartir', it: 'Condividi', de: 'Teilen', ar: 'مشاركة' })}
       >
         <Share2 size={32} />
       </button>
@@ -55,26 +70,27 @@ const ShopFooterActions: React.FC<ShopFooterActionsProps> = ({
       <button
         onClick={(e) => onShareClick(e, "Phone")}
         className="flex-1 p-4 text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500 rounded-xl transition-colors bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 border border-slate-200 dark:border-slate-700 flex justify-center items-center"
-        title="Appeler"
+        title={tr('viewShop.call', { fr: 'Appeler', en: 'Call', es: 'Llamar', it: 'Chiama', de: 'Anrufen', ar: 'اتصال' })}
       >
         <Phone size={32} />
       </button>
       <button
         onClick={(e) => onShareClick(e, "Message")}
         className="flex-1 p-4 text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-500 rounded-xl transition-colors bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-slate-200 dark:border-slate-700 flex justify-center items-center"
-        title="Message"
+        title={tr('viewShop.message', { fr: 'Message', en: 'Message', es: 'Mensaje', it: 'Messaggio', de: 'Nachricht', ar: 'رسالة' })}
       >
         <MessageSquare size={32} />
       </button>
       <button
         onClick={(e) => onShareClick(e, "WhatsApp")}
         className="flex-1 p-4 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-500 rounded-xl transition-colors bg-slate-100 dark:bg-slate-800 hover:bg-green-50 dark:hover:bg-green-900/30 border border-slate-200 dark:border-slate-700 flex justify-center items-center"
-        title="WhatsApp"
+        title={tr('viewShop.whatsapp', { fr: 'WhatsApp', en: 'WhatsApp', es: 'WhatsApp', it: 'WhatsApp', de: 'WhatsApp', ar: 'واتساب' })}
       >
         <MessageCircle size={32} />
       </button>
     </div>
   </div>
-);
+  );
+};
 
 export default ShopFooterActions;

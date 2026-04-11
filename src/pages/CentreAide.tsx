@@ -8,8 +8,15 @@ import SEOHead from '@/components/SEO/SEOHead';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 const CentreAide = () => {
-  const { t, isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
   const helpFaqs = [
     { question: t('helpCenter.popularTopics.createAccount'), answer: t('helpCenter.popularTopics.createAccountDesc') },
     { question: t('helpCenter.popularTopics.postAd'), answer: t('helpCenter.popularTopics.postAdDesc') },
@@ -37,7 +44,12 @@ const CentreAide = () => {
         title={t('helpCenter.title')}
         description={t('helpCenter.subtitle')}
         url={getLocalizedPath('/centre-aide')}
-        keywords={[t('helpCenter.title'), 'aide', 'support', 'faq']}
+        keywords={[
+          t('helpCenter.title'),
+          tr('common.help', { fr: 'aide', en: 'help', es: 'ayuda', it: 'aiuto', de: 'hilfe', ar: 'مساعدة' }),
+          tr('common.support', { fr: 'support', en: 'support', es: 'soporte', it: 'supporto', de: 'support', ar: 'الدعم' }),
+          'faq',
+        ]}
         structuredData={helpStructuredData}
       />
       <main className="flex-1">

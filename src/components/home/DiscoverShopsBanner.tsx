@@ -1,7 +1,14 @@
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
 
 const DiscoverShopsBanner = () => {
-  const { t, isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL, language } = useSafeI18nWithRouter();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === "string") return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   return (
     <div className={`mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -11,7 +18,7 @@ const DiscoverShopsBanner = () => {
         <div className={`${isRTL ? 'ml-3' : 'mr-3'}`}>
           <img 
             src="/lovable-uploads/4cf4a1ea-082d-4d7d-8b1b-01eb5e04557a.png" 
-            alt="Aladdin Logo" 
+            alt={tr('common.aladdinLogo', { fr: 'Logo Aladdin', en: 'Aladdin logo', es: 'Logo de Aladdin', it: 'Logo di Aladdin', de: 'Aladdin-Logo', ar: 'شعار علاء الدين' })} 
             className="w-8 h-8 object-contain"
           />
         </div>

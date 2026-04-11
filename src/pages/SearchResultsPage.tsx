@@ -28,6 +28,13 @@ const SearchResultsPage: React.FC = () => {
   const { getLocalizedPath } = useLanguageNavigation();
   const { announcements = [], loading, fetchAnnouncements, totalCount, isApproximate } = useAnnouncements();
 
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
   useRealtimeAnnouncements();
   
   useListenNewAnnouncements((newAnnouncement) => {
@@ -183,10 +190,31 @@ const SearchResultsPage: React.FC = () => {
       ? `${t('search.page.title')} - ${selectedCategoryName}`
       : t('search.page.title');
   const searchPageDescription = searchQuery
-    ? `Résultats de recherche pour "${searchQuery}" sur Aladdin Annonces Algérie. Parcourez les annonces disponibles${selectedCategoryName ? ` dans ${selectedCategoryName}` : ''}.`
+    ? tr('search.page.queryDescription', {
+        fr: `Résultats de recherche pour "${searchQuery}" sur Aladdin Annonces Algérie. Parcourez les annonces disponibles${selectedCategoryName ? ` dans ${selectedCategoryName}` : ''}.`,
+        en: `Search results for "${searchQuery}" on Aladdin Algeria Listings. Browse the available listings${selectedCategoryName ? ` in ${selectedCategoryName}` : ''}.`,
+        es: `Resultados de búsqueda para "${searchQuery}" en Anuncios Aladdin Argelia. Explora los anuncios disponibles${selectedCategoryName ? ` en ${selectedCategoryName}` : ''}.`,
+        it: `Risultati di ricerca per "${searchQuery}" su Annunci Aladdin Algeria. Sfoglia gli annunci disponibili${selectedCategoryName ? ` in ${selectedCategoryName}` : ''}.`,
+        de: `Suchergebnisse für "${searchQuery}" auf Aladdin Anzeigen Algerien. Durchsuchen Sie die verfügbaren Anzeigen${selectedCategoryName ? ` in ${selectedCategoryName}` : ''}.`,
+        ar: `نتائج البحث عن "${searchQuery}" على إعلانات علاء الدين الجزائر. تصفح الإعلانات المتاحة${selectedCategoryName ? ` في ${selectedCategoryName}` : ''}.`,
+      })
     : selectedCategoryName
-      ? `Résultats de recherche dans ${selectedCategoryName} sur Aladdin Annonces Algérie.`
-      : 'Résultats de recherche sur Aladdin Annonces Algérie. Parcourez les annonces selon vos filtres.';
+      ? tr('search.page.categoryDescription', {
+          fr: `Résultats de recherche dans ${selectedCategoryName} sur Aladdin Annonces Algérie.`,
+          en: `Search results in ${selectedCategoryName} on Aladdin Algeria Listings.`,
+          es: `Resultados de búsqueda en ${selectedCategoryName} en Anuncios Aladdin Argelia.`,
+          it: `Risultati di ricerca in ${selectedCategoryName} su Annunci Aladdin Algeria.`,
+          de: `Suchergebnisse in ${selectedCategoryName} auf Aladdin Anzeigen Algerien.`,
+          ar: `نتائج البحث في ${selectedCategoryName} على إعلانات علاء الدين الجزائر.`,
+        })
+      : tr('search.page.description', {
+          fr: 'Résultats de recherche sur Aladdin Annonces Algérie. Parcourez les annonces selon vos filtres.',
+          en: 'Search results on Aladdin Algeria Listings. Browse listings according to your filters.',
+          es: 'Resultados de búsqueda en Anuncios Aladdin Argelia. Explora los anuncios según tus filtros.',
+          it: 'Risultati di ricerca su Annunci Aladdin Algeria. Sfoglia gli annunci in base ai tuoi filtri.',
+          de: 'Suchergebnisse auf Aladdin Anzeigen Algerien. Durchsuchen Sie Anzeigen nach Ihren Filtern.',
+          ar: 'نتائج البحث على إعلانات علاء الدين الجزائر. تصفح الإعلانات حسب عوامل التصفية الخاصة بك.',
+        });
   const searchPageUrl = `${getLocalizedPath('/search')}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
   const searchHasDynamicFilters = Boolean(searchQuery || selectedCategory || selectedSubCategory || selectedSpecialisation || selectedCondition || minPrice || maxPrice || location || selectedWilaya);
   const searchBreadcrumbs = [
@@ -243,7 +271,14 @@ const SearchResultsPage: React.FC = () => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-amber-700">
-                    {t('search.approximateResults') || `Aucun résultat exact pour "${searchQuery}", voici des résultats approchants :`}
+                    {tr('search.approximateResults', {
+                      fr: `Aucun résultat exact pour "${searchQuery}", voici des résultats approchants :`,
+                      en: `No exact result for "${searchQuery}", here are similar results:`,
+                      es: `No hay resultados exactos para "${searchQuery}", aquí tienes resultados aproximados:`,
+                      it: `Nessun risultato esatto per "${searchQuery}", ecco risultati simili:`,
+                      de: `Kein genaues Ergebnis für "${searchQuery}", hier sind ähnliche Ergebnisse:`,
+                      ar: `لا توجد نتائج مطابقة تماماً لـ "${searchQuery}"، إليك نتائج قريبة:`,
+                    })}
                   </p>
                 </div>
               </div>
@@ -290,9 +325,25 @@ const SearchResultsPage: React.FC = () => {
               <>
                 {!loading && displayResults.length === 0 && (
                   <div className="text-center py-16">
-                    <p className="text-xl text-muted-foreground">{t('search.noResults') || "Aucun résultat trouvé"}</p>
+                    <p className="text-xl text-muted-foreground">
+                      {tr('search.noResults', {
+                        fr: 'Aucun résultat trouvé',
+                        en: 'No results found',
+                        es: 'No se encontraron resultados',
+                        it: 'Nessun risultato trovato',
+                        de: 'Keine Ergebnisse gefunden',
+                        ar: 'لم يتم العثور على نتائج',
+                      })}
+                    </p>
                     <Button onClick={() => { setSearchQuery(''); handleSearch(); }} variant="link" className="mt-2">
-                       {t('search.clearSearch') || "Effacer la recherche"}
+                       {tr('search.clearSearch', {
+                         fr: 'Effacer la recherche',
+                         en: 'Clear search',
+                         es: 'Borrar búsqueda',
+                         it: 'Cancella ricerca',
+                         de: 'Suche löschen',
+                         ar: 'مسح البحث',
+                       })}
                     </Button>
                   </div>
                 )}

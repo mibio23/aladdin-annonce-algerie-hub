@@ -8,8 +8,15 @@ import SEOHead from '@/components/SEO/SEOHead';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 const FAQ = () => {
-  const { t, isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   const faqCategories = [
     {
@@ -136,7 +143,12 @@ const FAQ = () => {
         title={t('faq.title')}
         description={t('faq.subtitle')}
         url={getLocalizedPath('/faq')}
-        keywords={[t('faq.title'), 'faq', 'aide', 'support']}
+        keywords={[
+          t('faq.title'),
+          'faq',
+          tr('common.help', { fr: 'aide', en: 'help', es: 'ayuda', it: 'aiuto', de: 'hilfe', ar: 'مساعدة' }),
+          tr('common.support', { fr: 'support', en: 'support', es: 'soporte', it: 'supporto', de: 'support', ar: 'الدعم' }),
+        ]}
         structuredData={faqStructuredData}
       />
       <main className="flex-1">

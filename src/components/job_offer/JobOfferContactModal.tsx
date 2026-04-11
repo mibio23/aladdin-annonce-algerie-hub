@@ -26,16 +26,30 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!offer || !offer.user_id) {
       toast({
-        title: "Erreur",
-        description: "Impossible de contacter le professionnel (Informations manquantes)",
+        title: t('common.error'),
+        description: tr('jobOfferContact.missingInfo', {
+          fr: 'Impossible de contacter le professionnel (informations manquantes)',
+          en: 'Unable to contact the professional (missing information)',
+          es: 'No se puede contactar al profesional (falta información)',
+          it: 'Impossibile contattare il professionista (informazioni mancanti)',
+          de: 'Der Dienstleister kann nicht kontaktiert werden (fehlende Informationen)',
+          ar: 'تعذر الاتصال بالمهني (معلومات ناقصة)',
+        }),
         variant: "destructive"
       });
       return;
@@ -48,8 +62,15 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
 
     if (offer.user_id === user.id) {
       toast({
-        title: "Erreur",
-        description: "Vous ne pouvez pas envoyer de message à vous-même.",
+        title: t('common.error'),
+        description: tr('jobOfferContact.selfMessage', {
+          fr: 'Vous ne pouvez pas envoyer de message à vous-même.',
+          en: 'You cannot send a message to yourself.',
+          es: 'No puedes enviarte un mensaje a ti mismo.',
+          it: 'Non puoi inviare un messaggio a te stesso.',
+          de: 'Sie können sich nicht selbst eine Nachricht senden.',
+          ar: 'لا يمكنك إرسال رسالة إلى نفسك.',
+        }),
         variant: "destructive"
       });
       return;
@@ -57,8 +78,15 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
 
     if (!message.trim()) {
       toast({
-        title: "Erreur",
-        description: "Veuillez saisir un message",
+        title: t('common.error'),
+        description: tr('jobOfferContact.enterMessage', {
+          fr: 'Veuillez saisir un message',
+          en: 'Please enter a message',
+          es: 'Por favor, introduce un mensaje',
+          it: 'Inserisci un messaggio',
+          de: 'Bitte geben Sie eine Nachricht ein',
+          ar: 'يرجى إدخال رسالة',
+        }),
         variant: "destructive"
       });
       return;
@@ -151,8 +179,22 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
         .eq('id', conversationId);
       
       toast({
-        title: "Message envoyé !",
-        description: `Votre message a été envoyé avec succès.`,
+        title: tr('jobOfferContact.sentTitle', {
+          fr: 'Message envoyé !',
+          en: 'Message sent!',
+          es: '¡Mensaje enviado!',
+          it: 'Messaggio inviato!',
+          de: 'Nachricht gesendet!',
+          ar: 'تم إرسال الرسالة!',
+        }),
+        description: tr('jobOfferContact.sentDesc', {
+          fr: 'Votre message a été envoyé avec succès.',
+          en: 'Your message has been sent successfully.',
+          es: 'Tu mensaje se ha enviado correctamente.',
+          it: 'Il tuo messaggio è stato inviato con successo.',
+          de: 'Ihre Nachricht wurde erfolgreich gesendet.',
+          ar: 'تم إرسال رسالتك بنجاح.',
+        }),
       });
       
       setMessage('');
@@ -165,8 +207,15 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer.",
+        title: t('common.error'),
+        description: tr('jobOfferContact.sendError', {
+          fr: "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer.",
+          en: 'An error occurred while sending your message. Please try again.',
+          es: 'Se produjo un error al enviar tu mensaje. Inténtalo de nuevo.',
+          it: "Si è verificato un errore durante l'invio del messaggio. Riprova.",
+          de: 'Beim Senden Ihrer Nachricht ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.',
+          ar: 'حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى.',
+        }),
         variant: "destructive"
       });
     } finally {
@@ -185,22 +234,52 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
             <MessageCircle className="h-6 w-6 text-primary" />
           </div>
           <DialogTitle className="text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-            Contacter le professionnel
+            {tr('jobOfferContact.title', {
+              fr: 'Contacter le professionnel',
+              en: 'Contact the professional',
+              es: 'Contactar al profesional',
+              it: 'Contatta il professionista',
+              de: 'Dienstleister kontaktieren',
+              ar: 'الاتصال بالمهني',
+            })}
           </DialogTitle>
           <DialogDescription className="text-center text-sm px-4">
-            Envoyez un message concernant "{offer.title}"
+            {tr('jobOfferContact.subtitle', {
+              fr: `Envoyez un message concernant "${offer.title}"`,
+              en: `Send a message about "${offer.title}"`,
+              es: `Envía un mensaje sobre "${offer.title}"`,
+              it: `Invia un messaggio riguardo "${offer.title}"`,
+              de: `Senden Sie eine Nachricht zu "${offer.title}"`,
+              ar: `أرسل رسالة بخصوص "${offer.title}"`,
+            })}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6 pt-4">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="message" className="text-sm font-semibold ml-1">Votre message</Label>
+              <Label htmlFor="message" className="text-sm font-semibold ml-1">
+                {tr('jobOfferContact.yourMessage', {
+                  fr: 'Votre message',
+                  en: 'Your message',
+                  es: 'Tu mensaje',
+                  it: 'Il tuo messaggio',
+                  de: 'Ihre Nachricht',
+                  ar: 'رسالتك',
+                })}
+              </Label>
               <Textarea
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Bonjour, je suis intéressé par vos services. Pouvez-vous me donner plus d'informations ?"
+                placeholder={tr('jobOfferContact.placeholder', {
+                  fr: "Bonjour, je suis intéressé par vos services. Pouvez-vous me donner plus d'informations ?",
+                  en: 'Hello, I am interested in your services. Could you give me more information?',
+                  es: 'Hola, estoy interesado en tus servicios. ¿Puedes darme más información?',
+                  it: 'Ciao, sono interessato ai tuoi servizi. Puoi darmi maggiori informazioni?',
+                  de: 'Hallo, ich interessiere mich für Ihre Dienstleistungen. Können Sie mir mehr Informationen geben?',
+                  ar: 'مرحباً، أنا مهتم بخدماتك. هل يمكنك تزويدي بمزيد من المعلومات؟',
+                })}
                 rows={5}
                 className="resize-none focus-visible:ring-primary rounded-xl border-gray-200 shadow-sm p-4 text-base"
                 required
@@ -213,11 +292,11 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
               className="w-full h-12 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] active:scale-[0.98]"
             >
               {loading ? (
-                <>Envoi en cours...</>
+                <>{tr('jobOfferContact.sending', { fr: 'Envoi en cours...', en: 'Sending...', es: 'Enviando...', it: 'Invio in corso...', de: 'Wird gesendet...', ar: 'جارٍ الإرسال...' })}</>
               ) : (
                 <>
                   <Send className="h-5 w-5 mr-2" />
-                  Envoyer le message
+                  {tr('jobOfferContact.send', { fr: 'Envoyer le message', en: 'Send message', es: 'Enviar mensaje', it: 'Invia il messaggio', de: 'Nachricht senden', ar: 'إرسال الرسالة' })}
                 </>
               )}
             </Button>

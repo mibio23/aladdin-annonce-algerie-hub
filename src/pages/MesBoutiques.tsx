@@ -9,10 +9,12 @@ import { Store, Plus, MapPin, Trash, Edit, Eye } from 'lucide-react';
 import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { wilayas } from '@/data/wilayaData';
+import { communes } from '@/data/communeData';
 
 function MesBoutiques() {
   const { user, loading: authLoading } = useAuth();
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
   const { toast } = useToast();
   
@@ -43,12 +45,76 @@ function MesBoutiques() {
     }
   }, [t, toast, user]);
 
+  const tr = useCallback((key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  }, [language, t]);
+
+  const normalizeText = useCallback((value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(), []);
+
+  const findWilaya = useCallback((value?: string | null) => {
+    if (!value) return null;
+    const normalized = normalizeText(value);
+    return wilayas.find((entry) =>
+      [entry.code.toString(), entry.name, entry.name_fr, entry.name_ar]
+        .filter(Boolean)
+        .some((candidate) => normalizeText(String(candidate)) === normalized)
+    ) || null;
+  }, [normalizeText]);
+
+  const localizeWilaya = useCallback((value?: string | null) => {
+    if (!value) return '';
+    const match = findWilaya(value);
+    if (!match) return value;
+    return language === 'ar' ? match.name_ar || match.name_fr || match.name : match.name_fr || match.name;
+  }, [findWilaya, language]);
+
+  const localizeCommune = useCallback((communeValue?: string | null, wilayaValue?: string | null) => {
+    if (!communeValue) return '';
+    const wilayaMatch = findWilaya(wilayaValue || communeValue);
+    const scopedCommunes = wilayaMatch ? communes[String(wilayaMatch.code)] || [] : [];
+    const allCommunes = scopedCommunes.length ? scopedCommunes : Object.values(communes).flat();
+    const normalized = normalizeText(communeValue);
+    const match = allCommunes.find((entry) =>
+      [entry.fr, entry.ar]
+        .filter(Boolean)
+        .some((candidate) => normalizeText(String(candidate)) === normalized)
+    );
+    if (!match) return communeValue;
+    return language === 'ar' ? match.ar || match.fr : match.fr;
+  }, [findWilaya, language, normalizeText]);
+
+  const getShopStatusLabel = useCallback((status?: string | null) => {
+    const normalized = (status || '').trim();
+    const statusMap: Record<string, string | Record<string, string>> = {
+      active: tr('myShops.active', { fr: 'Active', en: 'Active', es: 'Activa', it: 'Attiva', de: 'Aktiv', ar: 'نشطة' }),
+      inactive: tr('common.inactive', { fr: 'Inactive', en: 'Inactive', es: 'Inactiva', it: 'Inattiva', de: 'Inaktiv', ar: 'غير نشطة' }),
+      onlineShop: tr('viewShop.onlineShop', { fr: 'Boutique en ligne', en: 'Online shop', es: 'Tienda en línea', it: 'Negozio online', de: 'Online-Shop', ar: 'متجر إلكتروني' }),
+      shops: tr('menu.shops.stores', { fr: 'Magasins', en: 'Stores', es: 'Tiendas', it: 'Negozi', de: 'Geschäfte', ar: 'المتاجر' }),
+      cabinets: tr('menu.shops.offices', { fr: 'Cabinets', en: 'Offices', es: 'Oficinas', it: 'Uffici', de: 'Büros', ar: 'المكاتب' }),
+      privateCompanies: tr('menu.shops.privateCompanies', { fr: 'Entreprises privées', en: 'Private companies', es: 'Empresas privadas', it: 'Aziende private', de: 'Private Unternehmen', ar: 'الشركات الخاصة' }),
+      nationalCompanies: tr('menu.shops.nationalCompanies', { fr: 'Entreprises nationales', en: 'National companies', es: 'Empresas nacionales', it: 'Aziende nazionali', de: 'Nationale Unternehmen', ar: 'الشركات الوطنية' }),
+      mobileCommerce: tr('menu.shops.streetVendors', { fr: 'Commerce ambulant', en: 'Street vendors', es: 'Comercio ambulante', it: 'Commercio ambulante', de: 'Mobiler Handel', ar: 'تجارة متنقلة' }),
+      associations: tr('menu.shops.associations', { fr: 'Associations', en: 'Associations', es: 'Asociaciones', it: 'Associazioni', de: 'Vereine', ar: 'الجمعيات' }),
+    };
+    return statusMap[normalized] || normalized || tr('common.inactive', { fr: 'Inactive', en: 'Inactive', es: 'Inactiva', it: 'Inattiva', de: 'Inaktiv', ar: 'غير نشطة' });
+  }, [tr]);
+
   useEffect(() => {
     fetchShops();
   }, [fetchShops]);
 
   const handleDeleteShop = async (id: string) => {
-    if (window.confirm(t('common.warning'))) {
+    if (window.confirm(tr('myShops.confirmDelete', {
+      fr: 'Voulez-vous vraiment supprimer cette boutique ?',
+      en: 'Do you really want to delete this shop?',
+      es: '¿Realmente deseas eliminar esta tienda?',
+      it: 'Vuoi davvero eliminare questo negozio?',
+      de: 'Möchten Sie diesen Shop wirklich löschen?',
+      ar: 'هل تريد حقاً حذف هذا المتجر؟',
+    }))) {
       try {
         const { error } = await supabase
           .from('shops')
@@ -136,14 +202,16 @@ function MesBoutiques() {
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-semibold text-lg line-clamp-1">{shop.name}</h3>
                           <Badge variant={shop.shop_status === 'active' ? "default" : "secondary"}>
-                            {shop.shop_status === 'active' ? t('myShops.active') : (shop.shop_status || t('common.inactive'))}
+                            {getShopStatusLabel(shop.shop_status)}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{shop.description}</p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            <span className="truncate max-w-[150px]">{shop.wilaya}, {shop.commune}</span>
+                            <span className="truncate max-w-[150px]">
+                              {[localizeWilaya(shop.wilaya), localizeCommune(shop.commune, shop.wilaya)].filter(Boolean).join(', ')}
+                            </span>
                           </div>
                           {/* View count */}
                           <div className="flex items-center gap-1">
@@ -157,7 +225,9 @@ function MesBoutiques() {
                   
                   <CardContent className="pt-0">
                     <div className="flex items-center justify-between mt-4">
-                      <Badge variant="outline">{shop.main_category || 'Général'}</Badge>
+                      <Badge variant="outline">
+                        {shop.main_category || tr('common.general', { fr: 'Général', en: 'General', es: 'General', it: 'Generale', de: 'Allgemein', ar: 'عام' })}
+                      </Badge>
                     </div>
                     
                     <div className="grid grid-cols-3 gap-2 mt-4">

@@ -187,8 +187,8 @@ const navigationFr = {
 
   // Navigation additional
   "navigation.backToDashboard": "Retour au tableau de bord",
-  "navigation.productSearch": "Mes Offres de service Professionnel",
-  "navigation.productSearchDesc": "Gérez vos offres de services et améliorez vos compétences",
+  "navigation.productSearch": "Mes recherches de produits",
+  "navigation.productSearchDesc": "Gérez vos demandes de produits et vos recherches publiées",
   
   "navigation.logout": "Se déconnecter",
 

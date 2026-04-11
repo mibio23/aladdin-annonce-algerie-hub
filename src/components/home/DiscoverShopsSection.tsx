@@ -13,9 +13,16 @@ type DiscoverShopsSectionProps = {
 };
 
 const DiscoverShopsSection = ({ shopsCount }: DiscoverShopsSectionProps) => {
-  const { t, isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL, language } = useSafeI18nWithRouter();
   const [featuredShops, setFeaturedShops] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === "string") return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   useEffect(() => {
     const fetchShops = async () => {
@@ -59,7 +66,7 @@ const DiscoverShopsSection = ({ shopsCount }: DiscoverShopsSectionProps) => {
           to="/boutiques"
           className={`font-bold text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 ${isRTL ? 'order-1' : 'order-2'}`}
         >
-          {t('announcements.viewAll')}
+          {tr('announcements.viewAll', { fr: 'Voir tout', en: 'View all', es: 'Ver todo', it: 'Vedi tutto', de: 'Alle anzeigen', ar: 'عرض الكل' })}
         </LocalizedLink>
       </div>
       
@@ -69,7 +76,7 @@ const DiscoverShopsSection = ({ shopsCount }: DiscoverShopsSectionProps) => {
         </div>
       ) : featuredShops.length === 0 ? (
         <div className="flex justify-center items-center min-h-[200px] text-muted-foreground">
-          {t('sections.noShopsAvailable')}
+          {tr('sections.noShopsAvailable', { fr: 'Aucune boutique disponible pour le moment.', en: 'No shops available at the moment.', es: 'No hay tiendas disponibles por el momento.', it: 'Nessun negozio disponibile al momento.', de: 'Derzeit keine Shops verfügbar.', ar: 'لا توجد متاجر متاحة حالياً.' })}
         </div>
       ) : (
         <SmartAnnouncementsGrid itemsPerRow={8}>

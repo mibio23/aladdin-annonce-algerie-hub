@@ -12,7 +12,14 @@ const ShopStatusBadges: React.FC<ShopStatusBadgesProps> = ({
   isOnline,
   isVerified,
 }) => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === "string") return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
   
   return (
     <>
@@ -24,7 +31,7 @@ const ShopStatusBadges: React.FC<ShopStatusBadgesProps> = ({
             className="bg-green-600/40 text-white/90 text-xs font-semibold px-2 py-1 rounded-full shadow-sm backdrop-blur-md"
             style={{ backdropFilter: "blur(2px)" }}
           >
-            {t('online')}
+            {tr('messages.online', { fr: 'En ligne', en: 'Online', es: 'En línea', it: 'Online', de: 'Online', ar: 'متصل' })}
           </div>
         )}
       </div>
@@ -33,7 +40,7 @@ const ShopStatusBadges: React.FC<ShopStatusBadgesProps> = ({
         <div
           className="absolute bottom-2 right-2 bg-blue-600/40 text-white/90 p-1 rounded-full shadow-sm backdrop-blur-md z-10"
           style={{ backdropFilter: "blur(2px)" }}
-          title={t('verified')}
+          title={tr('viewShop.verified', { fr: 'Vérifiée', en: 'Verified', es: 'Verificada', it: 'Verificata', de: 'Verifiziert', ar: 'موثّق' })}
         >
           <BadgeCheck size={14} className="opacity-90" />
         </div>

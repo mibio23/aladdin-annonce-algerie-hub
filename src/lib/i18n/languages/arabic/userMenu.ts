@@ -6,8 +6,8 @@ export const userMenuTranslations = {
   "navigation.myShops": "متاجري",
   "navigation.myFavorites": "المفضلة",
   "navigation.settings": "الإعدادات",
-  "navigation.productSearch": "عروض خدماتي المهنية",
-  "navigation.productSearchDesc": "أدر عروض خدماتك وطور مهاراتك",
+  "navigation.productSearch": "طلباتي للمنتجات",
+  "navigation.productSearchDesc": "أدر طلبات المنتجات وعمليات البحث المنشورة الخاصة بك",
   
   "navigation.logout": "تسجيل الخروج",
 

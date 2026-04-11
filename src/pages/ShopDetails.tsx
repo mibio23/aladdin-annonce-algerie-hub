@@ -53,6 +53,8 @@ import { generateSessionId } from '@/utils/searchUtils';
 import { cn } from '@/lib/utils';
 import SEOHead from '@/components/SEO/SEOHead';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { wilayas } from '@/data/wilayaData';
+import { communes } from '@/data/communeData';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -60,7 +62,7 @@ const ShopDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { getLocalizedPath } = useLanguageNavigation();
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -168,8 +170,8 @@ const ShopDetails: React.FC = () => {
     if (!shop) return;
     if (!reportReason) {
       toast({
-        title: "Cause requise",
-        description: "Veuillez sélectionner une cause de signalement.",
+        title: tr('viewShop.reportReasonRequired', { fr: 'Cause requise', en: 'Reason required', es: 'Motivo obligatorio', it: 'Motivo obbligatorio', de: 'Grund erforderlich', ar: 'السبب مطلوب' }),
+        description: tr('viewShop.reportReasonRequiredText', { fr: 'Veuillez sélectionner une cause de signalement.', en: 'Please select a report reason.', es: 'Por favor selecciona un motivo del reporte.', it: 'Seleziona un motivo della segnalazione.', de: 'Bitte wählen Sie einen Meldegrund aus.', ar: 'يرجى اختيار سبب الإبلاغ.' }),
         variant: "destructive"
       });
       return;
@@ -196,8 +198,8 @@ const ShopDetails: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Signalement envoyé",
-        description: "Merci. Notre équipe va examiner ce contenu.",
+        title: tr('viewShop.reportSent', { fr: 'Signalement envoyé', en: 'Report sent', es: 'Reporte enviado', it: 'Segnalazione inviata', de: 'Meldung gesendet', ar: 'تم إرسال البلاغ' }),
+        description: tr('viewShop.reportSentText', { fr: 'Merci. Notre équipe va examiner ce contenu.', en: 'Thank you. Our team will review this content.', es: 'Gracias. Nuestro equipo revisará este contenido.', it: 'Grazie. Il nostro team esaminerà questo contenuto.', de: 'Vielen Dank. Unser Team wird diesen Inhalt prüfen.', ar: 'شكراً لك. سيقوم فريقنا بمراجعة هذا المحتوى.' }),
       });
 
       setShowReportModal(false);
@@ -206,8 +208,8 @@ const ShopDetails: React.FC = () => {
     } catch (error) {
       logger.error('Error submitting report:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer le signalement. Veuillez réessayer plus tard.",
+        title: t('common.error'),
+        description: tr('viewShop.reportError', { fr: "Impossible d'envoyer le signalement. Veuillez réessayer plus tard.", en: 'Unable to send the report. Please try again later.', es: 'No se pudo enviar el reporte. Inténtalo de nuevo más tarde.', it: 'Impossibile inviare la segnalazione. Riprova più tardi.', de: 'Die Meldung konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.', ar: 'تعذر إرسال البلاغ. يرجى المحاولة لاحقاً.' }),
         variant: "destructive"
       });
     } finally {
@@ -292,8 +294,8 @@ const ShopDetails: React.FC = () => {
       } catch (error) {
         logger.error('Error fetching shop:', error);
         toast({
-          title: "Erreur",
-          description: "Impossible de charger les informations de la boutique",
+          title: t('common.error'),
+          description: tr('shop.messages.errorLoadingShop', { fr: 'Impossible de charger les informations de la boutique', en: 'Unable to load shop information', es: 'No se pudo cargar la información de la tienda', it: 'Impossibile caricare le informazioni del negozio', de: 'Shop-Informationen konnten nicht geladen werden', ar: 'تعذر تحميل معلومات المتجر' }),
           variant: "destructive"
         });
       } finally {
@@ -515,14 +517,142 @@ const ShopDetails: React.FC = () => {
         logger.error('Error sharing:', error);
       }
     } else {
-      // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
       navigator.clipboard.writeText(shopUrl);
       toast({
-        title: "Lien copié",
-        description: "Le lien de la boutique a été copié dans votre presse-papiers",
+        title: t('viewShop.linkCopied'),
+        description: t('viewShop.linkCopiedText'),
       });
     }
   };
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
+  const localeByLanguage: Record<string, string> = {
+    fr: 'fr-FR',
+    en: 'en-US',
+    es: 'es-ES',
+    it: 'it-IT',
+    de: 'de-DE',
+    ar: 'ar-DZ',
+  };
+
+  const findWilaya = (value?: string | null) => {
+    if (!value) return null;
+    const normalized = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    return (
+      wilayas.find((entry) =>
+        [entry.code.toString(), entry.name, entry.name_fr, entry.name_ar]
+          .filter(Boolean)
+          .some((candidate) => String(candidate).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim() === normalized)
+      ) || null
+    );
+  };
+
+  const localizeWilaya = (value?: string | null) => {
+    if (!value) return '';
+    const match = findWilaya(value);
+    if (!match) return value;
+    return language === 'ar' ? match.name_ar || match.name_fr || match.name : match.name_fr || match.name;
+  };
+
+  const findCommune = (communeValue?: string | null, wilayaValue?: string | null) => {
+    if (!communeValue) return null;
+    const normalize = (input: string) =>
+      input.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const normalizedCommune = normalize(communeValue);
+    const wilayaMatch = findWilaya(wilayaValue || communeValue);
+    const scopedCommunes = wilayaMatch ? communes[String(wilayaMatch.code)] || [] : [];
+    const allCommunes = scopedCommunes.length ? scopedCommunes : Object.values(communes).flat();
+    return (
+      allCommunes.find((entry) =>
+        [entry.fr, entry.ar]
+          .filter(Boolean)
+          .some((candidate) => normalize(String(candidate)) === normalizedCommune)
+      ) || null
+    );
+  };
+
+  const localizeCommune = (communeValue?: string | null, wilayaValue?: string | null) => {
+    if (!communeValue) return '';
+    const match = findCommune(communeValue, wilayaValue);
+    if (!match) return communeValue;
+    return language === 'ar' ? match.ar || match.fr : match.fr;
+  };
+
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const replaceInsensitive = (source: string, search: string, replacement: string) => {
+    if (!search.trim()) return source;
+    return source.replace(new RegExp(escapeRegExp(search), 'gi'), replacement);
+  };
+
+  const localizeLocationText = (value?: string | null) => {
+    if (!value) return '';
+    let localized = value;
+    const replacements = [
+      { from: 'Algerie', to: language === 'ar' ? 'الجزائر' : 'Algérie' },
+      { from: 'Algeria', to: language === 'ar' ? 'الجزائر' : 'Algérie' },
+      { from: 'Algérie', to: language === 'ar' ? 'الجزائر' : 'Algérie' },
+    ];
+
+    if (shop?.wilaya) {
+      const localizedWilaya = localizeWilaya(shop.wilaya);
+      const wilayaMatch = findWilaya(shop.wilaya);
+      replacements.push({ from: shop.wilaya, to: localizedWilaya });
+      if (wilayaMatch) {
+        [wilayaMatch.name, wilayaMatch.name_fr, wilayaMatch.name_ar]
+          .filter(Boolean)
+          .forEach((candidate) => replacements.push({ from: String(candidate), to: localizedWilaya }));
+      }
+    }
+
+    if (shop?.commune) {
+      const localizedCommune = localizeCommune(shop.commune, shop.wilaya);
+      const communeMatch = findCommune(shop.commune, shop.wilaya);
+      replacements.push({ from: shop.commune, to: localizedCommune });
+      if (communeMatch) {
+        [communeMatch.fr, communeMatch.ar]
+          .filter(Boolean)
+          .forEach((candidate) => replacements.push({ from: String(candidate), to: localizedCommune }));
+      }
+    }
+
+    for (const replacement of replacements) {
+      localized = replaceInsensitive(localized, replacement.from, replacement.to);
+    }
+
+    return localized;
+  };
+
+  const formatLocalizedDate = (value?: string | null, options?: Intl.DateTimeFormatOptions) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString(localeByLanguage[language] || 'fr-FR', options || {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  const getDayLabel = (day: string) =>
+    tr(`days.${day}`, {
+      fr: { monday: 'Lundi', tuesday: 'Mardi', wednesday: 'Mercredi', thursday: 'Jeudi', friday: 'Vendredi', saturday: 'Samedi', sunday: 'Dimanche' }[day] || day,
+      en: { monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday' }[day] || day,
+      es: { monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles', thursday: 'Jueves', friday: 'Viernes', saturday: 'Sábado', sunday: 'Domingo' }[day] || day,
+      it: { monday: 'Lunedì', tuesday: 'Martedì', wednesday: 'Mercoledì', thursday: 'Giovedì', friday: 'Venerdì', saturday: 'Sabato', sunday: 'Domenica' }[day] || day,
+      de: { monday: 'Montag', tuesday: 'Dienstag', wednesday: 'Mittwoch', thursday: 'Donnerstag', friday: 'Freitag', saturday: 'Samstag', sunday: 'Sonntag' }[day] || day,
+      ar: { monday: 'الاثنين', tuesday: 'الثلاثاء', wednesday: 'الأربعاء', thursday: 'الخميس', friday: 'الجمعة', saturday: 'السبت', sunday: 'الأحد' }[day] || day,
+    });
+
+  const localizedShopAddress = localizeLocationText(shop?.address || '') || [localizeCommune(shop?.commune, shop?.wilaya), localizeWilaya(shop?.wilaya)].filter(Boolean).join(', ');
+  const localizedShopWilaya = localizeWilaya(shop?.wilaya);
+  const localizedShopCommune = localizeCommune(shop?.commune, shop?.wilaya);
 
   if (loading) {
     return (
@@ -546,14 +676,14 @@ const ShopDetails: React.FC = () => {
                 <div className="bg-muted rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
                   <Store className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Boutique introuvable</h3>
+                <h3 className="text-2xl font-bold mb-3">{t('viewShop.shopNotFound')}</h3>
                 <p className="text-muted-foreground mb-8">
-                  La boutique que vous recherchez n'existe pas ou a été déplacée.
+                  {t('viewShop.shopNotFoundText')}
                 </p>
                 <Button asChild size="lg" className="rounded-full px-8">
                   <Link to={getLocalizedPath('/')} className="flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" />
-                    Retour à l'accueil
+                    {t('viewShop.backButton')}
                   </Link>
                 </Button>
               </CardContent>
@@ -573,10 +703,6 @@ const ShopDetails: React.FC = () => {
   ].filter(link => link.url);
 
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  const dayNames: Record<string, string> = {
-    monday: 'Lundi', tuesday: 'Mardi', wednesday: 'Mercredi', thursday: 'Jeudi',
-    friday: 'Vendredi', saturday: 'Samedi', sunday: 'Dimanche'
-  };
   const phoneNumbers = shop.phoneNumbers ?? [];
   const displayPhoneNumbers = phoneNumbers;
   const rawWhatsappNumber = shop.whatsappNumber || phoneNumbers[0] || '';
@@ -588,12 +714,12 @@ const ShopDetails: React.FC = () => {
 
   const shopsLabel = (() => {
     const translated = t('shops.listing.title');
-    return translated && translated !== 'shops.listing.title' ? translated : 'Boutiques';
+    return translated && translated !== 'shops.listing.title' ? translated : tr('viewShop.shops', { fr: 'Boutiques', en: 'Shops', es: 'Tiendas', it: 'Negozi', de: 'Geschäfte', ar: 'المتاجر' });
   })();
   const shopDescription = (() => {
     const rawDescription = typeof shop.description === 'string' ? shop.description.trim() : '';
     if (!rawDescription) {
-      return `${shop.name} - ${shopsLabel} - Aladdin Annonces Algérie`;
+      return `${shop.name} - ${shopsLabel} - ${tr('viewShop.algeriaMarketplace', { fr: 'Aladdin Annonces Algérie', en: 'Aladdin Algeria Listings', es: 'Anuncios Aladdin Argelia', it: 'Annunci Aladdin Algeria', de: 'Aladdin Anzeigen Algerien', ar: 'إعلانات علاء الدين الجزائر' })}`;
     }
     return rawDescription.length > 180 ? `${rawDescription.slice(0, 177)}...` : rawDescription;
   })();
@@ -619,7 +745,14 @@ const ShopDetails: React.FC = () => {
         {shop.bannerUrl ? (
           <img 
             src={shop.bannerUrl} 
-            alt="Boutique Banner" 
+            alt={tr('viewShop.shopBanner', {
+              fr: 'Bannière de la boutique',
+              en: 'Shop banner',
+              es: 'Banner de la tienda',
+              it: 'Banner del negozio',
+              de: 'Shop-Banner',
+              ar: 'لافتة المتجر',
+            })} 
             className="w-full h-full object-cover"
           />
         ) : (
@@ -631,13 +764,13 @@ const ShopDetails: React.FC = () => {
         <div className="absolute top-6 right-6 flex flex-col gap-2 z-10">
           <Badge className={`${isOwnerOnline ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} text-white border-none px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1`}>
             <div className={`w-2 h-2 bg-white rounded-full ${isOwnerOnline ? 'animate-pulse' : ''}`} />
-            {isOwnerOnline ? (t('messages.online') === 'messages.online' ? 'En ligne' : t('messages.online')) : (t('messages.offline') === 'messages.offline' ? 'Hors ligne' : t('messages.offline'))}
+            {isOwnerOnline ? tr('messages.online', { fr: 'En ligne', en: 'Online', es: 'En línea', it: 'Online', de: 'Online', ar: 'متصل' }) : tr('messages.offline', { fr: 'Hors ligne', en: 'Offline', es: 'Desconectado', it: 'Offline', de: 'Offline', ar: 'غير متصل' })}
           </Badge>
           
           {shop.isVerified && (
             <Badge className="bg-purple-500 hover:bg-purple-600 text-white border-none px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
               <BadgeCheck className="h-3 w-3" />
-              Vérifiée
+              {t('viewShop.verified')}
             </Badge>
           )}
         </div>
@@ -711,7 +844,7 @@ const ShopDetails: React.FC = () => {
               {/* Modern Metrics Bar */}
               <div className="flex flex-wrap items-center gap-6">
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Note</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{tr('viewShop.rating', { fr: 'Note', en: 'Rating', es: 'Valoración', it: 'Valutazione', de: 'Bewertung', ar: 'التقييم' })}</span>
                   <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                     <span>{shop.rating?.toFixed(1)}</span>
@@ -731,7 +864,7 @@ const ShopDetails: React.FC = () => {
                 <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 hidden sm:block" />
 
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Vues</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{tr('viewShop.views', { fr: 'Vues', en: 'Views', es: 'Vistas', it: 'Visualizzazioni', de: 'Aufrufe', ar: 'المشاهدات' })}</span>
                   <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
                     <Eye className="h-4 w-4 text-slate-500" />
                     <span>{shop.followerCount?.toLocaleString()}</span>
@@ -741,10 +874,10 @@ const ShopDetails: React.FC = () => {
                 <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 hidden sm:block" />
 
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Localisation</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('viewShop.location')}</span>
                   <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
                     <MapPin className="h-4 w-4 text-slate-400" />
-                    <span>{shop.wilaya}</span>
+                    <span>{localizedShopWilaya || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -789,14 +922,14 @@ const ShopDetails: React.FC = () => {
             onClick={() => handleContactClick('phone')}
           >
             <Phone className="h-5 w-5" />
-            Appeler
+            {t('viewShop.call')}
           </Button>
           <Button 
             className="h-14 rounded-xl bg-[#25D366] hover:bg-[#22C35E] text-white font-bold text-lg shadow-lg flex items-center justify-center gap-3 border-none"
             onClick={() => handleContactClick('whatsapp')}
           >
             <MessageCircle className="h-5 w-5" />
-            WhatsApp
+            {tr('viewShop.whatsapp', { fr: 'WhatsApp', en: 'WhatsApp', es: 'WhatsApp', it: 'WhatsApp', de: 'WhatsApp', ar: 'واتساب' })}
           </Button>
         </div>
 
@@ -811,25 +944,25 @@ const ShopDetails: React.FC = () => {
                   value="products" 
                   className="rounded-none border-b-2 border-transparent px-2 pb-4 h-full data-[state=active]:bg-transparent data-[state=active]:border-orange-500 data-[state=active]:text-foreground data-[state=active]:shadow-none font-bold text-muted-foreground transition-all duration-300"
                 >
-                  Produits
+                  {tr('viewShop.products', { fr: 'Produits', en: 'Products', es: 'Productos', it: 'Prodotti', de: 'Produkte', ar: 'المنتجات' })}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="about" 
                   className="rounded-none border-b-2 border-transparent px-2 pb-4 h-full data-[state=active]:bg-transparent data-[state=active]:border-orange-500 data-[state=active]:text-foreground data-[state=active]:shadow-none font-bold text-muted-foreground transition-all duration-300"
                 >
-                  À propos
+                  {t('viewShop.about')}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="reviews" 
                   className="rounded-none border-b-2 border-transparent px-2 pb-4 h-full data-[state=active]:bg-transparent data-[state=active]:border-orange-500 data-[state=active]:text-foreground data-[state=active]:shadow-none font-bold text-muted-foreground transition-all duration-300"
                 >
-                  Avis
+                  {t('viewShop.reviews')}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="contact" 
                   className="rounded-none border-b-2 border-transparent px-2 pb-4 h-full data-[state=active]:bg-transparent data-[state=active]:border-orange-500 data-[state=active]:text-foreground data-[state=active]:shadow-none font-bold text-muted-foreground transition-all duration-300"
                 >
-                  Contact
+                  {t('viewShop.contact')}
                 </TabsTrigger>
               </TabsList>
               
@@ -842,9 +975,9 @@ const ShopDetails: React.FC = () => {
                     className="space-y-8"
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold">Catalogue Produits</h3>
+                      <h3 className="text-xl font-bold">{tr('viewShop.productCatalog', { fr: 'Catalogue Produits', en: 'Product Catalog', es: 'Catálogo de productos', it: 'Catalogo prodotti', de: 'Produktkatalog', ar: 'كتالوج المنتجات' })}</h3>
                       <Badge variant="secondary" className="rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-none">
-                        {shop.productImageUrls.length} articles
+                        {shop.productImageUrls.length} {tr('viewShop.items', { fr: 'articles', en: 'items', es: 'artículos', it: 'articoli', de: 'Artikel', ar: 'منتج' })}
                       </Badge>
                     </div>
 
@@ -869,7 +1002,7 @@ const ShopDetails: React.FC = () => {
                         >
                           <img 
                             src={url} 
-                            alt={`Produit ${index + 1}`} 
+                            alt={`${tr('viewShop.product', { fr: 'Produit', en: 'Product', es: 'Producto', it: 'Prodotto', de: 'Produkt', ar: 'منتج' })} ${index + 1}`} 
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -882,8 +1015,8 @@ const ShopDetails: React.FC = () => {
                       {shop.productImageUrls.length === 0 && (
                         <div className="col-span-full py-16 text-center bg-slate-50 dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                           <Package className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500 font-medium">Aucun produit affiché pour le moment.</p>
-                          <p className="text-sm text-slate-400">Cette boutique n'a pas encore ajouté de photos de produits.</p>
+                          <p className="text-slate-500 font-medium">{tr('viewShop.noProducts', { fr: 'Aucun produit affiché pour le moment.', en: 'No products displayed yet.', es: 'Aún no se muestran productos.', it: 'Nessun prodotto visualizzato al momento.', de: 'Derzeit keine Produkte angezeigt.', ar: 'لا توجد منتجات معروضة حالياً.' })}</p>
+                          <p className="text-sm text-slate-400">{tr('viewShop.noProductsText', { fr: "Cette boutique n'a pas encore ajouté de photos de produits.", en: 'This shop has not added product photos yet.', es: 'Esta tienda aún no ha añadido fotos de productos.', it: 'Questo negozio non ha ancora aggiunto foto dei prodotti.', de: 'Dieser Shop hat noch keine Produktfotos hinzugefügt.', ar: 'لم يضف هذا المتجر صور منتجات بعد.' })}</p>
                         </div>
                       )}
                     </div>
@@ -899,7 +1032,7 @@ const ShopDetails: React.FC = () => {
                   >
                     {/* Description Section */}
                     <section className="space-y-4">
-                      <h3 className="text-xl font-bold">Description</h3>
+                      <h3 className="text-xl font-bold">{t('viewShop.description')}</h3>
                       <div className="text-slate-600 dark:text-slate-400 leading-relaxed bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border">
                         <MultilingualText text={shop.description} />
                       </div>
@@ -911,15 +1044,17 @@ const ShopDetails: React.FC = () => {
                         <CardHeader className="pb-2">
                           <CardTitle className="text-sm font-bold flex items-center gap-2 text-blue-600 dark:text-blue-400">
                             <Truck className="h-4 w-4" />
-                            Livraison
+                            {tr('viewShop.delivery', { fr: 'Livraison', en: 'Delivery', es: 'Entrega', it: 'Consegna', de: 'Lieferung', ar: 'التوصيل' })}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <p className="text-sm text-slate-600 dark:text-slate-400">
                             {shop.deliveryOptions?.available ? (
-                              <>Disponible : {shop.deliveryOptions.regions?.join(', ') || 'Toutes les wilayas'}</>
+                              <>
+                                {tr('viewShop.availableIn', { fr: 'Disponible :', en: 'Available in:', es: 'Disponible en:', it: 'Disponibile in:', de: 'Verfügbar in:', ar: 'متوفر في:' })} {shop.deliveryOptions.regions?.join(', ') || tr('viewShop.allWilayas', { fr: 'Toutes les wilayas', en: 'All wilayas', es: 'Todas las wilayas', it: 'Tutte le wilayas', de: 'Alle Wilayas', ar: 'جميع الولايات' })}
+                              </>
                             ) : (
-                              'À discuter avec le vendeur'
+                              tr('viewShop.toBeDiscussed', { fr: 'À discuter avec le vendeur', en: 'To be discussed with the seller', es: 'A discutir con el vendedor', it: 'Da discutere con il venditore', de: 'Mit dem Verkäufer zu besprechen', ar: 'يتم الاتفاق مع البائع' })
                             )}
                           </p>
                         </CardContent>
@@ -929,15 +1064,15 @@ const ShopDetails: React.FC = () => {
                         <CardHeader className="pb-2">
                           <CardTitle className="text-sm font-bold flex items-center gap-2 text-green-600 dark:text-green-400">
                             <CreditCard className="h-4 w-4" />
-                            Paiement
+                            {tr('viewShop.payment', { fr: 'Paiement', en: 'Payment', es: 'Pago', it: 'Pagamento', de: 'Zahlung', ar: 'الدفع' })}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="flex flex-wrap gap-2">
-                            {shop.paymentMethods?.cash && <Badge variant="outline" className="bg-white dark:bg-slate-800">Espèces</Badge>}
-                            {shop.paymentMethods?.card && <Badge variant="outline" className="bg-white dark:bg-slate-800">Carte</Badge>}
+                            {shop.paymentMethods?.cash && <Badge variant="outline" className="bg-white dark:bg-slate-800">{tr('viewShop.cash', { fr: 'Espèces', en: 'Cash', es: 'Efectivo', it: 'Contanti', de: 'Bar', ar: 'نقداً' })}</Badge>}
+                            {shop.paymentMethods?.card && <Badge variant="outline" className="bg-white dark:bg-slate-800">{tr('viewShop.card', { fr: 'Carte', en: 'Card', es: 'Tarjeta', it: 'Carta', de: 'Karte', ar: 'بطاقة' })}</Badge>}
                             {shop.paymentMethods?.baridiMob && <Badge variant="outline" className="bg-white dark:bg-slate-800">BaridiMob</Badge>}
-                            {!shop.paymentMethods && <span className="text-sm text-slate-600">À discuter avec le vendeur</span>}
+                            {!shop.paymentMethods && <span className="text-sm text-slate-600">{tr('viewShop.toBeDiscussed', { fr: 'À discuter avec le vendeur', en: 'To be discussed with the seller', es: 'A discutir con el vendedor', it: 'Da discutere con il venditore', de: 'Mit dem Verkäufer zu besprechen', ar: 'يتم الاتفاق مع البائع' })}</span>}
                           </div>
                         </CardContent>
                       </Card>
@@ -945,7 +1080,7 @@ const ShopDetails: React.FC = () => {
 
                     {/* Informations Section */}
                     <section className="space-y-4">
-                      <h3 className="text-xl font-bold">Informations complémentaires</h3>
+                      <h3 className="text-xl font-bold">{tr('viewShop.additionalInfo', { fr: 'Informations complémentaires', en: 'Additional information', es: 'Información adicional', it: 'Informazioni aggiuntive', de: 'Zusätzliche Informationen', ar: 'معلومات إضافية' })}</h3>
                       
                       <div className="grid grid-cols-1 gap-4">
                         {/* Type de Boutique */}
@@ -954,20 +1089,20 @@ const ShopDetails: React.FC = () => {
                             <Store className="h-5 w-5 text-slate-500" />
                           </div>
                           <div className="space-y-1">
-                            <p className="font-bold">Type de Boutique</p>
+                            <p className="font-bold">{tr('viewShop.shopType', { fr: 'Type de Boutique', en: 'Shop type', es: 'Tipo de tienda', it: 'Tipo di negozio', de: 'Shop-Typ', ar: 'نوع المتجر' })}</p>
                             <div className="flex flex-wrap gap-2 pt-1">
                               {shop.isOnline && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
-                                  Boutique en Ligne
+                                  {t('viewShop.onlineShop')}
                                 </Badge>
                               )}
                               {shop.isPhysical && (
                                 <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800">
-                                  Boutique Physique
+                                  {t('viewShop.physicalShop')}
                                 </Badge>
                               )}
                               {!shop.isOnline && !shop.isPhysical && (
-                                <span className="text-sm text-slate-500">Non spécifié</span>
+                                <span className="text-sm text-slate-500">{tr('viewShop.unspecified', { fr: 'Non spécifié', en: 'Not specified', es: 'No especificado', it: 'Non specificato', de: 'Nicht angegeben', ar: 'غير محدد' })}</span>
                               )}
                             </div>
                           </div>
@@ -979,9 +1114,11 @@ const ShopDetails: React.FC = () => {
                             <Clock className="h-5 w-5 text-slate-500" />
                           </div>
                           <div className="space-y-1">
-                            <p className="font-bold">Horaires d'ouverture</p>
+                            <p className="font-bold">{tr('viewShop.openingHours', { fr: "Horaires d'ouverture", en: 'Opening hours', es: 'Horario de apertura', it: 'Orari di apertura', de: 'Öffnungszeiten', ar: 'ساعات العمل' })}</p>
                             <p className="text-sm text-slate-500">
-                              {shop.openingHours?.monday ? `Lun-Sam: ${shop.openingHours.monday.open}-${shop.openingHours.monday.close}, Dim: Fermé` : 'Lun-Sam: 9h-18h, Dim: Fermé'}
+                              {shop.openingHours?.monday
+                                ? `${tr('viewShop.weekdaysShort', { fr: 'Lun-Sam', en: 'Mon-Sat', es: 'Lun-Sáb', it: 'Lun-Sab', de: 'Mo-Sa', ar: 'الإثنين-السبت' })}: ${shop.openingHours.monday.open}-${shop.openingHours.monday.close}, ${tr('viewShop.sundayShort', { fr: 'Dim', en: 'Sun', es: 'Dom', it: 'Dom', de: 'So', ar: 'الأحد' })}: ${tr('viewShop.closed', { fr: 'Fermé', en: 'Closed', es: 'Cerrado', it: 'Chiuso', de: 'Geschlossen', ar: 'مغلق' })}`
+                                : `${tr('viewShop.weekdaysShort', { fr: 'Lun-Sam', en: 'Mon-Sat', es: 'Lun-Sáb', it: 'Lun-Sab', de: 'Mo-Sa', ar: 'الإثنين-السبت' })}: 09:00-18:00, ${tr('viewShop.sundayShort', { fr: 'Dim', en: 'Sun', es: 'Dom', it: 'Dom', de: 'So', ar: 'الأحد' })}: ${tr('viewShop.closed', { fr: 'Fermé', en: 'Closed', es: 'Cerrado', it: 'Chiuso', de: 'Geschlossen', ar: 'مغلق' })}`}
                             </p>
                           </div>
                         </div>
@@ -998,7 +1135,7 @@ const ShopDetails: React.FC = () => {
                     className="space-y-6"
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold">Avis Clients</h3>
+                      <h3 className="text-xl font-bold">{tr('viewShop.customerReviews', { fr: 'Avis Clients', en: 'Customer reviews', es: 'Reseñas de clientes', it: 'Recensioni clienti', de: 'Kundenbewertungen', ar: 'آراء العملاء' })}</h3>
                       <div className="flex items-center gap-1.5 font-bold text-yellow-500">
                         <Star className="h-5 w-5 fill-current" />
                         <span>{shop.rating?.toFixed(1)} / 5</span>
@@ -1009,16 +1146,16 @@ const ShopDetails: React.FC = () => {
                       <Card className="border border-orange-200 bg-orange-50/80 shadow-sm">
                         <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div>
-                            <p className="text-sm font-bold text-orange-700">Votre avis est déjà publié</p>
+                            <p className="text-sm font-bold text-orange-700">{tr('viewShop.yourReviewPublished', { fr: 'Votre avis est déjà publié', en: 'Your review is already published', es: 'Tu reseña ya está publicada', it: 'La tua recensione è già pubblicata', de: 'Ihre Bewertung ist bereits veröffentlicht', ar: 'تم نشر تقييمك بالفعل' })}</p>
                             <p className="text-sm text-orange-600">
-                              Vous avez donné {currentUserReview.rating}/5 à cette boutique. Vous pouvez le modifier à tout moment.
+                              {tr('viewShop.yourReviewPublishedText', { fr: `Vous avez donné ${currentUserReview.rating}/5 à cette boutique. Vous pouvez le modifier à tout moment.`, en: `You rated this shop ${currentUserReview.rating}/5. You can edit it anytime.`, es: `Has dado ${currentUserReview.rating}/5 a esta tienda. Puedes modificarlo en cualquier momento.`, it: `Hai dato ${currentUserReview.rating}/5 a questo negozio. Puoi modificarlo in qualsiasi momento.`, de: `Sie haben diesem Shop ${currentUserReview.rating}/5 gegeben. Sie können dies jederzeit ändern.`, ar: `لقد منحت هذا المتجر ${currentUserReview.rating}/5. يمكنك تعديله في أي وقت.` })}
                             </p>
                           </div>
                           <Button
                             className="rounded-xl bg-orange-500 hover:bg-orange-600 font-bold"
                             onClick={handleReviewClick}
                           >
-                            Modifier mon avis
+                            {tr('viewShop.editMyReview', { fr: 'Modifier mon avis', en: 'Edit my review', es: 'Editar mi reseña', it: 'Modifica la mia recensione', de: 'Meine Bewertung bearbeiten', ar: 'تعديل تقييمي' })}
                           </Button>
                         </CardContent>
                       </Card>
@@ -1050,15 +1187,15 @@ const ShopDetails: React.FC = () => {
                                   </Avatar>
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <p className="font-semibold text-sm">{review.profiles?.full_name || 'Utilisateur'}</p>
+                                      <p className="font-semibold text-sm">{review.profiles?.full_name || tr('viewShop.user', { fr: 'Utilisateur', en: 'User', es: 'Usuario', it: 'Utente', de: 'Benutzer', ar: 'مستخدم' })}</p>
                                       {isOwnReview && (
                                         <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-bold text-orange-700">
-                                          Votre avis
+                                          {tr('viewShop.yourReview', { fr: 'Votre avis', en: 'Your review', es: 'Tu reseña', it: 'La tua recensione', de: 'Ihre Bewertung', ar: 'تقييمك' })}
                                         </span>
                                       )}
                                     </div>
                                     <p className="text-xs text-slate-500">
-                                      {new Date(review.created_at).toLocaleDateString()}
+                                      {formatLocalizedDate(review.created_at)}
                                     </p>
                                   </div>
                                 </div>
@@ -1086,13 +1223,13 @@ const ShopDetails: React.FC = () => {
                           <div className="bg-white dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border">
                             <MessageCircle className="h-10 w-10 text-slate-300" />
                           </div>
-                          <h3 className="text-xl font-bold mb-2">Partagez votre expérience</h3>
+                          <h3 className="text-xl font-bold mb-2">{tr('viewShop.shareExperience', { fr: 'Partagez votre expérience', en: 'Share your experience', es: 'Comparte tu experiencia', it: 'Condividi la tua esperienza', de: 'Teilen Sie Ihre Erfahrung', ar: 'شارك تجربتك' })}</h3>
                           <p className="text-slate-500 text-sm mb-8 max-w-xs mx-auto">
-                            Votre avis aide les autres utilisateurs à découvrir les meilleures boutiques d'Algérie.
+                            {tr('viewShop.shareExperienceText', { fr: "Votre avis aide les autres utilisateurs à découvrir les meilleures boutiques d'Algérie.", en: 'Your review helps other users discover the best shops in Algeria.', es: 'Tu reseña ayuda a otros usuarios a descubrir las mejores tiendas de Argelia.', it: 'La tua recensione aiuta gli altri utenti a scoprire i migliori negozi in Algeria.', de: 'Ihre Bewertung hilft anderen Nutzern, die besten Geschäfte Algeriens zu entdecken.', ar: 'يساعد تقييمك المستخدمين الآخرين على اكتشاف أفضل المتاجر في الجزائر.' })}
                           </p>
                           <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12" onClick={handleReviewClick}>
-                              {currentUserReview ? 'Modifier mon avis' : 'Laisser un avis'}
+                              {currentUserReview ? tr('viewShop.editMyReview', { fr: 'Modifier mon avis', en: 'Edit my review', es: 'Editar mi reseña', it: 'Modifica la mia recensione', de: 'Meine Bewertung bearbeiten', ar: 'تعديل تقييمي' }) : tr('viewShop.leaveReview', { fr: 'Laisser un avis', en: 'Leave a review', es: 'Dejar una reseña', it: 'Lascia una recensione', de: 'Bewertung abgeben', ar: 'اترك تقييماً' })}
                             </Button>
                           </div>
                         </CardContent>
@@ -1102,7 +1239,7 @@ const ShopDetails: React.FC = () => {
                     {reviews.length > 0 && !currentUserReview && (
                       <div className="flex justify-center mt-6">
                         <Button className="rounded-xl px-8 bg-orange-500 hover:bg-orange-600 font-bold h-12" onClick={handleReviewClick}>
-                          {currentUserReview ? 'Modifier mon avis' : 'Laisser un avis'}
+                          {currentUserReview ? tr('viewShop.editMyReview', { fr: 'Modifier mon avis', en: 'Edit my review', es: 'Editar mi reseña', it: 'Modifica la mia recensione', de: 'Meine Bewertung bearbeiten', ar: 'تعديل تقييمي' }) : tr('viewShop.leaveReview', { fr: 'Laisser un avis', en: 'Leave a review', es: 'Dejar una reseña', it: 'Lascia una recensione', de: 'Bewertung abgeben', ar: 'اترك تقييماً' })}
                         </Button>
                       </div>
                     )}
@@ -1116,7 +1253,7 @@ const ShopDetails: React.FC = () => {
                     exit={{ opacity: 0, y: -10 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-xl font-bold">Contact & Localisation</h3>
+                    <h3 className="text-xl font-bold">{tr('viewShop.contactAndLocation', { fr: 'Contact & Localisation', en: 'Contact & Location', es: 'Contacto y ubicación', it: 'Contatto e posizione', de: 'Kontakt & Standort', ar: 'التواصل والموقع' })}</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
@@ -1127,7 +1264,7 @@ const ShopDetails: React.FC = () => {
                                 <Phone className="h-5 w-5 text-orange-500" />
                               </div>
                               <div className="space-y-1">
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Téléphone</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{tr('viewShop.phone', { fr: 'Téléphone', en: 'Phone', es: 'Teléfono', it: 'Telefono', de: 'Telefon', ar: 'الهاتف' })}</p>
                                 <p className="font-bold text-lg">{displayPhoneNumbers[0]}</p>
                                 {displayPhoneNumbers.length > 1 && (
                                   <p className="text-sm text-slate-500">{displayPhoneNumbers.slice(1).join(', ')}</p>
@@ -1140,7 +1277,7 @@ const ShopDetails: React.FC = () => {
                                 <MessageCircle className="h-5 w-5 text-green-500" />
                               </div>
                               <div className="space-y-1">
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">WhatsApp</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{tr('viewShop.whatsapp', { fr: 'WhatsApp', en: 'WhatsApp', es: 'WhatsApp', it: 'WhatsApp', de: 'WhatsApp', ar: 'واتساب' })}</p>
                                 <p className="font-bold text-lg">{displayWhatsappNumber}</p>
                               </div>
                             </div>
@@ -1150,8 +1287,8 @@ const ShopDetails: React.FC = () => {
                                 <MapPin className="h-5 w-5 text-blue-500" />
                               </div>
                               <div className="space-y-1">
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Adresse</p>
-                                <p className="font-bold">{shop.address || `${shop.commune || ''}, ${shop.wilaya}`}</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{tr('viewShop.address', { fr: 'Adresse', en: 'Address', es: 'Dirección', it: 'Indirizzo', de: 'Adresse', ar: 'العنوان' })}</p>
+                                <p className="font-bold">{localizedShopAddress}</p>
                               </div>
                             </div>
                           </CardContent>
@@ -1163,11 +1300,11 @@ const ShopDetails: React.FC = () => {
                             onClick={handleCallShop}
                             disabled={!phoneNumbers[0]}
                           >
-                            Appeler
+                            {t('viewShop.call')}
                           </Button>
                           <Button variant="outline" className="flex-1 h-12 rounded-xl font-bold border-2" onClick={handleMessageClick}>
                             <MessageCircle className="h-5 w-5 mr-2" />
-                            Message
+                            {tr('viewShop.message', { fr: 'Message', en: 'Message', es: 'Mensaje', it: 'Messaggio', de: 'Nachricht', ar: 'رسالة' })}
                           </Button>
                         </div>
                       </div>
@@ -1182,7 +1319,7 @@ const ShopDetails: React.FC = () => {
                           <div className="absolute bottom-4 left-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-3 rounded-xl shadow-xl border flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <Navigation className="h-4 w-4 text-blue-500" />
-                              <span className="text-xs font-bold truncate">{shop.address || shop.wilaya}</span>
+                              <span className="text-xs font-bold truncate">{localizedShopAddress || localizedShopWilaya}</span>
                             </div>
                             <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full" asChild>
                               <a href={`https://www.google.com/maps?q=${shop.gpsCoordinates?.lat},${shop.gpsCoordinates?.lng}`} target="_blank" rel="noopener noreferrer">
@@ -1205,8 +1342,8 @@ const ShopDetails: React.FC = () => {
             <Card className="border-none shadow-lg bg-[#0F172A] text-white overflow-hidden">
               <div className="p-6 space-y-6">
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Actions rapides</h3>
-                  <p className="text-slate-400 text-sm">Contacter directement la boutique</p>
+                  <h3 className="text-xl font-bold">{tr('viewShop.quickActions', { fr: 'Actions rapides', en: 'Quick actions', es: 'Acciones rápidas', it: 'Azioni rapide', de: 'Schnellaktionen', ar: 'إجراءات سريعة' })}</h3>
+                  <p className="text-slate-400 text-sm">{tr('viewShop.contactShopDirectly', { fr: 'Contacter directement la boutique', en: 'Contact the shop directly', es: 'Contactar directamente con la tienda', it: 'Contatta direttamente il negozio', de: 'Shop direkt kontaktieren', ar: 'اتصل بالمتجر مباشرة' })}</p>
                 </div>
                 
                 <div className="space-y-3">
@@ -1217,7 +1354,7 @@ const ShopDetails: React.FC = () => {
                     disabled={!phoneNumbers[0]}
                   >
                     <Phone className="h-4 w-4 mr-2" />
-                    Appeler maintenant
+                    {tr('viewShop.callNow', { fr: 'Appeler maintenant', en: 'Call now', es: 'Llamar ahora', it: 'Chiama ora', de: 'Jetzt anrufen', ar: 'اتصل الآن' })}
                   </Button>
                   <Button 
                     variant="secondary" 
@@ -1225,7 +1362,7 @@ const ShopDetails: React.FC = () => {
                     className="w-full h-12 rounded-xl bg-slate-800 hover:bg-slate-700 border-none text-white"
                   >
                     <MessageCircle className="h-4 w-4 mr-2 text-blue-400" />
-                    Envoyer un message
+                    {tr('viewShop.sendMessage', { fr: 'Envoyer un message', en: 'Send a message', es: 'Enviar un mensaje', it: 'Invia un messaggio', de: 'Nachricht senden', ar: 'أرسل رسالة' })}
                   </Button>
                 </div>
               </div>
@@ -1236,8 +1373,8 @@ const ShopDetails: React.FC = () => {
                     <ShieldCheck className="h-5 w-5 text-blue-400" />
                   </div>
                   <div className="text-xs">
-                    <p className="font-bold text-slate-200">Achat Sécurisé</p>
-                    <p className="text-slate-500">Vérifié par Aladdin</p>
+                    <p className="font-bold text-slate-200">{tr('viewShop.securePurchase', { fr: 'Achat sécurisé', en: 'Secure purchase', es: 'Compra segura', it: 'Acquisto sicuro', de: 'Sicherer Kauf', ar: 'شراء آمن' })}</p>
+                    <p className="text-slate-500">{tr('viewShop.verifiedByAladdin', { fr: 'Vérifié par Aladdin', en: 'Verified by Aladdin', es: 'Verificado por Aladdin', it: 'Verificato da Aladdin', de: 'Von Aladdin verifiziert', ar: 'موثّق من علاء الدين' })}</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-600" />
@@ -1249,7 +1386,7 @@ const ShopDetails: React.FC = () => {
               <CardHeader className="pb-3 border-b border-slate-50 dark:border-slate-800">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Clock className="h-5 w-5 text-orange-500" />
-                  Horaires d'ouverture
+                  {tr('viewShop.openingHours', { fr: "Horaires d'ouverture", en: 'Opening hours', es: 'Horario de apertura', it: 'Orari di apertura', de: 'Öffnungszeiten', ar: 'ساعات العمل' })}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -1262,10 +1399,10 @@ const ShopDetails: React.FC = () => {
                       <div key={day} className={`flex items-center justify-between text-sm ${isToday ? 'font-bold text-orange-500' : 'text-slate-600 dark:text-slate-400'}`}>
                         <span className="flex items-center gap-2">
                           {isToday && <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />}
-                          {dayNames[day]}
+                          {getDayLabel(day)}
                         </span>
                         <span>
-                          {hours?.closed ? 'Fermé' : `${hours?.open || '09:00'} - ${hours?.close || '18:00'}`}
+                          {hours?.closed ? tr('viewShop.closed', { fr: 'Fermé', en: 'Closed', es: 'Cerrado', it: 'Chiuso', de: 'Geschlossen', ar: 'مغلق' }) : `${hours?.open || '09:00'} - ${hours?.close || '18:00'}`}
                         </span>
                       </div>
                     );
@@ -1279,7 +1416,7 @@ const ShopDetails: React.FC = () => {
               <CardHeader className="pb-3 border-b border-slate-50 dark:border-slate-800">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Share2 className="h-5 w-5 text-blue-500" />
-                  Réseaux Sociaux
+                  {tr('viewShop.socialMedia', { fr: 'Réseaux sociaux', en: 'Social media', es: 'Redes sociales', it: 'Social media', de: 'Soziale Netzwerke', ar: 'وسائل التواصل الاجتماعي' })}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -1301,7 +1438,7 @@ const ShopDetails: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500 text-center italic">Aucun réseau social lié.</p>
+                  <p className="text-sm text-slate-500 text-center italic">{tr('viewShop.noSocialMedia', { fr: 'Aucun réseau social lié.', en: 'No social media linked.', es: 'No hay redes sociales vinculadas.', it: 'Nessun social collegato.', de: 'Keine sozialen Netzwerke verknüpft.', ar: 'لا توجد شبكات اجتماعية مرتبطة.' })}</p>
                 )}
               </CardContent>
             </Card>
@@ -1312,12 +1449,12 @@ const ShopDetails: React.FC = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center space-y-2">
                     <Navigation className="h-8 w-8 text-slate-400 mx-auto group-hover:text-orange-500 transition-colors" />
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Voir sur la carte</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{tr('viewShop.viewOnMap', { fr: 'Voir sur la carte', en: 'View on map', es: 'Ver en el mapa', it: 'Vedi sulla mappa', de: 'Auf der Karte ansehen', ar: 'عرض على الخريطة' })}</p>
                   </div>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-3 left-3 text-white text-xs font-medium">
-                  {shop.wilaya}, Algérie
+                  {[localizedShopWilaya, tr('viewShop.algeria', { fr: 'Algérie', en: 'Algeria', es: 'Argelia', it: 'Algeria', de: 'Algerien', ar: 'الجزائر' })].filter(Boolean).join(', ')}
                 </div>
               </div>
             </Card>
@@ -1349,46 +1486,46 @@ const ShopDetails: React.FC = () => {
           onClick={handleMessageClick} 
           className="flex-1 h-14 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold"
         >
-          Contacter
+          {t('viewShop.contactShop')}
         </Button>
       </div>
 
       <Dialog open={showReportModal} onOpenChange={(open) => !open && setShowReportModal(false)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Signaler ce contenu</DialogTitle>
+            <DialogTitle>{tr('viewShop.reportContent', { fr: 'Signaler ce contenu', en: 'Report this content', es: 'Reportar este contenido', it: 'Segnala questo contenuto', de: 'Diesen Inhalt melden', ar: 'الإبلاغ عن هذا المحتوى' })}</DialogTitle>
             <DialogDescription>
-              Aidez-nous à garder Aladdin sûr. Sélectionnez une cause et ajoutez des détails si nécessaire.
+              {tr('viewShop.reportDescription', { fr: "Aidez-nous à garder Aladdin sûr. Sélectionnez une cause et ajoutez des détails si nécessaire.", en: 'Help us keep Aladdin safe. Select a reason and add details if necessary.', es: 'Ayúdanos a mantener Aladdin seguro. Selecciona una razón y añade detalles si es necesario.', it: 'Aiutaci a mantenere Aladdin sicuro. Seleziona un motivo e aggiungi dettagli se necessario.', de: 'Helfen Sie uns, Aladdin sicher zu halten. Wählen Sie einen Grund und fügen Sie bei Bedarf Details hinzu.', ar: 'ساعدنا في الحفاظ على أمان علاء الدين. اختر سبباً وأضف التفاصيل عند الحاجة.' })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Cause de signalement ?</Label>
+              <Label>{tr('viewShop.reportReason', { fr: 'Cause de signalement ?', en: 'Reason for report?', es: '¿Motivo del reporte?', it: 'Motivo della segnalazione?', de: 'Meldegrund?', ar: 'سبب الإبلاغ؟' })}</Label>
               <Select value={reportReason} onValueChange={setReportReason}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une cause" />
+                  <SelectValue placeholder={tr('viewShop.selectReason', { fr: 'Sélectionner une cause', en: 'Select a reason', es: 'Selecciona un motivo', it: 'Seleziona un motivo', de: 'Grund auswählen', ar: 'اختر سبباً' })} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="illegal">Contenu illicite</SelectItem>
-                  <SelectItem value="impersonation">Usurpation</SelectItem>
-                  <SelectItem value="wrong_phone">Téléphone incorrect</SelectItem>
-                  <SelectItem value="wrong_category">Mauvaise rubrique</SelectItem>
-                  <SelectItem value="scam">Arnaque</SelectItem>
-                  <SelectItem value="spam">Spam / répétition</SelectItem>
-                  <SelectItem value="inappropriate">Contenu inapproprié</SelectItem>
-                  <SelectItem value="copyright">Droits d’auteur</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
+                  <SelectItem value="illegal">{tr('viewShop.reportReasons.illegal', { fr: 'Contenu illicite', en: 'Illegal content', es: 'Contenido ilegal', it: 'Contenuto illecito', de: 'Illegale Inhalte', ar: 'محتوى غير قانوني' })}</SelectItem>
+                  <SelectItem value="impersonation">{tr('viewShop.reportReasons.impersonation', { fr: 'Usurpation', en: 'Impersonation', es: 'Suplantación', it: 'Frode d’identità', de: 'Identitätsmissbrauch', ar: 'انتحال شخصية' })}</SelectItem>
+                  <SelectItem value="wrong_phone">{tr('viewShop.reportReasons.wrongPhone', { fr: 'Téléphone incorrect', en: 'Incorrect phone', es: 'Teléfono incorrecto', it: 'Telefono errato', de: 'Falsche Telefonnummer', ar: 'رقم هاتف غير صحيح' })}</SelectItem>
+                  <SelectItem value="wrong_category">{tr('viewShop.reportReasons.wrongCategory', { fr: 'Mauvaise rubrique', en: 'Wrong category', es: 'Categoría incorrecta', it: 'Categoria errata', de: 'Falsche Kategorie', ar: 'فئة غير صحيحة' })}</SelectItem>
+                  <SelectItem value="scam">{tr('viewShop.reportReasons.scam', { fr: 'Arnaque', en: 'Scam', es: 'Estafa', it: 'Truffa', de: 'Betrug', ar: 'احتيال' })}</SelectItem>
+                  <SelectItem value="spam">{tr('viewShop.reportReasons.spam', { fr: 'Spam / répétition', en: 'Spam / repetition', es: 'Spam / repetición', it: 'Spam / ripetizione', de: 'Spam / Wiederholung', ar: 'رسائل مزعجة / تكرار' })}</SelectItem>
+                  <SelectItem value="inappropriate">{tr('viewShop.reportReasons.inappropriate', { fr: 'Contenu inapproprié', en: 'Inappropriate content', es: 'Contenido inapropiado', it: 'Contenuto inappropriato', de: 'Unangemessene Inhalte', ar: 'محتوى غير لائق' })}</SelectItem>
+                  <SelectItem value="copyright">{tr('viewShop.reportReasons.copyright', { fr: 'Droits d’auteur', en: 'Copyright', es: 'Derechos de autor', it: 'Copyright', de: 'Urheberrecht', ar: 'حقوق النشر' })}</SelectItem>
+                  <SelectItem value="other">{tr('viewShop.reportReasons.other', { fr: 'Autre', en: 'Other', es: 'Otro', it: 'Altro', de: 'Andere', ar: 'أخرى' })}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Détails (optionnel)</Label>
+              <Label>{tr('viewShop.reportDetails', { fr: 'Détails (optionnel)', en: 'Details (optional)', es: 'Detalles (opcional)', it: 'Dettagli (facoltativo)', de: 'Details (optional)', ar: 'التفاصيل (اختياري)' })}</Label>
               <Textarea
                 value={reportDetails}
                 onChange={(e) => setReportDetails(e.target.value)}
-                placeholder="Décrivez le problème (optionnel)"
+                placeholder={tr('viewShop.reportDetailsPlaceholder', { fr: 'Décrivez le problème (optionnel)', en: 'Describe the issue (optional)', es: 'Describe el problema (opcional)', it: 'Descrivi il problema (facoltativo)', de: 'Beschreiben Sie das Problem (optional)', ar: 'صف المشكلة (اختياري)' })}
                 rows={4}
                 className="resize-none"
               />
@@ -1400,10 +1537,10 @@ const ShopDetails: React.FC = () => {
                 onClick={() => setShowReportModal(false)}
                 disabled={reportSubmitting}
               >
-                Annuler
+                {tr('common.cancel', { fr: 'Annuler', en: 'Cancel', es: 'Cancelar', it: 'Annulla', de: 'Abbrechen', ar: 'إلغاء' })}
               </Button>
               <Button onClick={submitReport} disabled={reportSubmitting}>
-                {reportSubmitting ? "Envoi..." : "Envoyer"}
+                {reportSubmitting ? tr('viewShop.sending', { fr: 'Envoi...', en: 'Sending...', es: 'Enviando...', it: 'Invio...', de: 'Senden...', ar: 'جارٍ الإرسال...' }) : tr('common.send', { fr: 'Envoyer', en: 'Send', es: 'Enviar', it: 'Invia', de: 'Senden', ar: 'إرسال' })}
               </Button>
             </div>
           </div>

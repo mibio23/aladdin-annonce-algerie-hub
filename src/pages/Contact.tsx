@@ -22,10 +22,17 @@ interface ContactFormData {
 }
 
 const Contact = () => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
   const contactFaqs = [
     { question: t('contact.faq.question1'), answer: t('contact.faq.answer1') },
     { question: t('contact.faq.question2'), answer: t('contact.faq.answer2') },
@@ -36,7 +43,14 @@ const Contact = () => {
     {
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
-      name: 'Aladdin Annonces Algérie',
+      name: tr('contact.businessName', {
+        fr: 'Aladdin Annonces Algérie',
+        en: 'Aladdin Algeria Listings',
+        es: 'Anuncios Aladdin Argelia',
+        it: 'Annunci Aladdin Algeria',
+        de: 'Aladdin Anzeigen Algerien',
+        ar: 'إعلانات علاء الدين الجزائر',
+      }),
       url: `${window.location.origin}${getLocalizedPath('/contact')}`,
       image: `${window.location.origin}/og-image.jpg`,
       telephone: t('contact.info.phone.main'),
@@ -82,7 +96,12 @@ const Contact = () => {
         title={t('contact.title')}
         description={t('contact.subtitle')}
         url={getLocalizedPath('/contact')}
-        keywords={[t('contact.title'), 'contact', 'support', 'Aladdin']}
+        keywords={[
+          t('contact.title'),
+          tr('common.contact', { fr: 'contact', en: 'contact', es: 'contacto', it: 'contatto', de: 'kontakt', ar: 'اتصال' }),
+          tr('common.support', { fr: 'support', en: 'support', es: 'soporte', it: 'supporto', de: 'support', ar: 'الدعم' }),
+          'Aladdin',
+        ]}
         structuredData={contactStructuredData}
       />
       <main className="flex-grow container mx-auto px-4 py-8">

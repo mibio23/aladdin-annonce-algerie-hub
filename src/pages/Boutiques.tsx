@@ -40,7 +40,7 @@ const rubriqueToShopStatus: Record<Exclude<ShopRubrique, "boutique-en-ligne">, s
 };
 
 export default function Boutiques() {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { getLocalizedPath } = useLanguageNavigation();
   const { rubrique } = useParams<{ rubrique?: string }>();
   
@@ -91,6 +91,13 @@ export default function Boutiques() {
     return value && value !== key ? value : fallback;
   };
 
+  const tr = (key: string, fallback: Record<string, string> | string) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === "string") return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
   const activeRubriqueLabel = (() => {
     if (activeRubrique === "all") {
       return getLabel("shops.listing.allShops", "Toutes les boutiques");
@@ -120,8 +127,22 @@ export default function Boutiques() {
   const shopsSeoTitle = activeRubrique === "all" ? shopsTitle : `${shopsTitle} - ${activeRubriqueName}`;
   const shopsSeoDescription =
     activeRubrique === "all"
-      ? `${shopsTitle} sur Aladdin Annonces Algérie. Découvrez les boutiques, magasins, cabinets, entreprises et associations disponibles.`
-      : `${activeRubriqueName} sur Aladdin Annonces Algérie. Parcourez les boutiques et professionnels disponibles dans cette rubrique.`;
+      ? `${shopsTitle} - ${tr('shops.listing.seoAll', {
+          fr: 'Découvrez les boutiques, magasins, cabinets, entreprises et associations disponibles sur Aladdin Annonces Algérie.',
+          en: 'Discover the shops, stores, offices, companies and associations available on Aladdin Algeria Listings.',
+          es: 'Descubre las tiendas, comercios, oficinas, empresas y asociaciones disponibles en Anuncios Aladdin Argelia.',
+          it: 'Scopri i negozi, gli store, gli uffici, le aziende e le associazioni disponibili su Annunci Aladdin Algeria.',
+          de: 'Entdecken Sie die auf Aladdin Anzeigen Algerien verfügbaren Geschäfte, Läden, Büros, Unternehmen und Vereine.',
+          ar: 'اكتشف المتاجر والمحلات والمكاتب والشركات والجمعيات المتاحة على إعلانات علاء الدين الجزائر.',
+        })}`
+      : `${activeRubriqueName} - ${tr('shops.listing.seoCategory', {
+          fr: 'Parcourez les boutiques et professionnels disponibles dans cette rubrique sur Aladdin Annonces Algérie.',
+          en: 'Browse the shops and professionals available in this category on Aladdin Algeria Listings.',
+          es: 'Explora las tiendas y profesionales disponibles en esta categoría en Anuncios Aladdin Argelia.',
+          it: 'Sfoglia i negozi e i professionisti disponibili in questa categoria su Annunci Aladdin Algeria.',
+          de: 'Durchsuchen Sie die in dieser Kategorie verfügbaren Geschäfte und Fachleute auf Aladdin Anzeigen Algerien.',
+          ar: 'تصفح المتاجر والمهنيين المتاحين في هذا القسم على إعلانات علاء الدين الجزائر.',
+        })}`;
   const shopsStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -129,7 +150,7 @@ export default function Boutiques() {
       '@type': 'ListItem',
       position: index + 1,
       url: `${window.location.origin}${getLocalizedPath(`/boutique/${shop.id}`)}`,
-      name: shop.name || `Boutique ${index + 1}`,
+      name: shop.name || `${tr('shops.listing.shopItem', { fr: 'Boutique', en: 'Shop', es: 'Tienda', it: 'Negozio', de: 'Geschäft', ar: 'متجر' })} ${index + 1}`,
     })),
   };
 

@@ -46,6 +46,22 @@ const Parametres = () => {
   });
   const [exportingData, setExportingData] = useState(false);
 
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
+  const monthLabels = {
+    fr: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    es: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    it: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+    de: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+    ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+  } as const;
+
   useEffect(() => {
     if (profile?.date_of_birth) {
       setDateOfBirth(new Date(profile.date_of_birth));
@@ -94,10 +110,24 @@ const Parametres = () => {
         .eq('user_id', user.id);
 
       const exportDate = new Date().toISOString();
-      const header = '===== Données du compte =====\n';
+      const header = `===== ${tr('parametres.accountData', {
+        fr: 'Données du compte',
+        en: 'Account data',
+        es: 'Datos de la cuenta',
+        it: "Dati dell'account",
+        de: 'Kontodaten',
+        ar: 'بيانات الحساب',
+      })} =====\n`;
       const profileSection = `\n[Profil]\n${JSON.stringify(profileData ?? {}, null, 2)}\n`;
       const announcementsSection = `\n[Annonces]\n${JSON.stringify(announcementsData ?? [], null, 2)}\n`;
-      const footer = `\nDate d'export: ${exportDate}\n`;
+      const footer = `\n${tr('parametres.exportDate', {
+        fr: "Date d'export",
+        en: 'Export date',
+        es: 'Fecha de exportación',
+        it: 'Data di esportazione',
+        de: 'Exportdatum',
+        ar: 'تاريخ التصدير',
+      })}: ${exportDate}\n`;
       const dataStr = header + profileSection + announcementsSection + footer;
       const dataUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataStr);
       
@@ -155,13 +185,32 @@ const Parametres = () => {
             <Alert variant="destructive" className="mb-6">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle className="flex items-center gap-2">
-                <span>Compte suspendu</span>
-                <Badge variant="destructive">Accès restreint</Badge>
+                <span>{tr('parametres.accountSuspended', {
+                  fr: 'Compte suspendu',
+                  en: 'Account suspended',
+                  es: 'Cuenta suspendida',
+                  it: 'Account sospeso',
+                  de: 'Konto gesperrt',
+                  ar: 'الحساب موقوف',
+                })}</span>
+                <Badge variant="destructive">{tr('parametres.restrictedAccess', {
+                  fr: 'Accès restreint',
+                  en: 'Restricted access',
+                  es: 'Acceso restringido',
+                  it: 'Accesso limitato',
+                  de: 'Eingeschränkter Zugriff',
+                  ar: 'وصول مقيّد',
+                })}</Badge>
               </AlertTitle>
               <AlertDescription>
-                Votre compte est temporairement suspendu pour non-respect des règles de publication.
-                Certaines fonctionnalités sont limitées. Pour un réexamen de votre dossier, contactez le support via
-                le centre d'aide avec votre identifiant utilisateur.
+                {tr('parametres.accountSuspendedDesc', {
+                  fr: "Votre compte est temporairement suspendu pour non-respect des règles de publication. Certaines fonctionnalités sont limitées. Pour un réexamen de votre dossier, contactez le support via le centre d'aide avec votre identifiant utilisateur.",
+                  en: 'Your account is temporarily suspended for not complying with the publishing rules. Some features are limited. For a review of your case, contact support through the help center with your user ID.',
+                  es: 'Tu cuenta está suspendida temporalmente por incumplimiento de las reglas de publicación. Algunas funciones están limitadas. Para revisar tu caso, contacta con soporte a través del centro de ayuda con tu identificador de usuario.',
+                  it: "Il tuo account è temporaneamente sospeso per mancato rispetto delle regole di pubblicazione. Alcune funzionalità sono limitate. Per una revisione del tuo caso, contatta l'assistenza tramite il centro assistenza con il tuo ID utente.",
+                  de: 'Ihr Konto ist vorübergehend gesperrt, weil die Veröffentlichungsregeln nicht eingehalten wurden. Einige Funktionen sind eingeschränkt. Für eine Überprüfung Ihres Falls wenden Sie sich mit Ihrer Benutzer-ID an den Support über das Hilfezentrum.',
+                  ar: 'تم تعليق حسابك مؤقتاً بسبب عدم الالتزام بقواعد النشر. بعض الميزات محدودة. لإعادة مراجعة حالتك، تواصل مع الدعم عبر مركز المساعدة باستخدام معرّف المستخدم الخاص بك.',
+                })}
               </AlertDescription>
             </Alert>
           )}
@@ -300,7 +349,7 @@ const Parametres = () => {
                           }}
                         >
                           <SelectTrigger className="w-[80px]">
-                            <SelectValue placeholder="Jour" />
+                            <SelectValue placeholder={tr('common.day', { fr: 'Jour', en: 'Day', es: 'Día', it: 'Giorno', de: 'Tag', ar: 'اليوم' })} />
                           </SelectTrigger>
                           <SelectContent className="max-h-[200px]">
                             {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
@@ -320,10 +369,10 @@ const Parametres = () => {
                           }}
                         >
                           <SelectTrigger className="flex-1">
-                            <SelectValue placeholder="Mois" />
+                            <SelectValue placeholder={tr('common.month', { fr: 'Mois', en: 'Month', es: 'Mes', it: 'Mese', de: 'Monat', ar: 'الشهر' })} />
                           </SelectTrigger>
                           <SelectContent className="max-h-[200px]">
-                            {['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'].map((m, i) => (
+                            {(monthLabels[language as keyof typeof monthLabels] || monthLabels.fr).map((m, i) => (
                               <SelectItem key={i} value={(i + 1).toString()}>
                                 {m}
                               </SelectItem>
@@ -340,7 +389,7 @@ const Parametres = () => {
                           }}
                         >
                           <SelectTrigger className="w-[100px]">
-                            <SelectValue placeholder="Année" />
+                            <SelectValue placeholder={tr('common.year', { fr: 'Année', en: 'Year', es: 'Año', it: 'Anno', de: 'Jahr', ar: 'السنة' })} />
                           </SelectTrigger>
                           <SelectContent className="max-h-[200px]">
                             {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map((y) => (

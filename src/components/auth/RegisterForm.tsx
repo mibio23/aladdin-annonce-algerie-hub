@@ -14,7 +14,7 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onMessage, onSuccess }) => {
-  const { t } = useSafeI18nWithRouter();
+  const { t, language } = useSafeI18nWithRouter();
   const { signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -30,6 +30,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onMessage, onSuccess }) => 
     acceptTerms: false,
     acceptNewsletter: false
   });
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -87,11 +94,32 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onMessage, onSuccess }) => 
         } else if (rawMessage.includes('Invalid email')) {
           errorMessage = t('auth.errors.invalidEmail');
         } else if (rawMessage.toLowerCase().includes('signup') && rawMessage.toLowerCase().includes('disabled')) {
-          errorMessage = "Les inscriptions sont désactivées dans Supabase (Auth).";
+          errorMessage = tr('auth.errors.signupDisabled', {
+            fr: 'Les inscriptions sont désactivées dans Supabase (Auth).',
+            en: 'Sign-ups are disabled in Supabase (Auth).',
+            es: 'Los registros están desactivados en Supabase (Auth).',
+            it: 'Le iscrizioni sono disattivate in Supabase (Auth).',
+            de: 'Registrierungen sind in Supabase (Auth) deaktiviert.',
+            ar: 'عمليات التسجيل معطلة في Supabase (Auth).',
+          });
         } else if (rawMessage.toLowerCase().includes('redirect') && rawMessage.toLowerCase().includes('not allowed')) {
-          errorMessage = "URL de redirection non autorisée. Ajoutez ce domaine dans Supabase → Auth → URL Configuration.";
+          errorMessage = tr('auth.errors.redirectNotAllowed', {
+            fr: 'URL de redirection non autorisée. Ajoutez ce domaine dans Supabase → Auth → URL Configuration.',
+            en: 'Redirect URL not allowed. Add this domain in Supabase → Auth → URL Configuration.',
+            es: 'URL de redirección no autorizada. Añade este dominio en Supabase → Auth → URL Configuration.',
+            it: 'URL di reindirizzamento non autorizzato. Aggiungi questo dominio in Supabase → Auth → URL Configuration.',
+            de: 'Weiterleitungs-URL nicht erlaubt. Fügen Sie diese Domain in Supabase → Auth → URL Configuration hinzu.',
+            ar: 'رابط إعادة التوجيه غير مسموح. أضف هذا النطاق في Supabase → Auth → URL Configuration.',
+          });
         } else if (rawMessage.includes('Failed to fetch') || rawMessage.toLowerCase().includes('network')) {
-          errorMessage = "Impossible de contacter Supabase. Vérifiez l’URL/clé et la connexion réseau.";
+          errorMessage = tr('auth.errors.supabaseUnavailable', {
+            fr: 'Impossible de contacter Supabase. Vérifiez l’URL/clé et la connexion réseau.',
+            en: 'Unable to reach Supabase. Check the URL/key and network connection.',
+            es: 'No se puede contactar con Supabase. Verifica la URL/clave y la conexión de red.',
+            it: "Impossibile contattare Supabase. Verifica l'URL/chiave e la connessione di rete.",
+            de: 'Supabase kann nicht erreicht werden. Überprüfen Sie URL/Schlüssel und Netzwerkverbindung.',
+            ar: 'تعذر الاتصال بـ Supabase. تحقق من الرابط/المفتاح واتصال الشبكة.',
+          });
         } else if (rawMessage) {
           errorMessage = rawMessage;
         }

@@ -186,8 +186,8 @@ export const navigationIt = {
 
   // Navigation additional
   "navigation.backToDashboard": "Torna alla dashboard",
-  "navigation.productSearch": "Le mie Offerte di Servizi Professionali",
-  "navigation.productSearchDesc": "Gestisci le tue offerte di servizi e migliora le tue competenze",
+  "navigation.productSearch": "Le mie richieste di prodotti",
+  "navigation.productSearchDesc": "Gestisci le tue richieste di prodotti e le ricerche pubblicate",
 
   // Common
   "common.loading": "Caricamento...",

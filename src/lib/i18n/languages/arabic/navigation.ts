@@ -190,8 +190,8 @@ const navigationAr = {
 
   // Navigation additional
   "navigation.backToDashboard": "العودة إلى لوحة التحكم",
-  "navigation.productSearch": "عروض خدماتي المهنية",
-  "navigation.productSearchDesc": "أدر عروض خدماتك وطور مهاراتك",
+  "navigation.productSearch": "طلباتي للمنتجات",
+  "navigation.productSearchDesc": "أدر طلبات المنتجات وعمليات البحث المنشورة الخاصة بك",
   
   "navigation.logout": "تسجيل الخروج",
 

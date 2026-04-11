@@ -10,6 +10,7 @@ import { logger } from '@/utils/silentLogger';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchCategoriesFromSupabase } from '@/services/supabaseCategoriesService';
 import { useAuth } from '@/contexts/useAuth';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 type OfflineAnnouncement = {
   id: string;
@@ -38,10 +39,18 @@ interface CachedData {
 }
 
 export const OfflineMode: React.FC = () => {
+  const { t, language } = useSafeI18nWithRouter();
   const { toast } = useToast();
   const { user } = useAuth();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [cachedData, setCachedData] = useState<CachedData | null>(null);
+
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
   const [storageUsage, setStorageUsage] = useState<{ used: number; total: number } | null>(null);
   const [syncProgress, setSyncProgress] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -152,14 +161,42 @@ export const OfflineMode: React.FC = () => {
       setSyncProgress(100);
 
       toast({
-        title: "Synchronisation terminée",
-        description: `${syncedData.announcements.length} annonces, ${syncedData.categories.length} catégories, ${syncedData.favorites.length} favoris`,
+        title: tr('offline.syncComplete', {
+          fr: 'Synchronisation terminée',
+          en: 'Synchronization complete',
+          es: 'Sincronización completada',
+          it: 'Sincronizzazione completata',
+          de: 'Synchronisierung abgeschlossen',
+          ar: 'اكتملت المزامنة',
+        }),
+        description: tr('offline.syncCompleteDesc', {
+          fr: `${syncedData.announcements.length} annonces, ${syncedData.categories.length} catégories, ${syncedData.favorites.length} favoris`,
+          en: `${syncedData.announcements.length} listings, ${syncedData.categories.length} categories, ${syncedData.favorites.length} favorites`,
+          es: `${syncedData.announcements.length} anuncios, ${syncedData.categories.length} categorías, ${syncedData.favorites.length} favoritos`,
+          it: `${syncedData.announcements.length} annunci, ${syncedData.categories.length} categorie, ${syncedData.favorites.length} preferiti`,
+          de: `${syncedData.announcements.length} Anzeigen, ${syncedData.categories.length} Kategorien, ${syncedData.favorites.length} Favoriten`,
+          ar: `${syncedData.announcements.length} إعلاناً، ${syncedData.categories.length} فئة، ${syncedData.favorites.length} مفضلة`,
+        }),
       });
     } catch (error) {
       logger.error('Sync error:', error);
       toast({
-        title: "Erreur de synchronisation",
-        description: "Impossible de synchroniser les données",
+        title: tr('offline.syncError', {
+          fr: 'Erreur de synchronisation',
+          en: 'Synchronization error',
+          es: 'Error de sincronización',
+          it: 'Errore di sincronizzazione',
+          de: 'Synchronisierungsfehler',
+          ar: 'خطأ في المزامنة',
+        }),
+        description: tr('offline.syncErrorDesc', {
+          fr: 'Impossible de synchroniser les données',
+          en: 'Unable to synchronize data',
+          es: 'No se pueden sincronizar los datos',
+          it: 'Impossibile sincronizzare i dati',
+          de: 'Daten konnten nicht synchronisiert werden',
+          ar: 'تعذر مزامنة البيانات',
+        }),
         variant: "destructive",
       });
     } finally {
@@ -173,8 +210,22 @@ export const OfflineMode: React.FC = () => {
     const handleOnline = () => {
       setIsOnline(true);
       toast({
-        title: "Connexion rétablie",
-        description: "Synchronisation des données en cours...",
+        title: tr('offline.connectionRestored', {
+          fr: 'Connexion rétablie',
+          en: 'Connection restored',
+          es: 'Conexión restablecida',
+          it: 'Connessione ristabilita',
+          de: 'Verbindung wiederhergestellt',
+          ar: 'تمت استعادة الاتصال',
+        }),
+        description: tr('offline.syncInProgress', {
+          fr: 'Synchronisation des données en cours...',
+          en: 'Data synchronization in progress...',
+          es: 'Sincronización de datos en curso...',
+          it: 'Sincronizzazione dei dati in corso...',
+          de: 'Datensynchronisierung läuft...',
+          ar: 'جارٍ مزامنة البيانات...',
+        }),
       });
       syncData(true);
     };
@@ -182,8 +233,22 @@ export const OfflineMode: React.FC = () => {
     const handleOffline = () => {
       setIsOnline(false);
       toast({
-        title: "Hors ligne",
-        description: "Mode hors ligne activé. Vos données locales sont disponibles.",
+        title: tr('offline.offline', {
+          fr: 'Hors ligne',
+          en: 'Offline',
+          es: 'Sin conexión',
+          it: 'Offline',
+          de: 'Offline',
+          ar: 'غير متصل',
+        }),
+        description: tr('offline.offlineDesc', {
+          fr: 'Mode hors ligne activé. Vos données locales sont disponibles.',
+          en: 'Offline mode enabled. Your local data is available.',
+          es: 'Modo sin conexión activado. Tus datos locales están disponibles.',
+          it: 'Modalità offline attivata. I tuoi dati locali sono disponibili.',
+          de: 'Offline-Modus aktiviert. Ihre lokalen Daten sind verfügbar.',
+          ar: 'تم تفعيل وضع عدم الاتصال. بياناتك المحلية متاحة.',
+        }),
         variant: "destructive",
       });
     };
@@ -204,8 +269,22 @@ export const OfflineMode: React.FC = () => {
     localStorage.removeItem('aladdin_offline_data');
     setCachedData(null);
     toast({
-      title: "Cache vidé",
-      description: "Toutes les données locales ont été supprimées",
+      title: tr('offline.cacheCleared', {
+        fr: 'Cache vidé',
+        en: 'Cache cleared',
+        es: 'Caché borrada',
+        it: 'Cache svuotata',
+        de: 'Cache geleert',
+        ar: 'تم مسح التخزين المؤقت',
+      }),
+      description: tr('offline.cacheClearedDesc', {
+        fr: 'Toutes les données locales ont été supprimées',
+        en: 'All local data has been removed',
+        es: 'Todos los datos locales han sido eliminados',
+        it: 'Tutti i dati locali sono stati rimossi',
+        de: 'Alle lokalen Daten wurden entfernt',
+        ar: 'تمت إزالة جميع البيانات المحلية',
+      }),
     });
     checkStorageUsage();
   };
@@ -234,18 +313,41 @@ export const OfflineMode: React.FC = () => {
             ) : (
               <WifiOff className="h-5 w-5 text-red-500" />
             )}
-            Statut de connexion
+            {tr('offline.connectionStatus', {
+              fr: 'Statut de connexion',
+              en: 'Connection status',
+              es: 'Estado de conexión',
+              it: 'Stato della connessione',
+              de: 'Verbindungsstatus',
+              ar: 'حالة الاتصال',
+            })}
           </CardTitle>
           <CardDescription>
             {isOnline 
-              ? "Vous êtes connecté à Internet" 
-              : "Vous êtes actuellement hors ligne"}
+              ? tr('offline.onlineDesc', {
+                  fr: 'Vous êtes connecté à Internet',
+                  en: 'You are connected to the internet',
+                  es: 'Estás conectado a Internet',
+                  it: 'Sei connesso a Internet',
+                  de: 'Sie sind mit dem Internet verbunden',
+                  ar: 'أنت متصل بالإنترنت',
+                })
+              : tr('offline.currentlyOffline', {
+                  fr: 'Vous êtes actuellement hors ligne',
+                  en: 'You are currently offline',
+                  es: 'Actualmente estás sin conexión',
+                  it: 'Sei attualmente offline',
+                  de: 'Sie sind derzeit offline',
+                  ar: 'أنت غير متصل حالياً',
+                })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
             <Badge variant={isOnline ? "default" : "destructive"}>
-              {isOnline ? "En ligne" : "Hors ligne"}
+              {isOnline
+                ? tr('messages.online', { fr: 'En ligne', en: 'Online', es: 'En línea', it: 'Online', de: 'Online', ar: 'متصل' })
+                : tr('offline.offline', { fr: 'Hors ligne', en: 'Offline', es: 'Sin conexión', it: 'Offline', de: 'Offline', ar: 'غير متصل' })}
             </Badge>
             
             {isOnline && (

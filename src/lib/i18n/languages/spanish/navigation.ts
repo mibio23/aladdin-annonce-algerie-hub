@@ -186,8 +186,8 @@ const navigationEs = {
 
   // Navigation additional
   "navigation.backToDashboard": "Volver al Panel",
-  "navigation.productSearch": "Mis Ofertas de Servicios Profesionales",
-  "navigation.productSearchDesc": "Gestiona tus ofertas de servicios y mejora tus habilidades",
+  "navigation.productSearch": "Mis solicitudes de productos",
+  "navigation.productSearchDesc": "Gestiona tus solicitudes de productos y búsquedas publicadas",
   
   "navigation.logout": "Cerrar sesión",
 

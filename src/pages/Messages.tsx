@@ -22,6 +22,13 @@ const Messages = () => {
   // Use `t` for translations
   const translate = t;
 
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
   const handleTabClick = (filter: 'all' | 'ad' | 'shop' | 'job_offer') => {
     setActiveFilter(filter);
     setSelectedConversationId(null);
@@ -103,7 +110,14 @@ const Messages = () => {
                  participant_2_id: ownerId,
                  subject_type: subjectType,
                  subject_id: subjectId,
-                 title: title || 'Nouvelle conversation',
+                title: title || tr('messages.newConversation', {
+                  fr: 'Nouvelle conversation',
+                  en: 'New conversation',
+                  es: 'Nueva conversación',
+                  it: 'Nuova conversazione',
+                  de: 'Neue Konversation',
+                  ar: 'محادثة جديدة',
+                }),
                  updated_at: now,
                  last_message_at: now
                })
@@ -167,7 +181,14 @@ const Messages = () => {
                 )}
               >
                 <Link to={getLocalizedPath('/')}>
-                  {translate('categories.backToHome') === 'categories.backToHome' ? "Retour à l'accueil" : translate('categories.backToHome')}
+                  {tr('categories.backToHome', {
+                    fr: "Retour à l'accueil",
+                    en: 'Back to home',
+                    es: 'Volver al inicio',
+                    it: 'Torna alla home',
+                    de: 'Zur Startseite',
+                    ar: 'العودة إلى الرئيسية',
+                  })}
                 </Link>
               </Button>
               <div className="flex items-center gap-3">
@@ -199,10 +220,24 @@ const Messages = () => {
                 <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'all' ? "bg-white/20" : "bg-blue-50 dark:bg-blue-900/30 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50")}>
                   <MessageCircle className={cn("h-6 w-6", activeFilter === 'all' ? "text-white" : "text-blue-500")} />
                 </div>
-                <span className="text-lg font-extrabold">{t('messages.tabs.all.title') === 'messages.tabs.all.title' ? 'Toutes les discussions' : t('messages.tabs.all.title')}</span>
+                <span className="text-lg font-extrabold">{tr('messages.tabs.all.title', {
+                  fr: 'Toutes les discussions',
+                  en: 'All conversations',
+                  es: 'Todas las conversaciones',
+                  it: 'Tutte le conversazioni',
+                  de: 'Alle Gespräche',
+                  ar: 'جميع المحادثات',
+                })}</span>
               </div>
               <span className={cn("text-xs font-medium text-center", activeFilter === 'all' ? "text-blue-100" : "text-slate-400")}>
-                {t('messages.tabs.all.desc') === 'messages.tabs.all.desc' ? 'Gérez tous vos échanges en un seul endroit' : t('messages.tabs.all.desc')}
+                {tr('messages.tabs.all.desc', {
+                  fr: 'Gérez tous vos échanges en un seul endroit',
+                  en: 'Manage all your conversations in one place',
+                  es: 'Gestiona todas tus conversaciones en un solo lugar',
+                  it: 'Gestisci tutte le tue conversazioni in un unico posto',
+                  de: 'Verwalten Sie alle Ihre Gespräche an einem Ort',
+                  ar: 'أدر جميع محادثاتك في مكان واحد',
+                })}
               </span>
             </button>
             
@@ -219,10 +254,24 @@ const Messages = () => {
                 <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'ad' ? "bg-white/20" : "bg-green-50 dark:bg-green-900/30 group-hover:bg-green-100 dark:group-hover:bg-green-900/50")}>
                   <FileText className={cn("h-6 w-6", activeFilter === 'ad' ? "text-white" : "text-green-500")} />
                 </div>
-                <span className="text-lg font-extrabold">{translate('messages.tabs.ad.title') === 'messages.tabs.ad.title' ? 'Annonces' : translate('messages.tabs.ad.title')}</span>
+                <span className="text-lg font-extrabold">{tr('messages.tabs.ad.title', {
+                  fr: 'Annonces',
+                  en: 'Listings',
+                  es: 'Anuncios',
+                  it: 'Annunci',
+                  de: 'Anzeigen',
+                  ar: 'الإعلانات',
+                })}</span>
               </div>
               <span className={cn("text-xs font-medium text-center", activeFilter === 'ad' ? "text-green-100" : "text-slate-400")}>
-                {translate('messages.tabs.ad.desc') === 'messages.tabs.ad.desc' ? "Messages liés à l'achat ou vente d'articles" : translate('messages.tabs.ad.desc')}
+                {tr('messages.tabs.ad.desc', {
+                  fr: "Messages liés à l'achat ou vente d'articles",
+                  en: 'Messages related to buying or selling items',
+                  es: 'Mensajes relacionados con la compra o venta de artículos',
+                  it: "Messaggi relativi all'acquisto o alla vendita di articoli",
+                  de: 'Nachrichten zum Kauf oder Verkauf von Artikeln',
+                  ar: 'رسائل مرتبطة بشراء أو بيع المنتجات',
+                })}
               </span>
             </button>
 
@@ -239,10 +288,24 @@ const Messages = () => {
                 <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'shop' ? "bg-white/20" : "bg-purple-50 dark:bg-purple-900/30 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/50")}>
                   <ShoppingBag className={cn("h-6 w-6", activeFilter === 'shop' ? "text-white" : "text-purple-500")} />
                 </div>
-                <span className="text-lg font-extrabold">{translate('messages.tabs.shop.title') === 'messages.tabs.shop.title' ? 'Boutiques' : translate('messages.tabs.shop.title')}</span>
+                <span className="text-lg font-extrabold">{tr('messages.tabs.shop.title', {
+                  fr: 'Boutiques',
+                  en: 'Shops',
+                  es: 'Tiendas',
+                  it: 'Negozi',
+                  de: 'Shops',
+                  ar: 'المتاجر',
+                })}</span>
               </div>
               <span className={cn("text-xs font-medium text-center", activeFilter === 'shop' ? "text-purple-100" : "text-slate-400")}>
-                {translate('messages.tabs.shop.desc') === 'messages.tabs.shop.desc' ? 'Échanges avec les magasins professionnels' : translate('messages.tabs.shop.desc')}
+                {tr('messages.tabs.shop.desc', {
+                  fr: 'Échanges avec les magasins professionnels',
+                  en: 'Conversations with professional stores',
+                  es: 'Conversaciones con tiendas profesionales',
+                  it: 'Conversazioni con negozi professionali',
+                  de: 'Unterhaltungen mit professionellen Geschäften',
+                  ar: 'محادثات مع المتاجر المهنية',
+                })}
               </span>
             </button>
 
@@ -259,10 +322,24 @@ const Messages = () => {
                 <div className={cn("p-2 rounded-xl shadow-inner", activeFilter === 'job_offer' ? "bg-white/20" : "bg-blue-50 dark:bg-blue-900/30 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50")}>
                   <Briefcase className={cn("h-6 w-6", activeFilter === 'job_offer' ? "text-white" : "text-blue-500")} />
                 </div>
-                <span className="text-lg font-extrabold">{translate('messages.tabs.job_offer.title') === 'messages.tabs.job_offer.title' ? 'Métiers' : translate('messages.tabs.job_offer.title')}</span>
+                <span className="text-lg font-extrabold">{tr('messages.tabs.job_offer.title', {
+                  fr: 'Métiers',
+                  en: 'Trades',
+                  es: 'Oficios',
+                  it: 'Mestieri',
+                  de: 'Berufe',
+                  ar: 'المهن',
+                })}</span>
               </div>
               <span className={cn("text-xs font-medium text-center", activeFilter === 'job_offer' ? "text-blue-100" : "text-slate-400")}>
-                {translate('messages.tabs.job_offer.desc') === 'messages.tabs.job_offer.desc' ? 'Contacts pour des services et réparations' : translate('messages.tabs.job_offer.desc')}
+                {tr('messages.tabs.job_offer.desc', {
+                  fr: 'Contacts pour des services et réparations',
+                  en: 'Contacts for services and repairs',
+                  es: 'Contactos para servicios y reparaciones',
+                  it: 'Contatti per servizi e riparazioni',
+                  de: 'Kontakte für Dienstleistungen und Reparaturen',
+                  ar: 'جهات اتصال للخدمات والإصلاحات',
+                })}
               </span>
             </button>
           </div>

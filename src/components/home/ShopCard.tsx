@@ -24,6 +24,13 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
   const [followersCount, setFollowersCount] = useState(shop.followerCount || 0);
   const isRTL = language === 'ar';
 
+  const tr = (key: string, fallback: string | Record<string, string>) => {
+    const value = t(key);
+    if (value && value !== key) return value;
+    if (typeof fallback === 'string') return fallback;
+    return fallback[language] || fallback.fr || Object.values(fallback)[0] || key;
+  };
+
   useEffect(() => {
     // 1. Charger le statut favori
     const checkFavoriteStatus = async () => {
@@ -190,7 +197,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         } else {
            toast({
             title: t('viewShop.addedToFavorites'),
-            description: "La boutique est maintenant enregistrée dans vos favoris.",
+            description: tr('viewShop.addedToFavoritesDesc', { fr: 'La boutique est maintenant enregistrée dans vos favoris.', en: 'The shop is now saved to your favorites.', es: 'La tienda ahora está guardada en tus favoritos.', it: 'Il negozio è ora salvato nei tuoi preferiti.', de: 'Der Shop ist jetzt in Ihren Favoriten gespeichert.', ar: 'تم حفظ المتجر الآن في المفضلة.' }),
           });
         }
       } else {
@@ -213,7 +220,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         } else {
           toast({
             title: t('viewShop.removedFromFavorites'),
-            description: "La boutique a été retirée de votre liste de favoris.",
+            description: tr('viewShop.removedFromFavoritesDesc', { fr: 'La boutique a été retirée de votre liste de favoris.', en: 'The shop has been removed from your favorites list.', es: 'La tienda ha sido eliminada de tu lista de favoritos.', it: 'Il negozio è stato rimosso dalla tua lista dei preferiti.', de: 'Der Shop wurde aus Ihrer Favoritenliste entfernt.', ar: 'تمت إزالة المتجر من قائمة المفضلة.' }),
           });
         }
       }
@@ -248,22 +255,29 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
     switch (action) {
       case "Phone":
         if (normalizedPhone) window.location.href = `tel:${normalizedPhone}`;
-        else toast({ title: "Info", description: "Aucun numéro de téléphone disponible" });
+        else toast({ title: tr('common.info', { fr: 'Info', en: 'Info', es: 'Info', it: 'Info', de: 'Info', ar: 'معلومة' }), description: tr('viewShop.noPhoneAvailable', { fr: 'Aucun numéro de téléphone disponible', en: 'No phone number available', es: 'No hay número de teléfono disponible', it: 'Nessun numero di telefono disponibile', de: 'Keine Telefonnummer verfügbar', ar: 'لا يوجد رقم هاتف متاح' }) });
         break;
       case "Message":
         if (normalizedPhone) window.location.href = `sms:${normalizedPhone}`;
-        else toast({ title: "Info", description: "Aucun numéro disponible pour les messages" });
+        else toast({ title: tr('common.info', { fr: 'Info', en: 'Info', es: 'Info', it: 'Info', de: 'Info', ar: 'معلومة' }), description: tr('viewShop.noMessageNumberAvailable', { fr: 'Aucun numéro disponible pour les messages', en: 'No number available for messages', es: 'No hay número disponible para mensajes', it: 'Nessun numero disponibile per i messaggi', de: 'Keine Nummer für Nachrichten verfügbar', ar: 'لا يوجد رقم متاح للرسائل' }) });
         break;
       case "WhatsApp":
         if (whatsappNumber) window.open(`https://wa.me/${whatsappNumber}`, '_blank', 'noopener,noreferrer');
-        else toast({ title: "Info", description: "Aucun numéro WhatsApp disponible" });
+        else toast({ title: tr('common.info', { fr: 'Info', en: 'Info', es: 'Info', it: 'Info', de: 'Info', ar: 'معلومة' }), description: tr('viewShop.noWhatsappAvailable', { fr: 'Aucun numéro WhatsApp disponible', en: 'No WhatsApp number available', es: 'No hay número de WhatsApp disponible', it: 'Nessun numero WhatsApp disponibile', de: 'Keine WhatsApp-Nummer verfügbar', ar: 'لا يوجد رقم واتساب متاح' }) });
         break;
       case "Share":
         if (navigator.share) {
           try {
             await navigator.share({
               title: shop.name,
-              text: `Découvrez ${shop.name} sur Aladdin`,
+              text: tr('viewShop.shareShopText', {
+                fr: `Découvrez ${shop.name} sur Aladdin`,
+                en: `Discover ${shop.name} on Aladdin`,
+                es: `Descubre ${shop.name} en Aladdin`,
+                it: `Scopri ${shop.name} su Aladdin`,
+                de: `Entdecken Sie ${shop.name} auf Aladdin`,
+                ar: `اكتشف ${shop.name} على علاء الدين`,
+              }),
               url: shopUrl,
             });
           } catch (error) {
@@ -272,7 +286,10 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         } else {
            // Fallback to copy to clipboard
            navigator.clipboard.writeText(shopUrl);
-           toast({ title: "Lien copié", description: "Le lien de la boutique a été copié dans le presse-papier" });
+           toast({
+            title: tr('viewShop.linkCopied', { fr: 'Lien copié', en: 'Link copied', es: 'Enlace copiado', it: 'Link copiato', de: 'Link kopiert', ar: 'تم نسخ الرابط' }),
+            description: tr('viewShop.linkCopiedText', { fr: 'Le lien de la boutique a été copié dans le presse-papier', en: 'The shop link has been copied to the clipboard', es: 'El enlace de la tienda se ha copiado al portapapeles', it: 'Il link del negozio è stato copiato negli appunti', de: 'Der Shop-Link wurde in die Zwischenablage kopiert', ar: 'تم نسخ رابط المتجر إلى الحافظة' })
+           });
         }
         break;
     }
@@ -300,7 +317,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
                         fontFamily: 'serif'
                       }}
                     >
-                      BOUTIQUE
+                      {tr('viewShop.shopWord', { fr: 'BOUTIQUE', en: 'SHOP', es: 'TIENDA', it: 'NEGOZIO', de: 'SHOP', ar: 'متجر' })}
                     </span>
                   </div>
                   <div className="w-7 h-7 flex items-center justify-center p-0.5 group-hover:scale-110 transition-transform duration-300">
