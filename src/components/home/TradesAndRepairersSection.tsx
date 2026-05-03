@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import SmartAnnouncementsGrid from './SmartAnnouncementsGrid';
 import { Briefcase, ArrowRight, Phone, MessageCircle, Share2, ShieldCheck, Home, Award, MapPin, Clock, Heart } from 'lucide-react';
 import { LocalizedLink } from '@/utils/linkUtils';
@@ -129,7 +130,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
         
         setOffers(transformedData);
       } catch (err) {
-        console.error('Error fetching trade offers:', err);
+        logger.warn('Error fetching trade offers:', err);
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 
 export const usePresenceTracker = () => {
   const { user } = useAuth();
@@ -22,10 +23,10 @@ export const usePresenceTracker = () => {
           });
 
         if (error) {
-          console.error('Error updating presence:', error);
+          logger.warn('Error updating presence:', error);
         }
       } catch (err) {
-        console.error('Error in presence tracker:', err);
+        logger.warn('Error in presence tracker:', err);
       }
     };
 

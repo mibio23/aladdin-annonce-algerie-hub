@@ -11,6 +11,7 @@ import { LocalizedLink } from "@/utils/linkUtils";
 import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/useAuth";
+import { logger } from "@/utils/silentLogger";
 import { Button } from "@/components/ui/button";
 
 interface ShopCardProps {
@@ -65,7 +66,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
             }
           }
         } catch (error) {
-          console.error("Erreur vérification favoris boutique:", error);
+          logger.warn("Erreur vérification favoris boutique:", error);
           setIsFavorite(isLocallyFavorite);
         }
       } else {
@@ -88,7 +89,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
           setFollowersCount(data.followers_count);
         }
       } catch (err) {
-        console.error("Erreur chargement compteurs:", err);
+        logger.warn("Erreur chargement compteurs:", err);
       }
     };
     
@@ -186,7 +187,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
           
         if (error) {
           // Revert optimiste en cas d'erreur
-          console.error("Erreur ajout favori:", error);
+          logger.warn("Erreur ajout favori:", error);
           setIsFavorite(false);
           setFollowersCount(prev => Math.max(0, prev - 1));
           toast({
@@ -209,7 +210,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
           
         if (error) {
            // Revert optimiste en cas d'erreur
-           console.error("Erreur suppression favori:", error);
+           logger.warn("Erreur suppression favori:", error);
            setIsFavorite(true);
            setFollowersCount(prev => prev + 1);
            toast({
@@ -225,7 +226,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         }
       }
     } catch (error) {
-      console.error("Erreur action favoris:", error);
+      logger.error("Erreur action favoris:", error);
       // Revert global en cas de crash
       setIsFavorite(!newIsFavorite);
       setFollowersCount(prev => newIsFavorite ? Math.max(0, prev - 1) : prev + 1);
@@ -281,7 +282,7 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
               url: shopUrl,
             });
           } catch (error) {
-            console.error("Error sharing:", error);
+            logger.warn("Error sharing:", error);
           }
         } else {
            // Fallback to copy to clipboard

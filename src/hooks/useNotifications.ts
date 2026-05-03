@@ -27,7 +27,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      const mapped: Notification[] = (data || []).map((n: any) => ({
+      const mapped: Notification[] = (data || []).map((n) => ({
         id: n.id,
         type: (n.type || 'info') as Notification['type'],
         title: n.title,
@@ -47,7 +47,35 @@ export const useNotifications = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, [fetchNotifications]);
+
+    // Subscribe to new notifications in realtime
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        const n = payload.new as any;
+        const newNotif: Notification = {
+          id: n.id,
+          type: (n.type || 'info') as Notification['type'],
+          title: n.title,
+          message: n.message || '',
+          timestamp: new Date(n.created_at),
+          isRead: Boolean(n.read),
+        };
+        setNotifications((prev) => [newNotif, ...prev]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchNotifications, user]);
 
   const markAsRead = useCallback(
     async (id: string) => {
@@ -56,8 +84,7 @@ export const useNotifications = () => {
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
       const { error } = await supabase
         .from('notifications')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update({ read_at: new Date().toISOString() } as any)
+        .update({ read: true })
         .eq('id', id)
         .eq('user_id', user.id);
 
@@ -75,8 +102,7 @@ export const useNotifications = () => {
 
     const { error } = await supabase
       .from('notifications')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .update({ read_at: new Date().toISOString() } as any)
+      .update({ read: true })
       .eq('user_id', user.id);
 
     if (error) {

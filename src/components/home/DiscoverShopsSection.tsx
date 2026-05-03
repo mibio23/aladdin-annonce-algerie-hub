@@ -6,6 +6,7 @@ import DiscoverShopsBanner from "./DiscoverShopsBanner";
 import SmartAnnouncementsGrid from "./SmartAnnouncementsGrid";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/utils/silentLogger";
 import { Badge } from "@/components/ui/badge";
 
 type DiscoverShopsSectionProps = {
@@ -36,7 +37,7 @@ const DiscoverShopsSection = ({ shopsCount }: DiscoverShopsSectionProps) => {
         if (error) throw error;
         setFeaturedShops(data || []);
       } catch (error) {
-        console.error('Error fetching shops:', error);
+        logger.warn('Error fetching shops:', error);
       } finally {
         setLoading(false);
       }

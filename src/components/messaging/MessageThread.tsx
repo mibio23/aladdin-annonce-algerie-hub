@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
+import { logger } from '@/utils/silentLogger';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -119,7 +120,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
               link
             });
           } catch (e) {
-            console.error('Error fetching subject details', e);
+            logger.warn('Error fetching subject details', e);
           }
         }
       }
@@ -155,7 +156,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
           setIsOtherUserOnline(false);
         }
       } catch (err) {
-        console.error('Error checking presence:', err);
+        logger.warn('Error checking presence:', err);
         setIsOtherUserOnline(false);
       }
     };
@@ -214,7 +215,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
         .order('created_at', { ascending: true });
 
       if (error) {
-        console.error(error);
+        logger.error('Error fetching messages:', error);
       }
 
       if (data) {
@@ -313,7 +314,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
           .eq('id', conversationId);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
     } finally {
       setSending(false);
     }

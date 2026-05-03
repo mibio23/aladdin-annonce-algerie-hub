@@ -380,7 +380,7 @@ export const useAnnouncements = () => {
     }
   }, [user, toast, transformAnnouncementData]);
 
-  // Get single announcement by ID - now checks announcements table first with phone protection
+  // Get single announcement by ID - uses secure RPC with fallback to direct query
   const getAnnouncementById = useCallback(async (id: string): Promise<Announcement | null> => {
     try {
       // Use the secure function to get announcement with protected contact info
@@ -418,24 +418,24 @@ export const useAnnouncements = () => {
         };
       }
 
-      // Fallback to advertising_banners table
+      // Fallback: direct query to announcements table (if RPC is not available)
       const { data, error } = await supabase
-        .from('advertising_banners')
-        .select('*')
+        .from('announcements')
+        .select(`*, categories:categories!fk_announcements_category(name, slug)`)
         .eq('id', id)
         .single();
 
       if (error) {
-        logger.error('Error fetching announcement:', error);
-        throw error;
+        logger.error('Error fetching announcement by ID:', error);
+        return null;
       }
 
-      return transformBannerToAnnouncement(data);
+      return transformAnnouncementData(data as DbAnnouncement);
     } catch (error) {
       logger.error('Error fetching announcement:', error);
       return null;
     }
-  }, []);
+  }, [transformAnnouncementData]);
 
   // Create new announcement
   const createAnnouncement = useCallback(async (announcementData: CreateAnnouncementData): Promise<Announcement | null> => {
@@ -619,10 +619,19 @@ export const useAnnouncements = () => {
     }
   }, [user, toast]);
 
-  // Increment views (placeholder - no views counter in banners table)
+  // Increment views using the database RPC function
   const incrementViews = useCallback(async (id: string) => {
-    // No-op since advertising_banners doesn't have views_count
-    logger.info('View incremented for banner:', id);
+    try {
+      const { error } = await supabase.rpc('increment_view_count', {
+        announcement_uuid: id,
+      });
+      if (error) {
+        logger.warn('Error incrementing view count:', error);
+      }
+    } catch (error) {
+      // Silently fail — view counting is non-critical
+      logger.warn('Failed to increment view count:', error);
+    }
   }, []);
 
   return {

@@ -3,6 +3,7 @@ import { MessageCircle, User, ShoppingBag, Briefcase, FileText } from 'lucide-re
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
+import { logger } from '@/utils/silentLogger';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { fr, ar, enUS, es, de, it } from 'date-fns/locale';
@@ -106,7 +107,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 if (data && data.images) subjectImageUrl = data.images[0];
               }
             } catch (e) {
-              console.error('Error fetching image for list', e);
+              logger.warn('Error fetching image for list', e);
             }
           }
 
@@ -120,7 +121,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
         setConversations(enhancedConversations);
       } catch (error) {
-        console.error('Error fetching conversations:', error);
+        logger.error('Error fetching conversations:', error);
       } finally {
         setLoading(false);
       }
@@ -225,7 +226,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
           return next;
         });
       } catch (err) {
-        console.error('Error fetching online statuses:', err);
+        logger.warn('Error fetching online statuses:', err);
       }
     };
 

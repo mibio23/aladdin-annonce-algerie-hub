@@ -635,7 +635,7 @@ const DeposerAnnonce = () => {
     let isL3Selected = false;
 
     // Logging pour débogage
-    console.log("🔍 Debug Attributes Calculation:", { 
+    logger.debug("Attributes Calculation:", { 
       category_id: formData.category_id, 
       subcategory_id: formData.subcategory_id, 
       selectedSubcategoryL2 
@@ -660,7 +660,7 @@ const DeposerAnnonce = () => {
 
       if (subSub) {
         isL3Selected = true;
-        console.log("Found L3 subcategory:", subSub.slug, "Attributes:", subSub.attributes);
+        logger.debug("Found L3 subcategory:", subSub.slug, "Attributes:", subSub.attributes);
         if (subSub.attributes) {
           newAttributes = subSub.attributes;
         }
@@ -673,18 +673,18 @@ const DeposerAnnonce = () => {
       // Or if we are simply on L2 selection
       
       const sub = subcategories.find(s => s.id === selectedSubcategoryL2);
-      console.log("Checking L2 subcategory:", sub?.slug, "Attributes:", sub?.attributes);
+      logger.debug("Checking L2 subcategory:", sub?.slug, "Attributes:", sub?.attributes);
       if (sub) {
          // However, user wants attributes "dès la selection de la deuxième case".
          // So if L3 is NOT selected, we MUST show L2.
         const rootCat = menuCategories.find(c => c.id === formData.category_id);
         let nextAttributes = sub.attributes ?? {};
         
-        console.log("DEBUG L2 Merge - Root:", rootCat?.slug, "Sub:", sub.slug);
+        logger.debug("L2 Merge - Root:", rootCat?.slug, "Sub:", sub.slug);
         
         if (rootCat?.slug === 'immobilier-maison') {
           const localSub = immobilierMaisonFr.subcategories?.find(s => s.slug === sub.slug);
-          console.log("DEBUG L2 Merge - Local Match:", localSub ? "Found" : "Not Found", localSub?.attributes);
+          logger.debug("L2 Merge - Local Match:", localSub ? "Found" : "Not Found", localSub?.attributes);
           if (localSub?.attributes) {
             nextAttributes = mergeAttributes(nextAttributes, localSub.attributes);
           }
@@ -698,7 +698,7 @@ const DeposerAnnonce = () => {
     // If still no attributes and we have a root category selected, try L1
     if (Object.keys(newAttributes).length === 0 && formData.category_id && !selectedSubcategoryL2) {
       const rootCat = menuCategories.find(c => c.id === formData.category_id);
-      console.log("Checking Root category:", rootCat?.slug, "Attributes:", rootCat?.attributes);
+      logger.debug("Checking Root category:", rootCat?.slug, "Attributes:", rootCat?.attributes);
       
       // Special fallback for education-loisirs using local data if needed
       if (rootCat?.slug === 'education-loisirs') {
@@ -794,7 +794,7 @@ const DeposerAnnonce = () => {
       // Silent fallback: attributes injection is optional
     }
     
-    console.log("✅ Final Calculated Attributes:", newAttributes);
+    logger.debug("Final Calculated Attributes:", newAttributes);
     setCurrentAttributes(newAttributes);
     
     // Clean up selected values that are no longer valid

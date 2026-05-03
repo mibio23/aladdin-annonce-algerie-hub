@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { logger } from '@/utils/silentLogger';
 import AnnouncementCard from '@/components/announcements/AnnouncementCard';
 import { useAnnouncements, Announcement } from '@/hooks/useAnnouncements';
 import { Loader2 } from 'lucide-react';
@@ -64,7 +65,7 @@ const AnnouncementPreviewCards = React.memo(() => {
           url: url,
         });
       } catch (err) {
-        console.error('Error sharing:', err);
+        logger.warn('Error sharing:', err);
       }
     } else {
       // Fallback: copy to clipboard

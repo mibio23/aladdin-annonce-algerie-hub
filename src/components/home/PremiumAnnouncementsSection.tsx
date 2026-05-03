@@ -5,6 +5,7 @@ import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import PremiumAnnouncementsBanner from "./PremiumAnnouncementsBanner";
 import SmartAnnouncementsGrid from "./SmartAnnouncementsGrid";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/utils/silentLogger";
 import { useFavorites } from "@/hooks/useFavorites";
 import { formatRelativeTime } from "@/lib/utils/dateUtils";
 import { toast } from "sonner";
@@ -76,7 +77,7 @@ const PremiumAnnouncementsSection = () => {
 
         setAnnouncements(enriched);
       } catch (error) {
-        console.error('Error fetching premium announcements:', error);
+        logger.warn('Error fetching premium announcements:', error);
       } finally {
         setLoading(false);
       }

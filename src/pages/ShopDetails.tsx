@@ -219,7 +219,7 @@ const ShopDetails: React.FC = () => {
 
   // Effet pour charger les données de la boutique
   useEffect(() => {
-    console.log("Modernized ShopDetails Page Loaded:", id);
+    logger.debug("ShopDetails Page Loaded:", id);
     const fetchShop = async () => {
       try {
         setLoading(true);
@@ -335,7 +335,7 @@ const ShopDetails: React.FC = () => {
           setIsOwnerOnline(false);
         }
       } catch (err) {
-        console.error('Error checking owner presence:', err);
+        logger.warn('Error checking owner presence:', err);
         setIsOwnerOnline(false);
       }
     };
@@ -464,7 +464,7 @@ const ShopDetails: React.FC = () => {
         if (error) throw error;
       }
     } catch (error) {
-      console.error("Error updating favorites:", error);
+      logger.error("Error updating favorites:", error);
       // Revert optimistic update
       setIsFavorite(!newIsFavorite);
       toast({

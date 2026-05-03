@@ -5,6 +5,7 @@ import { SmartSearchResponse, SearchOptions, SearchResult } from '@/types/search
 import { PROFESSION_KEYWORDS } from '@/data/searchKeywords';
 import { findWilayasInRadius, getWilayaCodeByName } from '@/utils/distanceUtils';
 import { wilayas } from '@/data/wilayaData';
+import { arabicSearchEnhancer, isArabicText, normalizeArabicDiacritics } from './arabicSearchEnhancer';
 
 export const searchService = {
   // Validation des paramètres de recherche
@@ -128,6 +129,23 @@ export const searchService = {
         const lowerQuery = query.toLowerCase();
         const extraTerms: string[] = [];
         
+        // Arabic search enhancement — enrich with phonetic variants, synonyms and dialect
+        if (isArabicText(searchQuery)) {
+          try {
+            const arabicResult = await arabicSearchEnhancer.enhanceArabicSearch(searchQuery);
+            searchQuery = normalizeArabicDiacritics(searchQuery);
+            // Add phonetic variants, synonyms, and Algerian dialect terms
+            extraTerms.push(
+              ...arabicResult.phoneticVariants.slice(0, 3),
+              ...arabicResult.synonyms.slice(0, 3),
+              ...arabicResult.algerianVariants.slice(0, 3)
+            );
+            logger.info(`[Search] Arabic enrichment: +${extraTerms.length} terms (confidence: ${arabicResult.confidence})`);
+          } catch (err) {
+            logger.warn('[Search] Arabic enhancement failed, using original query:', err);
+          }
+        }
+
         Object.entries(PROFESSION_KEYWORDS).forEach(([key, keywords]) => {
           if (keywords.some(k => lowerQuery.includes(k.toLowerCase())) || lowerQuery.includes(key)) {
              // Add top 5 related keywords to avoid query too long

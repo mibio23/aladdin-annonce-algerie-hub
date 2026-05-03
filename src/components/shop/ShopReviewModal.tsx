@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { useAuth } from '@/contexts/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -107,7 +108,7 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
       setRating(0);
       setComment('');
     } catch (error) {
-      console.error('Error submitting review:', error);
+      logger.error('Error submitting review:', error);
       const errorMessage =
         (error as { message?: string })?.message ||
         'Une erreur est survenue lors de l\'envoi de votre avis.';

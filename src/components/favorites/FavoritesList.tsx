@@ -164,7 +164,7 @@ const FavoritesList: React.FC = () => {
             }
           }
         } catch (err) {
-          console.error('Error fetching shop favorites from DB:', err);
+          logger.warn('Error fetching shop favorites from DB:', err);
           // Fallback to local only handled below if shopsData is empty
         }
       }
@@ -181,7 +181,7 @@ const FavoritesList: React.FC = () => {
             shopsData = data.map(mapDbToShop);
           }
         } catch (err) {
-          console.error('Error fetching shop favorites from local IDs:', err);
+          logger.warn('Error fetching shop favorites from local IDs:', err);
         }
       }
 
@@ -224,7 +224,7 @@ const FavoritesList: React.FC = () => {
         
         setProFavorites(valid);
       } catch (err) {
-        console.error('Error fetching pro favorites:', err);
+        logger.warn('Error fetching pro favorites:', err);
       } finally {
         setLoadingPros(false);
       }

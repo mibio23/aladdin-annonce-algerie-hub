@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import CategorySection from './CategorySection';
 import type { ExplorerCategory } from '@/data/categoryTypes';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
@@ -64,12 +65,12 @@ const DynamicCategorySection = ({ category }: DynamicCategorySectionProps) => {
         }
 
         if (error) {
-          console.error('Error fetching announcements for category', category.slug, error);
+          logger.warn('Error fetching announcements for category', category.slug, error);
         }
         
         setAnnouncements(finalAnnouncements);
       } catch (err) {
-        console.error('Exception fetching announcements', err);
+        logger.warn('Exception fetching announcements', err);
         setAnnouncements([]);
       } finally {
         setLoading(false);

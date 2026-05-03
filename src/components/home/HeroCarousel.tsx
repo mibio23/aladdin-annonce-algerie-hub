@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { getTextDirection } from '@/lib/utils/textDirection';
 import './HeroCarousel.css';
 
@@ -103,7 +104,7 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
           ]);
         }
       } catch (err) {
-        console.error("Error loading carousel data", err);
+        logger.warn("Error loading carousel data", err);
       } finally {
         setLoading(false);
       }

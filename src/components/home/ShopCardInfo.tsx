@@ -4,6 +4,7 @@ import { MapPin, Star } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/useAuth";
+import { logger } from "@/utils/silentLogger";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { Button } from "@/components/ui/button";
 import { wilayas } from "@/data/wilayaData";
@@ -90,7 +91,7 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
           setUserRating(data.rating);
         }
       } catch (error) {
-        console.error("Erreur chargement avis:", error);
+        logger.warn("Erreur chargement avis:", error);
       }
     };
 
@@ -169,7 +170,7 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
         description: t('viewShop.voteRecordedDesc').replace('{star}', star.toString()),
       });
     } catch (error) {
-      console.error("Erreur lors du vote:", error);
+      logger.warn("Erreur lors du vote:", error);
       toast({
         title: t('viewShop.voteError'),
         description: t('viewShop.voteErrorDesc'),

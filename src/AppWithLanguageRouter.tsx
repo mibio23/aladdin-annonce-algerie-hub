@@ -12,7 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AppErrorBoundary from '@/components/error/AppErrorBoundary';
 import SystemInitializer from '@/components/system/SystemInitializer';
 import LanguageRouter from '@/components/LanguageRouter';
-// import CategoryPerformanceMonitor from '@/components/performance/CategoryPerformanceMonitorSafe';
+
 import { generateAllLanguageRoutes, legacyRedirectRoutes, notFoundRoute } from '@/config/routesWithLanguage';
 
 // Create QueryClient outside of component to avoid recreation

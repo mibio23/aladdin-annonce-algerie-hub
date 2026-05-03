@@ -20,10 +20,8 @@ const CategoryAttributesRenderer: React.FC<CategoryAttributesRendererProps> = ({
 }) => {
   const { t } = useSafeI18nWithRouter();
 
-  // DEBUG : log ce qui est réellement reçu
-  React.useEffect(() => {
-    console.log('CategoryAttributesRenderer reçoit :', attributes);
-  }, [attributes]);
+
+
 
   if (!attributes || Object.keys(attributes).length === 0) {
     return (

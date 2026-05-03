@@ -55,11 +55,7 @@ export const useSecureAuth = () => {
           title: "Connexion réussie",
           description: "Vous êtes maintenant connecté",
         });
-        
-        // Secure redirection after login
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
+        // Redirection is handled by AuthContext.signIn (supports authRedirectUrl from sessionStorage)
       }
 
       return { data, error: null };

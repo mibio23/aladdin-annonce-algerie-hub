@@ -7,6 +7,7 @@ import { MessageCircle, Send, Phone, Mail, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { useNavigate } from 'react-router-dom';
 import type { Shop } from '@/types/shop';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
@@ -214,7 +215,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
       }, 1500);
       
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
       toast({
         title: t('common.error'),
         description: tr('shopContact.sendError', {
