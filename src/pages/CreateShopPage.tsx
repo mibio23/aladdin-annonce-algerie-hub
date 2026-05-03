@@ -540,7 +540,7 @@ const CreateShopPage: React.FC = () => {
           .upload(filePath, file);
 
         if (uploadError) {
-          console.error(`Error uploading file to ${bucket}:`, uploadError);
+          logger.error(`Error uploading file to ${bucket}:`, uploadError);
           toast({
              title: t('common.error'),
              description: `Erreur d'upload: ${uploadError.message}`,
@@ -555,7 +555,7 @@ const CreateShopPage: React.FC = () => {
 
         uploadedUrls.push(publicUrl);
       } catch (err) {
-        console.error('Unexpected error during upload:', err);
+        logger.error('Unexpected error during upload:', err);
         throw err;
       }
     }

@@ -34,7 +34,7 @@ export const useCategoryPrefetch = () => {
         const { supabase } = await import('@/integrations/supabase/client');
         const { createIcon } = await import('@/utils/iconMapper');
         
-        const result = await (supabase as any)
+        const result = await supabase
           .from('categories_with_translations')
           .select('id, slug, name, icon, translations')
           .eq('is_active', true)
@@ -110,7 +110,7 @@ export const useCategoryPrefetch = () => {
             const { supabase } = await import('@/integrations/supabase/client');
             const { createIcon } = await import('@/utils/iconMapper');
             
-            const result = await (supabase as any)
+            const result = await supabase
               .from('categories_with_translations')
               .select('id, slug, name, icon, translations')
               .eq('is_active', true)

@@ -61,7 +61,7 @@ export const useSecureAuth = () => {
       return { data, error: null };
 
     } catch (error) {
-      console.error('Erreur lors de la connexion sécurisée:', error);
+      logger.error('Erreur lors de la connexion sécurisée:', error);
       toast({
         title: "Erreur système",
         description: "Une erreur inattendue s'est produite",
@@ -113,7 +113,7 @@ export const useSecureAuth = () => {
       return { data, error: null };
 
     } catch (error) {
-      console.error('Erreur lors de l\'inscription sécurisée:', error);
+      logger.error('Erreur lors de l\'inscription sécurisée:', error);
       toast({
         title: "Erreur système",
         description: "Une erreur inattendue s'est produite",
@@ -137,7 +137,7 @@ export const useSecureAuth = () => {
       });
       
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      logger.error('Erreur lors de la déconnexion:', error);
       // Force redirect even on error
       window.location.href = '/?auth=login';
     } finally {
@@ -150,14 +150,14 @@ export const useSecureAuth = () => {
       const { data: { session }, error } = await authService.getSession();
       
       if (error) {
-        console.error('Erreur de vérification de session:', error);
+        logger.error('Erreur de vérification de session:', error);
         cleanupAuthState();
         return null;
       }
       
       return session;
     } catch (error) {
-      console.error('Erreur lors de la vérification de session:', error);
+      logger.error('Erreur lors de la vérification de session:', error);
       cleanupAuthState();
       return null;
     }

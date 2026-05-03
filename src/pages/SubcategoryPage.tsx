@@ -9,6 +9,7 @@ import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory, SubCategory } from "@/data/categoryTypes";
 import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from '@/utils/silentLogger';
 import { SubcategoryPageSEO } from "@/components/SEO";
 
 import Footer from "@/components/layout/Footer";
@@ -81,7 +82,7 @@ const SubcategoryPage = () => {
         const error = result.error;
 
         if (error) {
-          console.error('Error fetching announcements:', error);
+          logger.error('Error fetching announcements:', error);
           setAnnouncements([]);
           setFilteredAnnouncements([]);
         } else if (data) {
@@ -114,7 +115,7 @@ const SubcategoryPage = () => {
           setFilteredAnnouncements(mappedAnnouncements);
         }
       } catch (err) {
-        console.error('Exception fetching announcements:', err);
+        logger.error('Exception fetching announcements:', err);
       } finally {
         setLoadingAnnouncements(false);
       }

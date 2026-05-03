@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Store, Plus, MapPin, Trash, Edit, Eye } from 'lucide-react';
 import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { useToast } from '@/hooks/use-toast';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
@@ -34,7 +35,7 @@ function MesBoutiques() {
       if (error) throw error;
       setShops(data || []);
     } catch (error) {
-      console.error('Error fetching shops:', error);
+      logger.error('Error fetching shops:', error);
       toast({
         title: t('common.error'),
         description: t('myShops.errorFetch'),
@@ -129,7 +130,7 @@ function MesBoutiques() {
           description: t('common.deletedSuccessfully'),
         });
       } catch (error) {
-        console.error('Error deleting shop:', error);
+        logger.error('Error deleting shop:', error);
         toast({
           title: t('common.error'),
           description: t('common.errorOccurred'),

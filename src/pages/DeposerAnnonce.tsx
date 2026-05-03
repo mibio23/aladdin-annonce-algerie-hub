@@ -1041,7 +1041,7 @@ const DeposerAnnonce = () => {
       const { data, error } = await supabase
         .from('announcements')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .insert(announcementData as any)
+        .insert(announcementData)
         .select()
         .single();
 

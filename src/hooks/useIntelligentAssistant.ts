@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 
 interface IntelligentAssistantResponse {
   response: string;
@@ -33,7 +34,7 @@ export const useIntelligentAssistant = () => {
         const parsed = JSON.parse(saved);
         setConversationHistory(parsed);
       } catch (error) {
-        console.warn('Erreur lors du chargement de l\'historique:', error);
+        logger.warn('Erreur lors du chargement de l\'historique:', error);
       }
     }
   }, [sessionId]);
@@ -43,7 +44,7 @@ export const useIntelligentAssistant = () => {
     try {
       localStorage.setItem(`conversation_history_${sessionId}`, JSON.stringify(history.slice(-20))); // Garder seulement les 20 derniers
     } catch (error) {
-      console.warn('Erreur lors de la sauvegarde:', error);
+      logger.warn('Erreur lors de la sauvegarde:', error);
     }
   }, [sessionId]);
 
@@ -134,7 +135,7 @@ export const useIntelligentAssistant = () => {
       });
 
       if (error) {
-        console.error('Erreur assistant IA:', error);
+        logger.error('Erreur assistant IA:', error);
         
         // Fallback vers une réponse basique intelligente
         const fallbackResponse = generateFallbackResponse(message, context);
@@ -185,7 +186,7 @@ export const useIntelligentAssistant = () => {
       };
 
     } catch (error) {
-      console.error('Erreur lors de l\'envoi du message:', error);
+      logger.error('Erreur lors de l\'envoi du message:', error);
       
       // Réponse d'erreur avec récupération gracieuse
       const errorResponse = {
@@ -230,7 +231,7 @@ export const useIntelligentAssistant = () => {
         setProactiveSuggestions(data.proactiveSuggestions);
       }
     } catch (error) {
-      console.error('Erreur chargement suggestions proactives:', error);
+      logger.error('Erreur chargement suggestions proactives:', error);
     }
   }, [sessionId]);
 
@@ -245,9 +246,9 @@ export const useIntelligentAssistant = () => {
         })
         .eq('id', messageId);
       
-      console.log('Feedback envoyé:', { messageId, rating, comment });
+      logger.debug('Feedback envoyé:', { messageId, rating, comment });
     } catch (error) {
-      console.error('Erreur envoi feedback:', error);
+      logger.error('Erreur envoi feedback:', error);
     }
   }, []);
 

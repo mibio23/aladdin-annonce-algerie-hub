@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import AvatarDisplay from "@/components/avatar/AvatarDisplay";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { useAuth } from "@/contexts/useAuth";
@@ -448,7 +449,7 @@ const JobOfferDetailsPage = () => {
         if (!sessionStorage.getItem(viewKey)) {
           sessionStorage.setItem(viewKey, '1');
           try {
-            await (supabase as any).rpc('increment_professional_job_offer_view_count', { job_offer_uuid: id });
+            await supabase.rpc('increment_professional_job_offer_view_count', { job_offer_uuid: id });
             setOffer((prev) =>
               prev
                 ? {
@@ -458,11 +459,11 @@ const JobOfferDetailsPage = () => {
                 : prev
             );
           } catch (incrementError) {
-            console.error('Error incrementing job offer view count:', incrementError);
+            logger.error('Error incrementing job offer view count:', incrementError);
           }
         }
       } catch (err) {
-        console.error('Error fetching job offer:', err);
+        logger.error('Error fetching job offer:', err);
         setError('Impossible de charger l\'offre');
       } finally {
         setLoading(false);

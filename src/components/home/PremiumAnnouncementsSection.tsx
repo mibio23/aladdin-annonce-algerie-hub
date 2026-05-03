@@ -30,7 +30,7 @@ const PremiumAnnouncementsSection = () => {
     const fetchPremiumAnnouncements = async () => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from('announcements')
           .select('id, title, price, wilaya, location, images, image_url, created_at, is_urgent, phone_number, user_id, category_id, attributes')
           .eq('is_featured', true)

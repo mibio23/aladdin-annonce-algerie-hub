@@ -13,7 +13,7 @@ export const usePresenceTracker = () => {
     const updatePresence = async (isOnline = true) => {
       try {
         const { error } = await supabase
-          .from('user_presence' as any)
+          .from('user_presence')
           .upsert({ 
             user_id: user.id,
             is_online: isOnline,

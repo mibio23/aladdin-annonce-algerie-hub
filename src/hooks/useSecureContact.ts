@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { useSecurityAudit } from './useSecurityAudit';
 
 interface ContactRequest {
@@ -33,7 +34,7 @@ export const useSecureContact = () => {
         announcement: data?.[0] || null 
       };
     } catch (error) {
-      console.error('[Contact] Failed to get secure announcement details:', error);
+      logger.error('[Contact] Failed to get secure announcement details:', error);
       return { success: false, announcement: null, error };
     } finally {
       setLoading(false);
@@ -69,7 +70,7 @@ export const useSecureContact = () => {
         };
       }
     } catch (error) {
-      console.error('[Contact] Failed to request contact access:', error);
+      logger.error('[Contact] Failed to request contact access:', error);
       return { 
         success: false, 
         phoneNumber: null,
@@ -100,7 +101,7 @@ export const useSecureContact = () => {
       await logContactAccess('announcement', request.announcementId);
       return { success: true };
     } catch (error) {
-      console.error('[Contact] Failed to submit contact request:', error);
+      logger.error('[Contact] Failed to submit contact request:', error);
       return { success: false, error };
     } finally {
       setLoading(false);
@@ -141,7 +142,7 @@ export const useSecureContact = () => {
         })) || []
       };
     } catch (error) {
-      console.error('[Contact] Failed to get business contacts:', error);
+      logger.error('[Contact] Failed to get business contacts:', error);
       return { success: false, error, contacts: [] };
     } finally {
       setLoading(false);
@@ -157,7 +158,7 @@ export const useSecureContact = () => {
 
       return { success: true, maskedPhone: data };
     } catch (error) {
-      console.error('[Contact] Failed to mask phone number:', error);
+      logger.error('[Contact] Failed to mask phone number:', error);
       return { success: false, maskedPhone: phoneNumber };
     }
   }, []);
@@ -174,7 +175,7 @@ export const useSecureContact = () => {
 
       return { allowed: data };
     } catch (error) {
-      console.error('[Contact] Failed to check rate limit:', error);
+      logger.error('[Contact] Failed to check rate limit:', error);
       return { allowed: false };
     }
   }, []);

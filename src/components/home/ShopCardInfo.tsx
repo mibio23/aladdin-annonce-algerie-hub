@@ -80,7 +80,7 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
       if (!user) return;
 
       try {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('shop_reviews')
           .select('rating')
           .eq('shop_id', shopId)
@@ -134,7 +134,7 @@ const ShopCardInfo: React.FC<ShopCardInfoProps> = ({
 
     try {
       // 1. Envoyer le vote à Supabase
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('shop_reviews')
         .upsert({
           shop_id: shopId,

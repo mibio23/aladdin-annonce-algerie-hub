@@ -137,7 +137,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
     const checkPresence = async () => {
       try {
         const { data, error } = await supabase
-          .from('user_presence' as any)
+          .from('user_presence')
           .select('last_seen_at, is_online')
           .eq('user_id', otherUser.id)
           .maybeSingle();

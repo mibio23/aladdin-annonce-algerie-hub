@@ -158,7 +158,7 @@ const MyAnnouncementsPage: React.FC = () => {
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Error updating status:', error);
+        logger.error('Error updating status:', error);
         throw error;
       }
 
@@ -169,7 +169,7 @@ const MyAnnouncementsPage: React.FC = () => {
 
       fetchAnnouncements();
     } catch (error) {
-      console.error('Error toggling status:', error);
+      logger.error('Error toggling status:', error);
       logger.error('Error toggling status:', error);
       toast({
         title: t('common.error'),

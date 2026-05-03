@@ -44,11 +44,11 @@ const Index = () => {
         supabase.from("announcements_public").select("id", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("professional_job_offers").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("shops").select("id", { count: "exact", head: true }),
-        (supabase as any)
+        supabase
           .from("announcements_public")
           .select("category_slug, count:id")
           .eq("status", "active"),
-        (supabase as any).rpc("get_global_listing_total"),
+        supabase.rpc("get_global_listing_total"),
       ]);
 
       if (cancelled) return;

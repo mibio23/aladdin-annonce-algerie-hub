@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from '@/utils/silentLogger';
 import { Loader2, Plus, Pencil, Trash2, Save } from "lucide-react";
 import ImageUpload from "@/components/ui/ImageUpload";
 
@@ -73,30 +74,30 @@ const HeroCarouselManagement = () => {
       
       // Fetch settings - Using 'any' cast to bypass strict typing until codegen
       const { data: settingsData, error: settingsError } = await supabase
-        .from('hero_carousel_settings' as any)
+        .from('hero_carousel_settings')
         .select('*');
         
       if (settingsError) {
         // If table doesn't exist, we might get an error. 
         // In a real scenario, we should handle this gracefully.
-        console.error("Settings error:", settingsError);
+        logger.error("Settings error:", settingsError);
         // Don't throw here to allow UI to render even if empty
       }
       setSettings((settingsData as any) || []);
 
       // Fetch slides - Using 'any' cast
       const { data: slidesData, error: slidesError } = await supabase
-        .from('hero_carousel_slides' as any)
+        .from('hero_carousel_slides')
         .select('*')
         .order('display_order', { ascending: true });
         
       if (slidesError) {
-        console.error("Slides error:", slidesError);
+        logger.error("Slides error:", slidesError);
       }
       setSlides((slidesData as any) || []);
       
     } catch (error) {
-      console.error("Error fetching data:", error);
+      logger.error("Error fetching data:", error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les données. Avez-vous exécuté la migration SQL ?",
@@ -128,14 +129,14 @@ const HeroCarouselManagement = () => {
 
       if (currentSettings) {
         const { error } = await supabase
-          .from('hero_carousel_settings' as any)
+          .from('hero_carousel_settings')
           .update({ interval_ms: interval })
           .eq('id', currentSettings.id);
           
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from('hero_carousel_settings' as any)
+          .from('hero_carousel_settings')
           .insert({ carousel_id: carouselId, interval_ms: interval });
           
         if (error) throw error;
@@ -147,7 +148,7 @@ const HeroCarouselManagement = () => {
       });
       fetchData();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       toast({
         title: "Erreur",
         description: "Erreur lors de la sauvegarde des paramètres.",
@@ -188,13 +189,13 @@ const HeroCarouselManagement = () => {
 
       if (isEditing && currentSlide.id) {
         const { error } = await supabase
-          .from('hero_carousel_slides' as any)
+          .from('hero_carousel_slides')
           .update(slideData)
           .eq('id', currentSlide.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from('hero_carousel_slides' as any)
+          .from('hero_carousel_slides')
           .insert(slideData);
         if (error) throw error;
       }
@@ -206,7 +207,7 @@ const HeroCarouselManagement = () => {
       setIsDialogOpen(false);
       fetchData();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       toast({
         title: "Erreur",
         description: "Erreur lors de la sauvegarde du slide.",
@@ -220,7 +221,7 @@ const HeroCarouselManagement = () => {
 
     try {
       const { error } = await supabase
-        .from('hero_carousel_slides' as any)
+        .from('hero_carousel_slides')
         .delete()
         .eq('id', id);
 
@@ -232,7 +233,7 @@ const HeroCarouselManagement = () => {
       });
       fetchData();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       toast({
         title: "Erreur",
         description: "Erreur lors de la suppression.",

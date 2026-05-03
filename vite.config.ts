@@ -33,17 +33,64 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-core': ['react', 'react-dom'],
-          'react-router': ['react-router-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'react-query': ['@tanstack/react-query'],
-          'icons': ['lucide-react'],
-          'three-3d': ['three'],
-          'charts': ['recharts'],
-          'date-utils': ['date-fns'],
-          'forms': ['zod'],
-          'emoji': ['emoji-picker-react'],
+        manualChunks(id) {
+          const normalizedId = id.replace(/\\/g, '/');
+          // React core
+          if (normalizedId.includes('node_modules/react/') || normalizedId.includes('node_modules/react-dom/')) {
+            return 'react-core';
+          }
+          // React Router
+          if (normalizedId.includes('node_modules/react-router')) {
+            return 'react-router';
+          }
+          // Supabase
+          if (normalizedId.includes('node_modules/@supabase/')) {
+            return 'supabase';
+          }
+          // React Query
+          if (normalizedId.includes('node_modules/@tanstack/')) {
+            return 'react-query';
+          }
+          // Radix UI primitives (shared across all Shadcn components)
+          if (normalizedId.includes('node_modules/@radix-ui/')) {
+            return 'radix-ui';
+          }
+          // Icons (lucide-react is very large)
+          if (normalizedId.includes('node_modules/lucide-react/')) {
+            return 'icons';
+          }
+          // Three.js / 3D
+          if (normalizedId.includes('node_modules/three/') || normalizedId.includes('node_modules/@react-three/')) {
+            return 'three-3d';
+          }
+          // Charts
+          if (normalizedId.includes('node_modules/recharts/') || normalizedId.includes('node_modules/d3-')) {
+            return 'charts';
+          }
+          // Date utilities
+          if (normalizedId.includes('node_modules/date-fns')) {
+            return 'date-utils';
+          }
+          // Forms & validation
+          if (normalizedId.includes('node_modules/zod/') || normalizedId.includes('node_modules/react-hook-form/') || normalizedId.includes('node_modules/@hookform/')) {
+            return 'forms';
+          }
+          // Emoji picker
+          if (normalizedId.includes('node_modules/emoji-picker-react/')) {
+            return 'emoji';
+          }
+          // Animation libraries
+          if (normalizedId.includes('node_modules/framer-motion/') || normalizedId.includes('node_modules/embla-carousel')) {
+            return 'animations';
+          }
+          // i18n translation data (our own, changes often)
+          if (normalizedId.includes('/src/lib/i18n/translations/') || normalizedId.includes('/src/lib/i18n/locales/')) {
+            return 'i18n-data';
+          }
+          // Wilaya/commune data
+          if (normalizedId.includes('/src/data/wilayaData') || normalizedId.includes('/src/data/communeData') || normalizedId.includes('/src/data/mock/')) {
+            return 'geo-data';
+          }
         },
       },
     },

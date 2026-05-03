@@ -6,6 +6,7 @@ import ConversationList from '@/components/messaging/ConversationList';
 import MessageThread from '@/components/messaging/MessageThread';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
@@ -127,12 +128,12 @@ const Messages = () => {
              if (newConv) {
                setSelectedConversationId(newConv.id);
              } else if (error) {
-               console.error("Error creating conversation:", error);
+               logger.error("Error creating conversation:", error);
              }
            }
         }
       } catch (err) {
-        console.error("Error initializing conversation:", err);
+        logger.error("Error initializing conversation:", err);
       } finally {
         setInitializing(false);
         // Clear params to avoid re-running

@@ -6,12 +6,14 @@ import AppLayout from "@/components/layout/AppLayout";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Navigate } from "react-router-dom";
 
-// Import des composants existants
+// Import des composants critiques (premier chargement)
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
-import Connexion from "@/pages/Connexion";
-import Inscription from "@/pages/Inscription";
-import CategoryPage from "@/pages/CategoryPage";
+
+// Lazy load - pages auth & navigation
+const Connexion = React.lazy(() => import("@/pages/Connexion"));
+const Inscription = React.lazy(() => import("@/pages/Inscription"));
+const CategoryPage = React.lazy(() => import("@/pages/CategoryPage"));
 
 // Lazy load components
 const NotreHistoire = React.lazy(() => import("@/pages/NotreHistoire"));

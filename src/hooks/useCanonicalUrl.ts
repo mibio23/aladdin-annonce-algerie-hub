@@ -9,7 +9,7 @@ export function useCanonicalUrl(customUrl?: string) {
   const location = useLocation();
   
   useEffect(() => {
-    const baseUrl = 'http://localhost:8080';
+    const baseUrl = (import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/$/, '');
     const fullUrl = customUrl || `${baseUrl}${location.pathname}`;
     
     // Trouver ou créer la balise canonical

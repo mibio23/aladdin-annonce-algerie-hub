@@ -20,7 +20,7 @@ export const authService = {
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         if (currentUser) {
           await supabase
-            .from('user_presence' as any)
+            .from('user_presence')
             .update({ is_online: false, last_seen_at: new Date().toISOString() })
             .eq('user_id', currentUser.id);
         }
@@ -96,7 +96,7 @@ export const authService = {
       if (user) {
         // Mettre à jour le statut de présence à hors ligne
         await supabase
-          .from('user_presence' as any)
+          .from('user_presence')
           .update({ is_online: false, last_seen_at: new Date().toISOString() })
           .eq('user_id', user.id);
       }

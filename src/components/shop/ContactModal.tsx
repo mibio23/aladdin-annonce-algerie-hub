@@ -104,8 +104,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
       setLoading(true);
       
       // 1. Vérifier si une conversation existe déjà
-      const { data: existingConversations, error: fetchError } = await (supabase
-        .from('conversations') as any)
+      const { data: existingConversations, error: fetchError } = await supabase
+        .from('conversations')
         .select('id')
         .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${shop.ownerId}),and(participant_1_id.eq.${shop.ownerId},participant_2_id.eq.${user.id})`)
         .eq('subject_type', 'shop')
@@ -120,8 +120,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
       let conversationId = existingConversations?.id;
 
       if (!conversationId) {
-        const { data: participantConversation, error: participantFetchError } = await (supabase
-          .from('conversations') as any)
+        const { data: participantConversation, error: participantFetchError } = await supabase
+        .from('conversations')
           .select('id')
           .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${shop.ownerId}),and(participant_1_id.eq.${shop.ownerId},participant_2_id.eq.${user.id})`)
           .limit(1)
@@ -150,8 +150,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ shop, onClose }) => {
           .single();
 
         if (createError) {
-          const { data: fallbackConversation, error: fallbackError } = await (supabase
-            .from('conversations') as any)
+          const { data: fallbackConversation, error: fallbackError } = await supabase
+        .from('conversations')
             .select('id')
             .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${shop.ownerId}),and(participant_1_id.eq.${shop.ownerId},participant_2_id.eq.${user.id})`)
             .limit(1)

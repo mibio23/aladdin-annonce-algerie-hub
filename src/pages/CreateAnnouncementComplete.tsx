@@ -819,7 +819,7 @@ const CreateAnnouncementPage: React.FC = () => {
       try {
         return JSON.parse(saved);
       } catch (e) {
-        console.error("Erreur lecture brouillon", e);
+        logger.error("Erreur lecture brouillon", e);
         return null;
       }
     }
@@ -1002,7 +1002,7 @@ const CreateAnnouncementPage: React.FC = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching announcement:', error);
+        logger.error('Error fetching announcement:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger l'annonce",
@@ -1794,7 +1794,7 @@ const CreateAnnouncementPage: React.FC = () => {
             (updatePayload as any)[key] === undefined && delete (updatePayload as any)[key]
          );
 
-         console.log('Sending update payload:', updatePayload);
+         logger.debug('Sending update payload:', updatePayload);
 
          const { error } = await supabase
             .from('announcements')
@@ -1802,7 +1802,7 @@ const CreateAnnouncementPage: React.FC = () => {
             .eq('id', id);
          
          if (error) {
-            console.error('Error updating announcement:', error);
+            logger.error('Error updating announcement:', error);
             toast({
                title: t('common.error'), 
                description: `Erreur lors de la mise à jour: ${error.message || 'Erreur inconnue'}`,
@@ -1822,9 +1822,9 @@ const CreateAnnouncementPage: React.FC = () => {
         formData.category_id;
       const subcategoryLogicKey = formData.subcategory_id || '';
 
-      console.log('Traitement de l\'ID de catégorie:', categoryIdForDb);
+      logger.debug('Traitement de l\'ID de catégorie:', categoryIdForDb);
       if (subcategoryIdForDb) {
-        console.log('Traitement de l\'ID de sous-catégorie:', subcategoryIdForDb);
+        logger.debug('Traitement de l\'ID de sous-catégorie:', subcategoryIdForDb);
       }
 
       const { count: categoryCount, error: categoryCheckError } = await supabase
@@ -1833,9 +1833,9 @@ const CreateAnnouncementPage: React.FC = () => {
         .eq('id', categoryIdForDb);
         
       if (categoryCheckError) {
-        console.error('Erreur lors de la vérification de la catégorie:', categoryCheckError);
+        logger.error('Erreur lors de la vérification de la catégorie:', categoryCheckError);
       } else if (categoryCount === 0) {
-        console.error(`Catégorie introuvable dans la base de données: ${categoryIdForDb}`);
+        logger.error(`Catégorie introuvable dans la base de données: ${categoryIdForDb}`);
         toast({
           title: "Erreur de catégorie",
           description: `La catégorie sélectionnée (${categoryIdForDb}) n'est pas synchronisée avec le serveur. Veuillez contacter le support.`,
@@ -1851,7 +1851,7 @@ const CreateAnnouncementPage: React.FC = () => {
           .eq('id', subcategoryIdForDb);
 
         if (!subCheckError && subCount === 0) {
-          console.warn(`Sous-catégorie introuvable dans la base de données: ${subcategoryIdForDb}. On l'ignore pour éviter l'erreur.`);
+          logger.warn(`Sous-catégorie introuvable dans la base de données: ${subcategoryIdForDb}. On l'ignore pour éviter l'erreur.`);
           subcategoryIdForDb = null;
         }
       }
@@ -1886,7 +1886,7 @@ const CreateAnnouncementPage: React.FC = () => {
          (insertPayload as any)[key] === undefined && delete (insertPayload as any)[key]
       );
       
-      console.log('Sending insert payload:', insertPayload);
+      logger.debug('Sending insert payload:', insertPayload);
       
       if (categoryLogicKey) {
         invalidateCache(categoryLogicKey);
@@ -1904,15 +1904,15 @@ const CreateAnnouncementPage: React.FC = () => {
       const { data, error } = await supabase
         .from('announcements')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .insert(insertPayload as any)
+        .insert(insertPayload)
         .select()
         .single();
 
       if (error) {
-        console.error('Erreur Supabase détaillée:', error);
-        console.error('Message d\'erreur:', error.message);
-        console.error('Détails de l\'erreur:', error.details);
-        console.error('Code d\'erreur:', error.code);
+        logger.error('Erreur Supabase détaillée:', error);
+        logger.error('Message d\'erreur:', error.message);
+        logger.error('Détails de l\'erreur:', error.details);
+        logger.error('Code d\'erreur:', error.code);
         
         // En cas d'erreur, notifier pour retirer l'annonce optimiste
         window.dispatchEvent(new CustomEvent('optimisticAnnouncementFailed', { 
@@ -1950,7 +1950,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (computerError) {
-           console.error('Error inserting computer details:', computerError);
+           logger.error('Error inserting computer details:', computerError);
          }
       }
 
@@ -1970,7 +1970,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (phoneError) {
-           console.error('Error inserting phone details:', phoneError);
+           logger.error('Error inserting phone details:', phoneError);
          }
       }
 
@@ -1988,7 +1988,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (furnitureError) {
-           console.error('Error inserting furniture details:', furnitureError);
+           logger.error('Error inserting furniture details:', furnitureError);
          }
       }
 
@@ -2009,7 +2009,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (bikeError) {
-           console.error('Error inserting bike details:', bikeError);
+           logger.error('Error inserting bike details:', bikeError);
          }
       }
 
@@ -2031,7 +2031,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (boatError) {
-           console.error('Error inserting boat details:', boatError);
+           logger.error('Error inserting boat details:', boatError);
          }
       }
 
@@ -2068,7 +2068,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (educationError) {
-           console.error('Error inserting education and leisure details:', educationError);
+           logger.error('Error inserting education and leisure details:', educationError);
          }
       }
 
@@ -2088,7 +2088,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (constructionError) {
-           console.error('Error inserting construction details:', constructionError);
+           logger.error('Error inserting construction details:', constructionError);
          }
       }
 
@@ -2107,7 +2107,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (clothingError) {
-           console.error('Error inserting clothing details:', clothingError);
+           logger.error('Error inserting clothing details:', clothingError);
          }
       }
 
@@ -2136,7 +2136,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (vehicleError) {
-           console.error('Error inserting vehicle details:', vehicleError);
+           logger.error('Error inserting vehicle details:', vehicleError);
            // Non-blocking error, we continue
          }
       }
@@ -2173,7 +2173,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (realEstateError) {
-           console.error('Error inserting real estate details:', realEstateError);
+           logger.error('Error inserting real estate details:', realEstateError);
          }
       }
 
@@ -2190,7 +2190,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (babyError) {
-           console.error('Error inserting baby details:', babyError);
+           logger.error('Error inserting baby details:', babyError);
          }
       }
 
@@ -2208,7 +2208,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (fashionError) {
-           console.error('Error inserting fashion details:', fashionError);
+           logger.error('Error inserting fashion details:', fashionError);
          }
       }
 
@@ -2224,7 +2224,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (bagsError) {
-           console.error('Error inserting bags details:', bagsError);
+           logger.error('Error inserting bags details:', bagsError);
          }
       }
 
@@ -2241,7 +2241,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (appliancesError) {
-           console.error('Error inserting appliances details:', appliancesError);
+           logger.error('Error inserting appliances details:', appliancesError);
          }
       }
 
@@ -2257,7 +2257,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (multimediaError) {
-           console.error('Error inserting multimedia details:', multimediaError);
+           logger.error('Error inserting multimedia details:', multimediaError);
          }
       }
 
@@ -2273,7 +2273,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (gamingError) {
-           console.error('Error inserting gaming details:', gamingError);
+           logger.error('Error inserting gaming details:', gamingError);
          }
       }
 
@@ -2288,7 +2288,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (hardwareError) {
-           console.error('Error inserting hardware details:', hardwareError);
+           logger.error('Error inserting hardware details:', hardwareError);
          }
       }
 
@@ -2303,7 +2303,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (agricultureError) {
-           console.error('Error inserting agriculture details:', agricultureError);
+           logger.error('Error inserting agriculture details:', agricultureError);
          }
       }
 
@@ -2318,7 +2318,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (parapharmacyError) {
-           console.error('Error inserting parapharmacy details:', parapharmacyError);
+           logger.error('Error inserting parapharmacy details:', parapharmacyError);
          }
       }
 
@@ -2334,7 +2334,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (beautyError) {
-           console.error('Error inserting beauty details:', beautyError);
+           logger.error('Error inserting beauty details:', beautyError);
          }
       }
 
@@ -2352,7 +2352,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (gastronomyError) {
-           console.error('Error inserting gastronomy details:', gastronomyError);
+           logger.error('Error inserting gastronomy details:', gastronomyError);
          }
       }
 
@@ -2368,7 +2368,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (craftsError) {
-           console.error('Error inserting crafts details:', craftsError);
+           logger.error('Error inserting crafts details:', craftsError);
          }
       }
 
@@ -2386,7 +2386,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (travelError) {
-           console.error('Error inserting travel details:', travelError);
+           logger.error('Error inserting travel details:', travelError);
          }
       }
 
@@ -2402,7 +2402,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (eventsError) {
-           console.error('Error inserting events details:', eventsError);
+           logger.error('Error inserting events details:', eventsError);
          }
       }
 
@@ -2419,7 +2419,7 @@ const CreateAnnouncementPage: React.FC = () => {
            });
            
          if (jobsError) {
-           console.error('Error inserting jobs details:', jobsError);
+           logger.error('Error inserting jobs details:', jobsError);
          }
       }
 
@@ -2475,7 +2475,7 @@ const CreateAnnouncementPage: React.FC = () => {
         if (err.code) errorMessage += ` (Code: ${err.code})`;
       }
       
-      console.error('Erreur finale affichée:', errorMessage);
+      logger.error('Erreur finale affichée:', errorMessage);
       
       toast({
         title: t('createAd.errors.createFailed') || "Erreur",

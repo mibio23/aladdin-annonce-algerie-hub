@@ -58,7 +58,7 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
       try {
         // Fetch settings - Cast to any to bypass type check
         const { data: settingsData } = await supabase
-          .from('hero_carousel_settings' as any)
+          .from('hero_carousel_settings')
           .select('interval_ms')
           .eq('carousel_id', carouselId)
           .single();
@@ -69,7 +69,7 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
 
         // Fetch slides - Cast to any
         const { data: slidesData } = await supabase
-          .from('hero_carousel_slides' as any)
+          .from('hero_carousel_slides')
           .select('*')
           .eq('carousel_id', carouselId)
           .eq('is_active', true)

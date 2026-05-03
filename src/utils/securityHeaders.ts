@@ -2,6 +2,9 @@
  * Configuration des en-têtes de sécurité pour l'application
  */
 
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseWss = supabaseUrl.replace('https://', 'wss://');
+
 export const securityHeaders = {
   'Content-Security-Policy': [
     "default-src 'self'",
@@ -9,7 +12,7 @@ export const securityHeaders = {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://smsvybphkdxzvgawzoru.supabase.co wss://smsvybphkdxzvgawzoru.supabase.co",
+    `connect-src 'self' ${supabaseUrl} ${supabaseWss}`,
     "media-src 'self' blob:",
     "frame-ancestors 'none'",
     "base-uri 'self'",

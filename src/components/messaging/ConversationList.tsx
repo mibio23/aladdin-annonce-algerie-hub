@@ -192,7 +192,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         if (userIds.size === 0) return;
 
         const { data, error } = await supabase
-          .from('user_presence' as any)
+          .from('user_presence')
           .select('user_id, last_seen_at, is_online')
           .in('user_id', Array.from(userIds));
 

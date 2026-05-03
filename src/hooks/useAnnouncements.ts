@@ -479,7 +479,7 @@ export const useAnnouncements = () => {
       const { data, error } = await supabase
         .from('announcements')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .insert(announcementPayload as any)
+        .insert(announcementPayload)
         .select()
         .single();
 

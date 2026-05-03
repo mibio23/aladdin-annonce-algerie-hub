@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { SubCategory } from "@/data/categoryTypes";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { LocalizedLink } from "@/utils/linkUtils";
@@ -43,7 +44,7 @@ const DynamicSubcategoryAnnouncements: React.FC<DynamicSubcategoryAnnouncementsP
           // Checking the schema from previous context: 
           // announcements table has subcategory_id.
           
-          const result = await (supabase as any)
+          const result = await supabase
             .from('announcements_public')
             .select('*')
             .eq('subcategory_id', subcat.slug)
@@ -58,7 +59,7 @@ const DynamicSubcategoryAnnouncements: React.FC<DynamicSubcategoryAnnouncementsP
             results[subcat.slug] = data;
           }
         } catch (err) {
-          console.error(`Error fetching for subcat ${subcat.slug}`, err);
+          logger.error(`Error fetching for subcat ${subcat.slug}`, err);
         }
       }
       

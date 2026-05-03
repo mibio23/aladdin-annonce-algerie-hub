@@ -6,6 +6,7 @@ import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory } from "@/data/categoryTypes";
 import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from '@/utils/silentLogger';
 import { mockVehicleAnnouncements } from "@/data/mock/vehicleAnnouncements";
 import { CategoryPageSEO } from "@/components/SEO";
 
@@ -97,7 +98,7 @@ const CategoryPage = () => {
         setAnnouncements(mappedData);
         setFilteredAnnouncements(mappedData);
       } catch (err) {
-        console.error('Error fetching category announcements:', err);
+        logger.error('Error fetching category announcements:', err);
       } finally {
         setLoadingAnnouncements(false);
       }

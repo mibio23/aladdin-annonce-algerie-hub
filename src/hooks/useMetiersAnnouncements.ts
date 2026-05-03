@@ -1,6 +1,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 
 export interface MetierAnnouncement {
   id: string;
@@ -75,7 +76,7 @@ export const useMetiersAnnouncements = (options?: { professionValues?: string[] 
       setAnnouncements(transformedData);
       setError(null);
     } catch (err) {
-      console.error('Error fetching metiers announcements:', err);
+      logger.error('Error fetching metiers announcements:', err);
       setError('Erreur lors du chargement des annonces');
       setAnnouncements([]);
     } finally {

@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nHooks';
 
 export interface AdvertisingBanner {
@@ -77,7 +78,7 @@ export const useAdvertisingBanners = () => {
         .limit(10);
 
       if (bannersError) {
-        console.warn('Banner fetch failed, continuing without banners:', bannersError);
+        logger.warn('Banner fetch failed, continuing without banners:', bannersError);
         setBanners([]);
         setTranslations([]);
         setError(null); // Ne pas afficher d'erreur à l'utilisateur
@@ -91,7 +92,7 @@ export const useAdvertisingBanners = () => {
         
         // Corriger les anciens liens "rechercher-reparateur" vers "deposer-offre-metier"
         if (bannerData.link_url && bannerData.link_url.includes('rechercher-reparateur')) {
-          console.log('Correcting old link from rechercher-reparateur to deposer-offre-metier');
+          logger.debug('Correcting old link from rechercher-reparateur to deposer-offre-metier');
           bannerData.link_url = bannerData.link_url.replace('rechercher-reparateur', 'deposer-offre-metier');
         }
         
@@ -128,7 +129,7 @@ export const useAdvertisingBanners = () => {
       setTranslations(allTranslations);
     } catch (err) {
       // Gestion d'erreur gracieuse: ne pas bloquer le site
-      console.warn('Banner loading failed silently:', err);
+      logger.warn('Banner loading failed silently:', err);
       setBanners([]);
       setTranslations([]);
       setError(null); // Ne pas propager l'erreur

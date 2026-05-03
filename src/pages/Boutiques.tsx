@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LocalizedLink } from "@/utils/linkUtils";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from '@/utils/silentLogger';
 import SEOHead from "@/components/SEO/SEOHead";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -65,7 +66,7 @@ export default function Boutiques() {
       if (error) throw error;
       setShops(data || []);
     } catch (error) {
-      console.error('Error fetching shops:', error);
+      logger.error('Error fetching shops:', error);
     } finally {
       setLoading(false);
     }

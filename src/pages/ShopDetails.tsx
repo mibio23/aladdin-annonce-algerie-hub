@@ -194,7 +194,7 @@ const ShopDetails: React.FC = () => {
         details: reportDetails.trim() ? reportDetails.trim() : null
       };
 
-      const { error } = await supabase.from('reports').insert(payload as any);
+      const { error } = await supabase.from('reports').insert(payload);
       if (error) throw error;
 
       toast({
@@ -275,7 +275,7 @@ const ShopDetails: React.FC = () => {
           if (!sessionStorage.getItem(viewKey)) {
             sessionStorage.setItem(viewKey, '1');
             try {
-              await (supabase as any).rpc('increment_shop_view_count', { shop_uuid: id });
+              await supabase.rpc('increment_shop_view_count', { shop_uuid: id });
               setShop((prev) =>
                 prev
                   ? {
@@ -316,7 +316,7 @@ const ShopDetails: React.FC = () => {
     const checkOwnerPresence = async () => {
       try {
         const { data, error } = await supabase
-          .from('user_presence' as any)
+          .from('user_presence')
           .select('last_seen_at, is_online')
           .eq('user_id', shop.ownerId)
           .maybeSingle();
@@ -384,6 +384,9 @@ const ShopDetails: React.FC = () => {
 
     return () => {
       clearInterval(interval);
+      if (channel && isNewChannel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [shop?.ownerId]);
 

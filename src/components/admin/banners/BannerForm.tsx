@@ -192,7 +192,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSave, onCancel }) => 
         // Update existing banner
         const { error } = await supabase
           .from('advertising_banners')
-          .update(bannerData as any)
+          .update(bannerData)
           .eq('id', banner.id);
 
         if (error) throw error;
@@ -200,7 +200,7 @@ const BannerForm: React.FC<BannerFormProps> = ({ banner, onSave, onCancel }) => 
         // Create new banner
         const { data, error } = await supabase
           .from('advertising_banners')
-          .insert([bannerData] as any)
+          .insert([bannerData])
           .select()
           .single();
 

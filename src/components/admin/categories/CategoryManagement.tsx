@@ -92,11 +92,11 @@ const CategoryManagement = () => {
 
         const [announcementTotalRes, rootCategoryCountRes, subCategoryCountRes] = await Promise.all([
           supabase.from('announcements_public').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-          (supabase as any)
+          supabase
             .from('announcements_public')
             .select('category_slug, count:id')
             .eq('status', 'active'),
-          (supabase as any)
+          supabase
             .from('announcements_public')
             .select('subcategory_id, count:id')
             .eq('status', 'active')

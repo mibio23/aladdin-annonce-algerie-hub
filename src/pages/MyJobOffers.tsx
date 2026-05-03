@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/useAuth";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -50,7 +51,7 @@ const MyJobOffers = () => {
         if (error) throw error;
         setOffers(data || []);
       } catch (err) {
-        console.error('Error fetching my offers:', err);
+        logger.error('Error fetching my offers:', err);
         toast({
           title: t('common.error'),
           description: "Impossible de charger vos offres.",
@@ -79,7 +80,7 @@ const MyJobOffers = () => {
         description: "Offre supprimée avec succès.",
       });
     } catch (err) {
-      console.error('Error deleting offer:', err);
+      logger.error('Error deleting offer:', err);
       toast({
         title: t('common.error'),
         description: "Erreur lors de la suppression.",

@@ -1,3 +1,4 @@
+import { logger } from '@/utils/silentLogger';
 import React, { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
@@ -46,7 +47,7 @@ const SystemInitializer: React.FC<SystemInitializerProps> = ({ children }) => {
             });
           }
         } catch (error) {
-          console.error(`Erreur lors du préchargement des catégories pour ${lang}:`, error);
+          logger.error(`Erreur lors du préchargement des catégories pour ${lang}:`, error);
         }
       }
     };

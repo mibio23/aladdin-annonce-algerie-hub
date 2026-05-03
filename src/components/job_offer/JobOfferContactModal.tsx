@@ -7,6 +7,7 @@ import { MessageCircle, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 import { useNavigate } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
@@ -96,8 +97,8 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
       setLoading(true);
       
       // 1. Check if conversation exists (with specific subject)
-      const { data: existingConversations, error: fetchError } = await (supabase
-        .from('conversations') as any)
+      const { data: existingConversations, error: fetchError } = await supabase
+        .from('conversations')
         .select('id')
         .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
         .eq('subject_type', 'job_offer')
@@ -112,8 +113,8 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
       let conversationId = existingConversations?.id;
 
       if (!conversationId) {
-        const { data: participantConversation, error: participantFetchError } = await (supabase
-          .from('conversations') as any)
+        const { data: participantConversation, error: participantFetchError } = await supabase
+        .from('conversations')
           .select('id')
           .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
           .limit(1)
@@ -142,8 +143,8 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
           .single();
 
         if (createError) {
-          const { data: fallbackConversation, error: fallbackError } = await (supabase
-            .from('conversations') as any)
+          const { data: fallbackConversation, error: fallbackError } = await supabase
+        .from('conversations')
             .select('id')
             .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${offer.user_id}),and(participant_1_id.eq.${offer.user_id},participant_2_id.eq.${user.id})`)
             .limit(1)
@@ -205,7 +206,7 @@ const JobOfferContactModal: React.FC<JobOfferContactModalProps> = ({ offer, onCl
       }, 1500);
       
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
       toast({
         title: t('common.error'),
         description: tr('jobOfferContact.sendError', {

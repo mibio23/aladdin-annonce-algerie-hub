@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/utils/silentLogger';
 
 interface LoadingSettings {
   isEnabled: boolean;
@@ -22,7 +23,7 @@ export const useLoadingSettings = () => {
         const parsed = JSON.parse(savedSettings);
         setSettings({ ...defaultSettings, ...parsed });
       } catch (error) {
-        console.error('Error parsing loading settings:', error);
+        logger.error('Error parsing loading settings:', error);
       }
     }
   }, []);

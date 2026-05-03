@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/silentLogger';
 
 interface CSRFContextType {
   token: string | null;
@@ -39,7 +40,7 @@ export const CSRFProvider: React.FC<CSRFProviderProps> = ({ children }) => {
       
       setToken(newToken);
     } catch (error) {
-      console.error('Erreur lors de la génération du token CSRF:', error);
+      logger.error('Erreur lors de la génération du token CSRF:', error);
     }
   }, [generateToken]);
 
