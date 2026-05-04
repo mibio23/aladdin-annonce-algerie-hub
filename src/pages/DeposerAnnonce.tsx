@@ -985,7 +985,7 @@ const DeposerAnnonce = () => {
       if (!isUUID(finalCategoryId)) {
         toast({
           title: t('common.error') || "Erreur",
-          description: "Erreur de configuration de catégorie (UUID introuvable). Veuillez recharger la page.",
+          description: t('createAd.errors.invalidCategory'),
         });
         setLoading(false);
         return;
@@ -995,8 +995,8 @@ const DeposerAnnonce = () => {
 
       if (finalSubcategoryId && !isUUID(finalSubcategoryId)) {
         toast({
-          title: "Erreur de catégorie",
-          description: `La sous-catégorie sélectionnée est invalide (${finalSubcategoryId}). Veuillez recharger la page.`,
+          title: t('createAd.errors.categoryError'),
+          description: t('createAd.errors.invalidSubcategory'),
           variant: "destructive"
         });
         setLoading(false);
@@ -1005,8 +1005,8 @@ const DeposerAnnonce = () => {
 
       if (!isUUID(finalCategoryId)) {
         toast({
-          title: "Erreur de catégorie",
-          description: `La catégorie principale sélectionnée est invalide (${finalCategoryId}). Veuillez recharger la page.`,
+          title: t('createAd.errors.categoryError'),
+          description: t('createAd.errors.invalidMainCategory'),
           variant: "destructive"
         });
         setLoading(false);

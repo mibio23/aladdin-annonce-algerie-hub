@@ -519,11 +519,11 @@ const Parametres = () => {
                         <SelectValue placeholder={t('profile.countryPlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Algeria">Algérie</SelectItem>
-                        <SelectItem value="Morocco">Maroc</SelectItem>
-                        <SelectItem value="Tunisia">Tunisie</SelectItem>
-                        <SelectItem value="France">France</SelectItem>
-                        <SelectItem value="Canada">Canada</SelectItem>
+                        <SelectItem value="Algeria">{t('parametres.countryAlgeria')}</SelectItem>
+                        <SelectItem value="Morocco">{t('parametres.countryMorocco')}</SelectItem>
+                        <SelectItem value="Tunisia">{t('parametres.countryTunisia')}</SelectItem>
+                        <SelectItem value="France">{t('parametres.countryFrance')}</SelectItem>
+                        <SelectItem value="Canada">{t('parametres.countryCanada')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -693,7 +693,7 @@ const Parametres = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="fr">Français</SelectItem>
+                          <SelectItem value="fr">{t('parametres.langFr')}</SelectItem>
                           <SelectItem value="ar">العربية</SelectItem>
                           <SelectItem value="en">English</SelectItem>
                           <SelectItem value="de">Deutsch</SelectItem>
@@ -708,9 +708,9 @@ const Parametres = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="DZD">Dinar Algérien (DZD)</SelectItem>
-                          <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                          <SelectItem value="USD">Dollar US (USD)</SelectItem>
+                          <SelectItem value="DZD">{t('parametres.currencyDZD')}</SelectItem>
+                          <SelectItem value="EUR">{t('parametres.currencyEUR')}</SelectItem>
+                          <SelectItem value="USD">{t('parametres.currencyUSD')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

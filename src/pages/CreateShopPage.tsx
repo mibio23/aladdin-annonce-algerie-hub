@@ -543,7 +543,7 @@ const CreateShopPage: React.FC = () => {
           logger.error(`Error uploading file to ${bucket}:`, uploadError);
           toast({
              title: t('common.error'),
-             description: `Erreur d'upload: ${uploadError.message}`,
+             description: `${t('createShop.uploadError')}: ${uploadError.message}`,
              variant: "destructive"
           });
           throw uploadError;
@@ -1753,7 +1753,7 @@ const CreateShopPage: React.FC = () => {
                       type="button"
                       variant="outline"
                       onClick={() => {
-                        if (confirm("Voulez-vous vraiment supprimer ce brouillon et annuler ?")) {
+                        if (confirm(t('createShop.confirmDeleteDraft'))) {
                           clearDraft();
                           navigate(getLocalizedPath('/'));
                         }

@@ -464,7 +464,7 @@ const JobOfferDetailsPage = () => {
         }
       } catch (err) {
         logger.error('Error fetching job offer:', err);
-        setError('Impossible de charger l\'offre');
+        setError(t('jobOffer.loadError'));
       } finally {
         setLoading(false);
       }

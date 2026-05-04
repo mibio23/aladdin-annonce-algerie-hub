@@ -137,7 +137,7 @@ const ConversationalSearchAI: React.FC<ConversationalSearchProps> = ({
       logger.error('Erreur lors de l\'envoi du message:', error);
       toast({
         title: t('intelligentAssistant.error') || "Erreur",
-        description: "Impossible de traiter votre message. Réessayez.",
+        description: t('search.errors.processingError'),
         variant: "destructive",
       });
     }

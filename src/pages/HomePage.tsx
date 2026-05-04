@@ -22,7 +22,6 @@ import AnnouncementPreviewCards from '@/components/home/AnnouncementPreviewCards
 const OptimizedLoadingSpinner = React.memo(() => (
   <div className="flex items-center justify-center p-8">
     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    <span className="ml-2 text-muted-foreground">Chargement...</span>
   </div>
 ));
 

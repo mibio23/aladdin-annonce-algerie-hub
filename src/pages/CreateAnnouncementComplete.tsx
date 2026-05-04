@@ -832,7 +832,7 @@ const CreateAnnouncementPage: React.FC = () => {
       setLastSaved(null);
       setDraftSaved(false);
       if (!silent) {
-        toast({ title: "Brouillon supprimé", description: "Le brouillon a été effacé." });
+        toast({ title: t('createAd.errors.draftDeleted'), description: t('createAd.errors.draftDeletedDesc') });
       }
     }
   }, [user, toast]);
@@ -1004,8 +1004,8 @@ const CreateAnnouncementPage: React.FC = () => {
       if (error) {
         logger.error('Error fetching announcement:', error);
         toast({
-          title: "Erreur",
-          description: "Impossible de charger l'annonce",
+          title: t('common.error'),
+          description: t('createAd.errors.loadError'),
         });
         setLoading(false);
         return;
@@ -1013,8 +1013,8 @@ const CreateAnnouncementPage: React.FC = () => {
 
       if (data.user_id !== user.id) {
         toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas la permission de modifier cette annonce",
+          title: t('createAd.errors.accessDenied'),
+          description: t('createAd.errors.accessDeniedDesc'),
         });
         setLoading(false);
         navigateWithLanguage('/mes-annonces');
@@ -1625,8 +1625,8 @@ const CreateAnnouncementPage: React.FC = () => {
 
       if (!isUUID(finalCategoryId)) {
         toast({
-          title: "Erreur",
-          description: "Catégorie invalide. Rechargez la page et réessayez.",
+          title: t('common.error'),
+          description: t('createAd.errors.invalidCategory'),
           variant: "destructive",
         });
         setLoading(false);
@@ -1657,8 +1657,8 @@ const CreateAnnouncementPage: React.FC = () => {
 
       if (finalSubcategoryId && !isUUID(finalSubcategoryId)) {
         toast({
-          title: "Erreur de catégorie",
-          description: `La sous-catégorie sélectionnée est invalide (${finalSubcategoryId}). Veuillez recharger la page.`,
+          title: t('createAd.errors.categoryError'),
+          description: t('createAd.errors.invalidSubcategory'),
           variant: "destructive"
         });
         setLoading(false);
@@ -1667,8 +1667,8 @@ const CreateAnnouncementPage: React.FC = () => {
 
       if (!isUUID(finalCategoryId)) {
         toast({
-          title: "Erreur de catégorie",
-          description: `La catégorie principale sélectionnée est invalide (${finalCategoryId}). Veuillez recharger la page.`,
+          title: t('createAd.errors.categoryError'),
+          description: t('createAd.errors.invalidMainCategory'),
           variant: "destructive"
         });
         setLoading(false);
@@ -1837,8 +1837,8 @@ const CreateAnnouncementPage: React.FC = () => {
       } else if (categoryCount === 0) {
         logger.error(`Catégorie introuvable dans la base de données: ${categoryIdForDb}`);
         toast({
-          title: "Erreur de catégorie",
-          description: `La catégorie sélectionnée (${categoryIdForDb}) n'est pas synchronisée avec le serveur. Veuillez contacter le support.`,
+          title: t('createAd.errors.categoryError'),
+          description: t('createAd.errors.categoryNotSynced'),
         });
         setLoading(false);
         return;
@@ -2453,7 +2453,7 @@ const CreateAnnouncementPage: React.FC = () => {
 
       // Gestion spécifique des erreurs connues
       if (err?.code === '22003' || (err?.message && err?.message.includes('numeric field overflow'))) {
-        errorMessage = "Le prix indiqué est trop élevé. Veuillez vérifier le montant ou contacter le support.";
+        errorMessage = t('createAd.errors.priceTooHigh');
       }
       else if (error instanceof Error) {
         errorMessage = error.message;
@@ -5610,7 +5610,7 @@ const CreateAnnouncementPage: React.FC = () => {
                                       setFormData(prev => ({ ...prev, isPremium: true }));
                                     } else {
                                       toast({
-                                        title: 'Premium indisponible',
+                                        title: t('createAd.errors.premiumUnavailable') || 'Premium',
                                         description: 'Vous avez besoin de 100 points ou d’un paiement',
                                       });
                                       setFormData(prev => ({ ...prev, isPremium: false }));
@@ -5663,7 +5663,7 @@ const CreateAnnouncementPage: React.FC = () => {
                       type="button"
                       variant="outline"
                       onClick={() => {
-                        if (confirm("Voulez-vous vraiment supprimer ce brouillon et annuler ?")) {
+                        if (confirm(t('createAd.errors.confirmDeleteDraft'))) {
                           clearDraft();
                           navigate('/');
                         }

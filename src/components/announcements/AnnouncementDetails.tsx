@@ -2,6 +2,7 @@
 import React from "react";
 import { MapPin, Phone } from "lucide-react";
 import ShopInfo from "./ShopInfo";
+import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
 interface AnnouncementDetailsProps {
   location: string;
@@ -24,6 +25,7 @@ const AnnouncementDetails: React.FC<AnnouncementDetailsProps> = ({
   isUrgent,
   urgentMessage,
 }) => {
+  const { t } = useSafeI18nWithRouter();
   return (
     <div className="text-xs text-gray-500 dark:text-slate-400 space-y-1.5 mb-3">
       <div className="flex items-center">
@@ -31,7 +33,7 @@ const AnnouncementDetails: React.FC<AnnouncementDetailsProps> = ({
         <span className="truncate">{location}</span>
       </div>
       <div className="flex items-center">
-        <span className="truncate">{category || "Non spécifié"}</span>
+        <span className="truncate">{category || t('common.notSpecified')}</span>
       </div>
       {phoneNumber && (
         <div className="flex items-center">

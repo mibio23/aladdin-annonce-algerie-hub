@@ -6,12 +6,14 @@ import { toast } from '@/hooks/use-toast';
 import { Profile } from '@/types/profile';
 import { profileService } from '@/services/profileService';
 import { createDefaultProfile, normalizeProfile } from '@/utils/profileUtils';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nHooks';
 
 export const useProfile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
+  const { t } = useSafeI18nWithRouter();
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
@@ -64,15 +66,15 @@ export const useProfile = () => {
       const lower = message.toLowerCase();
       if (message.includes('Failed to fetch') || lower.includes('network') || lower.includes('fetch')) {
         toast({
-          title: "Erreur",
-          description: "Impossible de charger le profil (problème de connexion).",
+          title: t('common.error'),
+          description: t('profile.loadError'),
           variant: "destructive",
         });
       }
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, t]);
 
   const updateProfile = async (updatedProfile: Partial<Profile>) => {
     if (!user || !profile) return false;
@@ -83,8 +85,8 @@ export const useProfile = () => {
       
       setProfile(prev => prev ? { ...prev, ...normalizeProfile(data) } : normalizeProfile(data));
       toast({
-        title: "Succès",
-        description: "Profil mis à jour avec succès",
+        title: t('common.success'),
+        description: t('profile.updateSuccess'),
       });
       return true;
     } catch (error) {
@@ -93,13 +95,14 @@ export const useProfile = () => {
       
       // Personnalisation du message d'erreur spécifique pour les champs protégés
       if (message.includes("Modification des champs d'identité interdite") || message.includes("identity fields")) {
-        message = "L'utilisateur n'a pas le droit de changer ces cases d'informations (Nom, Prénom, Sexe, Téléphone Principal).";
+        message = t('profile.identityFieldsBlocked');
       }
 
+      const isUnauthorized = message.includes(t('profile.identityFieldsBlocked').substring(0, 20));
       toast({
-        title: message.includes("L'utilisateur n'a pas le droit") ? "Action non autorisée" : "Erreur",
-        description: message ? message : "Erreur lors de la mise à jour du profil",
-        variant: message.includes("L'utilisateur n'a pas le droit") ? "default" : "destructive",
+        title: isUnauthorized ? t('profile.unauthorized') : t('common.error'),
+        description: message ? message : t('profile.updateError'),
+        variant: isUnauthorized ? "default" : "destructive",
       });
       return false;
     } finally {
@@ -114,15 +117,15 @@ export const useProfile = () => {
       await profileService.updateAvatar(user.id, avatarUrl);
       setProfile(prev => prev ? { ...prev, avatar_url: avatarUrl } : null);
       toast({
-        title: "Succès",
-        description: "Photo de profil mise à jour",
+        title: t('common.success'),
+        description: t('profile.avatarUpdateSuccess'),
       });
       return true;
     } catch (error) {
       logger.error('Error updating avatar:', error);
       toast({
-        title: "Erreur",
-        description: "Erreur lors de la mise à jour de la photo",
+        title: t('common.error'),
+        description: t('profile.avatarUpdateError'),
         variant: "destructive",
       });
       return false;

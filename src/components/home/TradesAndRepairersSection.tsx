@@ -70,7 +70,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
       .maybeSingle();
 
     if (existingError) {
-      toast.error("Impossible de mettre à jour le favori");
+      toast.error(t('favorites.updateError'));
       return;
     }
 
@@ -81,7 +81,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
         .eq('id', existing.id)
         .eq('user_id', user.id);
       if (error) {
-        toast.error("Impossible de retirer le favori");
+        toast.error(t('favorites.removeError'));
         return;
       }
       await loadProFavorites();
@@ -93,7 +93,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
       .upsert({ user_id: user.id, pro_id: id }, { onConflict: 'user_id,pro_id' });
 
     if (error) {
-      toast.error("Impossible d'ajouter aux favoris");
+      toast.error(t('favorites.addError'));
       return;
     }
 
@@ -216,7 +216,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
 
               const copyToClipboard = () => {
                 navigator.clipboard.writeText(shareUrl);
-                toast.success('Lien copié', { description: 'Le lien de cette offre a été copié.' });
+                toast.success(t('common.linkCopiedToast'), { description: t('common.linkCopiedOfferDesc') });
               };
 
               const handleShare = (e: React.MouseEvent) => {
@@ -344,7 +344,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                           <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                             <span className="flex items-center gap-2 truncate">
                               <MapPin className="w-3 h-3 text-primary" />
-                              <span className="truncate">{(offer as any)?.wilaya || 'Non spécifiée'}</span>
+                              <span className="truncate">{(offer as any)?.wilaya || t('common.notSpecifiedFemale')}</span>
                               <span className="text-slate-400">•</span>
                               <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
                                 {formatRelativeTime(offer.created_at)}

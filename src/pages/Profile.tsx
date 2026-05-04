@@ -215,7 +215,7 @@ const Profile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base text-muted-foreground">
                   <User className="h-4 w-4" />
-                  Informations d'identité (Non modifiables)
+                  {t('profile.identityInfo')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -269,7 +269,7 @@ const Profile = () => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('profile.phone')} (Principal)</FormLabel>
+                        <FormLabel>{t('profile.phone')} {t('profile.phonePrincipal')}</FormLabel>
                         <FormControl>
                           <Input {...field} disabled={true} className="bg-muted" />
                         </FormControl>
@@ -289,7 +289,7 @@ const Profile = () => {
                       <Briefcase className="h-5 w-5 text-primary" />
                       Informations Publiques & Contact
                     </CardTitle>
-                    <CardDescription>Ces informations sont visibles sur votre profil public</CardDescription>
+                    <CardDescription>{t('profile.publicInfoDesc')}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     
@@ -300,9 +300,9 @@ const Profile = () => {
                         name="display_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('profile.displayName')} (Surnom)</FormLabel>
+                            <FormLabel>{t('profile.displayName')} {t('profile.surnom')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Votre surnom public" />
+                              <Input {...field} placeholder={t('profile.nicknamePlaceholderShort')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -331,7 +331,7 @@ const Profile = () => {
                         <FormItem>
                           <FormLabel>{t('profile.profession')}</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Ex: Commerçant, Étudiant..." />
+                            <Input {...field} placeholder={t('profile.professionPlaceholderShort')} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -345,7 +345,7 @@ const Profile = () => {
                         name="phone_secondary"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Téléphone Secondaire</FormLabel>
+                            <FormLabel>{t('profile.phoneSecondaryLabel')}</FormLabel>
                             <FormControl>
                               <Input {...field} placeholder="+213..." />
                             </FormControl>
@@ -358,7 +358,7 @@ const Profile = () => {
                         name="phone_tertiary"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Téléphone Tertiaire</FormLabel>
+                            <FormLabel>{t('profile.phoneTertiaryLabel')}</FormLabel>
                             <FormControl>
                               <Input {...field} placeholder="+213..." />
                             </FormControl>
@@ -371,7 +371,7 @@ const Profile = () => {
                     {/* Localisation Complète */}
                     <div className="space-y-4 pt-4 border-t">
                       <h4 className="font-medium flex items-center gap-2">
-                        <MapPin className="h-4 w-4" /> Localisation
+                        <MapPin className="h-4 w-4" /> {t('profile.location')}
                       </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <FormField
@@ -381,7 +381,7 @@ const Profile = () => {
                             <FormItem>
                               <FormLabel>Wilaya <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Votre Wilaya" />
+                                <Input {...field} placeholder={t('profile.wilayaPlaceholderShort')} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -394,7 +394,7 @@ const Profile = () => {
                             <FormItem>
                               <FormLabel>Commune <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Votre Commune" />
+                                <Input {...field} placeholder={t('profile.communePlaceholderShort')} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -406,9 +406,9 @@ const Profile = () => {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Adresse précise</FormLabel>
+                            <FormLabel>{t('profile.addressLabel')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Rue, Bâtiment, Étage..." />
+                              <Input {...field} placeholder={t('profile.addressPlaceholderShort')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -426,13 +426,13 @@ const Profile = () => {
                           <FormControl>
                             <Textarea 
                               {...field} 
-                              placeholder="Parlez-nous de vous..." 
+                              placeholder={t('profile.bioPlaceholderShort')} 
                               rows={4}
                               className="resize-none"
                             />
                           </FormControl>
                           <FormDescription>
-                            {field.value?.length || 0}/500 caractères
+                            {field.value?.length || 0}/500 {t('profile.characters')}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

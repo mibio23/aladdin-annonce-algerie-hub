@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSecureContact } from '@/hooks/useSecureContact';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Mail, User, MessageSquare } from 'lucide-react';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 interface SecureContactFormProps {
   announcementId: string;
@@ -27,24 +28,25 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
   
   const { submitContactRequest, loading } = useSecureContact();
   const { toast } = useToast();
+  const { t } = useSafeI18nWithRouter();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.requesterName.trim()) {
-      newErrors.requesterName = 'Le nom est requis';
+      newErrors.requesterName = t('secureContact.nameRequired');
     } else if (formData.requesterName.length < 2) {
-      newErrors.requesterName = 'Le nom doit contenir au moins 2 caractères';
+      newErrors.requesterName = t('secureContact.nameMinLength');
     }
 
     if (!formData.requesterEmail.trim()) {
-      newErrors.requesterEmail = 'L\'email est requis';
+      newErrors.requesterEmail = t('secureContact.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.requesterEmail)) {
-      newErrors.requesterEmail = 'Format d\'email invalide';
+      newErrors.requesterEmail = t('secureContact.emailInvalid');
     }
 
     if (formData.message.length > 500) {
-      newErrors.message = 'Le message ne peut pas dépasser 500 caractères';
+      newErrors.message = t('secureContact.messageMaxLength');
     }
 
     setErrors(newErrors);
@@ -65,8 +67,8 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
 
     if (result.success) {
       toast({
-        title: 'Demande de contact envoyée',
-        description: 'Votre demande a été transmise au vendeur. Il vous contactera directement par email.',
+        title: t('secureContact.success'),
+        description: t('secureContact.successDesc'),
       });
       
       setFormData({
@@ -78,8 +80,8 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
       onSuccess?.();
     } else {
       toast({
-        title: 'Erreur',
-        description: 'Impossible d\'envoyer votre demande. Veuillez réessayer.',
+        title: t('common.error'),
+        description: t('secureContact.error'),
         variant: 'destructive',
       });
     }
@@ -97,10 +99,10 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-primary" />
-          Contact sécurisé
+          {t('secureContact.title')}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Contactez le vendeur pour: {announcementTitle}
+          {t('secureContact.contactSeller')} {announcementTitle}
         </p>
       </CardHeader>
       <CardContent>
@@ -108,14 +110,14 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
           <div className="space-y-2">
             <label htmlFor="requesterName" className="text-sm font-medium flex items-center gap-1">
               <User className="h-4 w-4" />
-              Votre nom *
+              {t('secureContact.yourName')}
             </label>
             <Input
               id="requesterName"
               type="text"
               value={formData.requesterName}
               onChange={(e) => handleInputChange('requesterName', e.target.value)}
-              placeholder="Votre nom complet"
+              placeholder={t('secureContact.yourNamePlaceholder')}
               className={errors.requesterName ? 'border-destructive' : ''}
             />
             {errors.requesterName && (
@@ -126,7 +128,7 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
           <div className="space-y-2">
             <label htmlFor="requesterEmail" className="text-sm font-medium flex items-center gap-1">
               <Mail className="h-4 w-4" />
-              Votre email *
+              {t('secureContact.yourEmail')}
             </label>
             <Input
               id="requesterEmail"
@@ -144,13 +146,13 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
           <div className="space-y-2">
             <label htmlFor="message" className="text-sm font-medium flex items-center gap-1">
               <MessageSquare className="h-4 w-4" />
-              Message (optionnel)
+              {t('secureContact.message')}
             </label>
             <Textarea
               id="message"
               value={formData.message}
               onChange={(e) => handleInputChange('message', e.target.value)}
-              placeholder="Votre message au vendeur..."
+              placeholder={t('secureContact.messagePlaceholder')}
               rows={3}
               maxLength={500}
               className={errors.message ? 'border-destructive' : ''}
@@ -166,13 +168,12 @@ export const SecureContactForm: React.FC<SecureContactFormProps> = ({
           <div className="bg-muted/50 p-3 rounded-lg">
             <p className="text-xs text-muted-foreground">
               <Shield className="h-3 w-3 inline mr-1" />
-              Votre demande est sécurisée. Le vendeur recevra vos coordonnées par email 
-              et pourra vous contacter directement. Vos données ne sont pas partagées avec des tiers.
+              {t('secureContact.securityNotice')}
             </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Envoi en cours...' : 'Envoyer la demande'}
+            {loading ? t('secureContact.sending') : t('secureContact.send')}
           </Button>
         </form>
       </CardContent>

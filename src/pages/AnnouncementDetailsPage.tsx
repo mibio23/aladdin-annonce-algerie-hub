@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { MapPin, Calendar, Heart, Share2, Flag, Truck, ShieldCheck, Package, Info, Tag, Ruler, Clock, User, ShieldAlert, ExternalLink, Eye, Home, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -188,7 +188,7 @@ const AnnouncementDetailsPage: React.FC = () => {
         ...mockAnnouncement.vehicleDetails,
         papers: mockAnnouncement.vehicleDetails.paper ? [mockAnnouncement.vehicleDetails.paper] : [],
         purchase_year: mockAnnouncement.vehicleDetails.year,
-        category: "Véhicules",
+        category: "VÃ©hicules",
         categorySlug: "vehicules-equipements",
         imageUrl: mockAnnouncement.images[0],
         imageUrls: mockAnnouncement.images,
@@ -480,13 +480,13 @@ const AnnouncementDetailsPage: React.FC = () => {
         toast({
           title: t('common.error'),
           description: ({
-            fr: "Impossible de charger les détails de l'annonce",
+            fr: "Impossible de charger les dÃ©tails de l'annonce",
             en: "Unable to load announcement details",
             es: "No se pueden cargar los detalles del anuncio",
             it: "Impossibile caricare i dettagli dell'annuncio",
             de: "Anzeigendetails konnten nicht geladen werden",
-            ar: "تعذر تحميل تفاصيل الإعلان",
-          } as Record<string, string>)[currentLanguage || 'fr'] || "Impossible de charger les détails de l'annonce"
+            ar: "ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¥Ø¹Ù„Ø§Ù†",
+          } as Record<string, string>)[currentLanguage || 'fr'] || "Impossible de charger les dÃ©tails de l'annonce"
         });
       } finally {
         setLoading(false);
@@ -550,29 +550,29 @@ const AnnouncementDetailsPage: React.FC = () => {
       .trim();
 
     if (normalized.includes('carte grise') && (normalized.includes('barree') || normalized.includes('barree'))) {
-      return isRTL ? 'البطاقة الرمادية مشطوبة' : raw;
+      return isRTL ? 'Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø±Ù…Ø§Ø¯ÙŠØ© Ù…Ø´Ø·ÙˆØ¨Ø©' : raw;
     }
     if (normalized.includes('carte grise')) {
-      return isRTL ? 'البطاقة الرمادية' : raw;
+      return isRTL ? 'Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø±Ù…Ø§Ø¯ÙŠØ©' : raw;
     }
     if (normalized.includes('facture')) {
-      return t('createAd.invoice', isRTL ? 'فاتورة' : raw);
+      return t('createAd.invoice', isRTL ? 'ÙØ§ØªÙˆØ±Ø©' : raw);
     }
     if (normalized.includes('garantie') || normalized.includes('warranty')) {
-      return t('createAd.warranty', isRTL ? 'ضمان' : raw);
+      return t('createAd.warranty', isRTL ? 'Ø¶Ù…Ø§Ù†' : raw);
     }
     if (normalized.includes('boite') || normalized.includes('box')) {
       return translateStaticLabel({
-        fr: normalized.includes('sans') ? 'Sans boîte' : "Boîte d'origine",
+        fr: normalized.includes('sans') ? 'Sans boÃ®te' : "BoÃ®te d'origine",
         en: normalized.includes('without') || normalized.includes('sans') ? 'Without box' : 'Original box',
         es: normalized.includes('without') || normalized.includes('sans') ? 'Sin caja' : 'Caja original',
         it: normalized.includes('without') || normalized.includes('sans') ? 'Senza scatola' : 'Scatola originale',
         de: normalized.includes('without') || normalized.includes('sans') ? 'Ohne Verpackung' : 'Originalverpackung',
-        ar: normalized.includes('without') || normalized.includes('sans') ? 'بدون علبة' : 'العلبة الأصلية',
+        ar: normalized.includes('without') || normalized.includes('sans') ? 'Ø¨Ø¯ÙˆÙ† Ø¹Ù„Ø¨Ø©' : 'Ø§Ù„Ø¹Ù„Ø¨Ø© Ø§Ù„Ø£ØµÙ„ÙŠØ©',
       });
     }
     if (normalized.includes('credit') || normalized.includes('credit')) {
-      return t('createAd.papers.credit', isRTL ? 'قرض' : raw);
+      return t('createAd.papers.credit', isRTL ? 'Ù‚Ø±Ø¶' : raw);
     }
 
     return translateVehicleDictionaryValue("paper", raw);
@@ -603,7 +603,7 @@ const AnnouncementDetailsPage: React.FC = () => {
             es: 'Precio a consultar',
             it: 'Prezzo su richiesta',
             de: 'Preis auf Anfrage',
-            ar: 'السعر عند الطلب',
+            ar: 'Ø§Ù„Ø³Ø¹Ø± Ø¹Ù†Ø¯ Ø§Ù„Ø·Ù„Ø¨',
           } as Record<string, string>)[currentLanguage || 'fr'] || 'Prix sur demande'}
         </Badge>
       );
@@ -798,31 +798,31 @@ const AnnouncementDetailsPage: React.FC = () => {
   const translateColorLabel = (rawValue?: string | null) => {
     const normalized = normalizeLookupValue(rawValue);
     const colorMap: Record<string, Record<string, string>> = {
-      noir: { fr: 'Noir', en: 'Black', es: 'Negro', it: 'Nero', de: 'Schwarz', ar: 'أسود' },
-      black: { fr: 'Noir', en: 'Black', es: 'Negro', it: 'Nero', de: 'Schwarz', ar: 'أسود' },
-      blanc: { fr: 'Blanc', en: 'White', es: 'Blanco', it: 'Bianco', de: 'Weiß', ar: 'أبيض' },
-      white: { fr: 'Blanc', en: 'White', es: 'Blanco', it: 'Bianco', de: 'Weiß', ar: 'أبيض' },
-      gris: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'رمادي' },
-      gray: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'رمادي' },
-      grey: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'رمادي' },
-      argent: { fr: 'Argent', en: 'Silver', es: 'Plateado', it: 'Argento', de: 'Silber', ar: 'فضي' },
-      silver: { fr: 'Argent', en: 'Silver', es: 'Plateado', it: 'Argento', de: 'Silber', ar: 'فضي' },
-      bleu: { fr: 'Bleu', en: 'Blue', es: 'Azul', it: 'Blu', de: 'Blau', ar: 'أزرق' },
-      blue: { fr: 'Bleu', en: 'Blue', es: 'Azul', it: 'Blu', de: 'Blau', ar: 'أزرق' },
-      rouge: { fr: 'Rouge', en: 'Red', es: 'Rojo', it: 'Rosso', de: 'Rot', ar: 'أحمر' },
-      red: { fr: 'Rouge', en: 'Red', es: 'Rojo', it: 'Rosso', de: 'Rot', ar: 'أحمر' },
-      vert: { fr: 'Vert', en: 'Green', es: 'Verde', it: 'Verde', de: 'Grün', ar: 'أخضر' },
-      green: { fr: 'Vert', en: 'Green', es: 'Verde', it: 'Verde', de: 'Grün', ar: 'أخضر' },
-      jaune: { fr: 'Jaune', en: 'Yellow', es: 'Amarillo', it: 'Giallo', de: 'Gelb', ar: 'أصفر' },
-      yellow: { fr: 'Jaune', en: 'Yellow', es: 'Amarillo', it: 'Giallo', de: 'Gelb', ar: 'أصفر' },
-      marron: { fr: 'Marron', en: 'Brown', es: 'Marrón', it: 'Marrone', de: 'Braun', ar: 'بني' },
-      brown: { fr: 'Marron', en: 'Brown', es: 'Marrón', it: 'Marrone', de: 'Braun', ar: 'بني' },
-      beige: { fr: 'Beige', en: 'Beige', es: 'Beige', it: 'Beige', de: 'Beige', ar: 'بيج' },
-      rose: { fr: 'Rose', en: 'Pink', es: 'Rosa', it: 'Rosa', de: 'Rosa', ar: 'وردي' },
-      pink: { fr: 'Rose', en: 'Pink', es: 'Rosa', it: 'Rosa', de: 'Rosa', ar: 'وردي' },
-      violet: { fr: 'Violet', en: 'Purple', es: 'Morado', it: 'Viola', de: 'Lila', ar: 'بنفسجي' },
-      purple: { fr: 'Violet', en: 'Purple', es: 'Morado', it: 'Viola', de: 'Lila', ar: 'بنفسجي' },
-      orange: { fr: 'Orange', en: 'Orange', es: 'Naranja', it: 'Arancione', de: 'Orange', ar: 'برتقالي' },
+      noir: { fr: 'Noir', en: 'Black', es: 'Negro', it: 'Nero', de: 'Schwarz', ar: 'Ø£Ø³ÙˆØ¯' },
+      black: { fr: 'Noir', en: 'Black', es: 'Negro', it: 'Nero', de: 'Schwarz', ar: 'Ø£Ø³ÙˆØ¯' },
+      blanc: { fr: 'Blanc', en: 'White', es: 'Blanco', it: 'Bianco', de: 'WeiÃŸ', ar: 'Ø£Ø¨ÙŠØ¶' },
+      white: { fr: 'Blanc', en: 'White', es: 'Blanco', it: 'Bianco', de: 'WeiÃŸ', ar: 'Ø£Ø¨ÙŠØ¶' },
+      gris: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'Ø±Ù…Ø§Ø¯ÙŠ' },
+      gray: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'Ø±Ù…Ø§Ø¯ÙŠ' },
+      grey: { fr: 'Gris', en: 'Gray', es: 'Gris', it: 'Grigio', de: 'Grau', ar: 'Ø±Ù…Ø§Ø¯ÙŠ' },
+      argent: { fr: 'Argent', en: 'Silver', es: 'Plateado', it: 'Argento', de: 'Silber', ar: 'ÙØ¶ÙŠ' },
+      silver: { fr: 'Argent', en: 'Silver', es: 'Plateado', it: 'Argento', de: 'Silber', ar: 'ÙØ¶ÙŠ' },
+      bleu: { fr: 'Bleu', en: 'Blue', es: 'Azul', it: 'Blu', de: 'Blau', ar: 'Ø£Ø²Ø±Ù‚' },
+      blue: { fr: 'Bleu', en: 'Blue', es: 'Azul', it: 'Blu', de: 'Blau', ar: 'Ø£Ø²Ø±Ù‚' },
+      rouge: { fr: 'Rouge', en: 'Red', es: 'Rojo', it: 'Rosso', de: 'Rot', ar: 'Ø£Ø­Ù…Ø±' },
+      red: { fr: 'Rouge', en: 'Red', es: 'Rojo', it: 'Rosso', de: 'Rot', ar: 'Ø£Ø­Ù…Ø±' },
+      vert: { fr: 'Vert', en: 'Green', es: 'Verde', it: 'Verde', de: 'GrÃ¼n', ar: 'Ø£Ø®Ø¶Ø±' },
+      green: { fr: 'Vert', en: 'Green', es: 'Verde', it: 'Verde', de: 'GrÃ¼n', ar: 'Ø£Ø®Ø¶Ø±' },
+      jaune: { fr: 'Jaune', en: 'Yellow', es: 'Amarillo', it: 'Giallo', de: 'Gelb', ar: 'Ø£ØµÙØ±' },
+      yellow: { fr: 'Jaune', en: 'Yellow', es: 'Amarillo', it: 'Giallo', de: 'Gelb', ar: 'Ø£ØµÙØ±' },
+      marron: { fr: 'Marron', en: 'Brown', es: 'MarrÃ³n', it: 'Marrone', de: 'Braun', ar: 'Ø¨Ù†ÙŠ' },
+      brown: { fr: 'Marron', en: 'Brown', es: 'MarrÃ³n', it: 'Marrone', de: 'Braun', ar: 'Ø¨Ù†ÙŠ' },
+      beige: { fr: 'Beige', en: 'Beige', es: 'Beige', it: 'Beige', de: 'Beige', ar: 'Ø¨ÙŠØ¬' },
+      rose: { fr: 'Rose', en: 'Pink', es: 'Rosa', it: 'Rosa', de: 'Rosa', ar: 'ÙˆØ±Ø¯ÙŠ' },
+      pink: { fr: 'Rose', en: 'Pink', es: 'Rosa', it: 'Rosa', de: 'Rosa', ar: 'ÙˆØ±Ø¯ÙŠ' },
+      violet: { fr: 'Violet', en: 'Purple', es: 'Morado', it: 'Viola', de: 'Lila', ar: 'Ø¨Ù†ÙØ³Ø¬ÙŠ' },
+      purple: { fr: 'Violet', en: 'Purple', es: 'Morado', it: 'Viola', de: 'Lila', ar: 'Ø¨Ù†ÙØ³Ø¬ÙŠ' },
+      orange: { fr: 'Orange', en: 'Orange', es: 'Naranja', it: 'Arancione', de: 'Orange', ar: 'Ø¨Ø±ØªÙ‚Ø§Ù„ÙŠ' },
     };
     return colorMap[normalized]?.[currentLanguage || 'fr'] || humanizeStoredValue(rawValue);
   };
@@ -833,10 +833,10 @@ const AnnouncementDetailsPage: React.FC = () => {
       normal: {
         fr: 'Standard',
         en: 'Standard',
-        es: 'Estándar',
+        es: 'EstÃ¡ndar',
         it: 'Standard',
         de: 'Standard',
-        ar: 'عادي',
+        ar: 'Ø¹Ø§Ø¯ÙŠ',
       },
       premium: {
         fr: 'Premium',
@@ -844,15 +844,15 @@ const AnnouncementDetailsPage: React.FC = () => {
         es: 'Premium',
         it: 'Premium',
         de: 'Premium',
-        ar: 'مميز',
+        ar: 'Ù…Ù…ÙŠØ²',
       },
       featured: {
-        fr: 'À la une',
+        fr: 'Ã€ la une',
         en: 'Featured',
         es: 'Destacado',
         it: 'In evidenza',
         de: 'Hervorgehoben',
-        ar: 'مميز',
+        ar: 'Ù…Ù…ÙŠØ²',
       },
       urgent: {
         fr: 'Urgent',
@@ -860,7 +860,7 @@ const AnnouncementDetailsPage: React.FC = () => {
         es: 'Urgente',
         it: 'Urgente',
         de: 'Dringend',
-        ar: 'مستعجل',
+        ar: 'Ù…Ø³ØªØ¹Ø¬Ù„',
       },
     };
 
@@ -873,37 +873,37 @@ const AnnouncementDetailsPage: React.FC = () => {
   ) => {
     const normalized = normalizeLookupValue(rawValue);
     const dictionaries: Record<string, Record<string, string>> = {
-      upgrade: { fr: 'Mise à niveau', en: 'Upgrade', es: 'Actualización', it: 'Aggiornamento', de: 'Upgrade', ar: 'ترقية' },
-      renouvellement: { fr: 'Renouvellement', en: 'Renewal', es: 'Renovación', it: 'Rinnovo', de: 'Erneuerung', ar: 'تجديد' },
-      no_longer_needed: { fr: 'Plus nécessaire', en: 'No longer needed', es: 'Ya no es necesario', it: 'Non più necessario', de: 'Nicht mehr benötigt', ar: 'لم أعد بحاجة إليه' },
-      urgent_sale: { fr: 'Vente urgente', en: 'Urgent sale', es: 'Venta urgente', it: 'Vendita urgente', de: 'Dringender Verkauf', ar: 'بيع مستعجل' },
-      demenagement: { fr: 'Déménagement', en: 'Moving', es: 'Mudanza', it: 'Trasloco', de: 'Umzug', ar: 'انتقال' },
-      liquidation: { fr: 'Liquidation', en: 'Clearance', es: 'Liquidación', it: 'Liquidazione', de: 'Räumungsverkauf', ar: 'تصفية' },
-      fermeture: { fr: 'Fermeture', en: 'Closure', es: 'Cierre', it: 'Chiusura', de: 'Schließung', ar: 'إغلاق' },
-      avec_boite: { fr: 'Avec boîte', en: 'With box', es: 'Con caja', it: 'Con scatola', de: 'Mit Verpackung', ar: 'مع العلبة' },
-      sans_boite: { fr: 'Sans boîte', en: 'Without box', es: 'Sin caja', it: 'Senza scatola', de: 'Ohne Verpackung', ar: 'بدون علبة' },
-      boite_origine: { fr: "Boîte d'origine", en: 'Original box', es: 'Caja original', it: 'Scatola originale', de: 'Originalverpackung', ar: 'العلبة الأصلية' },
-      original_box: { fr: "Boîte d'origine", en: 'Original box', es: 'Caja original', it: 'Scatola originale', de: 'Originalverpackung', ar: 'العلبة الأصلية' },
-      scelle: { fr: 'Scellé', en: 'Sealed', es: 'Sellado', it: 'Sigillato', de: 'Versiegelt', ar: 'مختوم' },
-      sealed: { fr: 'Scellé', en: 'Sealed', es: 'Sellado', it: 'Sigillato', de: 'Versiegelt', ar: 'مختوم' },
-      chargeur: { fr: 'Chargeur', en: 'Charger', es: 'Cargador', it: 'Caricatore', de: 'Ladegerät', ar: 'شاحن' },
-      charger: { fr: 'Chargeur', en: 'Charger', es: 'Cargador', it: 'Caricatore', de: 'Ladegerät', ar: 'شاحن' },
-      cable: { fr: 'Câble', en: 'Cable', es: 'Cable', it: 'Cavo', de: 'Kabel', ar: 'كابل' },
-      ecouteurs: { fr: 'Écouteurs', en: 'Earphones', es: 'Auriculares', it: 'Auricolari', de: 'Kopfhörer', ar: 'سماعات' },
-      headphones: { fr: 'Casque', en: 'Headphones', es: 'Auriculares', it: 'Cuffie', de: 'Kopfhörer', ar: 'سماعات رأس' },
-      telecommande: { fr: 'Télécommande', en: 'Remote control', es: 'Mando a distancia', it: 'Telecomando', de: 'Fernbedienung', ar: 'جهاز تحكم' },
-      remote: { fr: 'Télécommande', en: 'Remote control', es: 'Mando a distancia', it: 'Telecomando', de: 'Fernbedienung', ar: 'جهاز تحكم' },
-      batterie: { fr: 'Batterie', en: 'Battery', es: 'Batería', it: 'Batteria', de: 'Akku', ar: 'بطارية' },
-      battery: { fr: 'Batterie', en: 'Battery', es: 'Batería', it: 'Batteria', de: 'Akku', ar: 'بطارية' },
-      coque: { fr: 'Coque', en: 'Case', es: 'Funda', it: 'Cover', de: 'Hülle', ar: 'غطاء' },
-      case: { fr: 'Coque', en: 'Case', es: 'Funda', it: 'Cover', de: 'Hülle', ar: 'غطاء' },
-      housse: { fr: 'Housse', en: 'Cover', es: 'Funda', it: 'Custodia', de: 'Schutzhülle', ar: 'حافظة' },
-      facture: { fr: 'Facture', en: 'Invoice', es: 'Factura', it: 'Fattura', de: 'Rechnung', ar: 'فاتورة' },
-      invoice: { fr: 'Facture', en: 'Invoice', es: 'Factura', it: 'Fattura', de: 'Rechnung', ar: 'فاتورة' },
-      garantie: { fr: 'Garantie', en: 'Warranty', es: 'Garantía', it: 'Garanzia', de: 'Garantie', ar: 'ضمان' },
-      warranty: { fr: 'Garantie', en: 'Warranty', es: 'Garantía', it: 'Garanzia', de: 'Garantie', ar: 'ضمان' },
-      manuel: { fr: 'Manuel', en: 'Manual', es: 'Manual', it: 'Manuale', de: 'Handbuch', ar: 'دليل' },
-      manual: { fr: 'Manuel', en: 'Manual', es: 'Manual', it: 'Manuale', de: 'Handbuch', ar: 'دليل' },
+      upgrade: { fr: 'Mise Ã  niveau', en: 'Upgrade', es: 'ActualizaciÃ³n', it: 'Aggiornamento', de: 'Upgrade', ar: 'ØªØ±Ù‚ÙŠØ©' },
+      renouvellement: { fr: 'Renouvellement', en: 'Renewal', es: 'RenovaciÃ³n', it: 'Rinnovo', de: 'Erneuerung', ar: 'ØªØ¬Ø¯ÙŠØ¯' },
+      no_longer_needed: { fr: 'Plus nÃ©cessaire', en: 'No longer needed', es: 'Ya no es necesario', it: 'Non piÃ¹ necessario', de: 'Nicht mehr benÃ¶tigt', ar: 'Ù„Ù… Ø£Ø¹Ø¯ Ø¨Ø­Ø§Ø¬Ø© Ø¥Ù„ÙŠÙ‡' },
+      urgent_sale: { fr: 'Vente urgente', en: 'Urgent sale', es: 'Venta urgente', it: 'Vendita urgente', de: 'Dringender Verkauf', ar: 'Ø¨ÙŠØ¹ Ù…Ø³ØªØ¹Ø¬Ù„' },
+      demenagement: { fr: 'DÃ©mÃ©nagement', en: 'Moving', es: 'Mudanza', it: 'Trasloco', de: 'Umzug', ar: 'Ø§Ù†ØªÙ‚Ø§Ù„' },
+      liquidation: { fr: 'Liquidation', en: 'Clearance', es: 'LiquidaciÃ³n', it: 'Liquidazione', de: 'RÃ¤umungsverkauf', ar: 'ØªØµÙÙŠØ©' },
+      fermeture: { fr: 'Fermeture', en: 'Closure', es: 'Cierre', it: 'Chiusura', de: 'SchlieÃŸung', ar: 'Ø¥ØºÙ„Ø§Ù‚' },
+      avec_boite: { fr: 'Avec boÃ®te', en: 'With box', es: 'Con caja', it: 'Con scatola', de: 'Mit Verpackung', ar: 'Ù…Ø¹ Ø§Ù„Ø¹Ù„Ø¨Ø©' },
+      sans_boite: { fr: 'Sans boÃ®te', en: 'Without box', es: 'Sin caja', it: 'Senza scatola', de: 'Ohne Verpackung', ar: 'Ø¨Ø¯ÙˆÙ† Ø¹Ù„Ø¨Ø©' },
+      boite_origine: { fr: "BoÃ®te d'origine", en: 'Original box', es: 'Caja original', it: 'Scatola originale', de: 'Originalverpackung', ar: 'Ø§Ù„Ø¹Ù„Ø¨Ø© Ø§Ù„Ø£ØµÙ„ÙŠØ©' },
+      original_box: { fr: "BoÃ®te d'origine", en: 'Original box', es: 'Caja original', it: 'Scatola originale', de: 'Originalverpackung', ar: 'Ø§Ù„Ø¹Ù„Ø¨Ø© Ø§Ù„Ø£ØµÙ„ÙŠØ©' },
+      scelle: { fr: 'ScellÃ©', en: 'Sealed', es: 'Sellado', it: 'Sigillato', de: 'Versiegelt', ar: 'Ù…Ø®ØªÙˆÙ…' },
+      sealed: { fr: 'ScellÃ©', en: 'Sealed', es: 'Sellado', it: 'Sigillato', de: 'Versiegelt', ar: 'Ù…Ø®ØªÙˆÙ…' },
+      chargeur: { fr: 'Chargeur', en: 'Charger', es: 'Cargador', it: 'Caricatore', de: 'LadegerÃ¤t', ar: 'Ø´Ø§Ø­Ù†' },
+      charger: { fr: 'Chargeur', en: 'Charger', es: 'Cargador', it: 'Caricatore', de: 'LadegerÃ¤t', ar: 'Ø´Ø§Ø­Ù†' },
+      cable: { fr: 'CÃ¢ble', en: 'Cable', es: 'Cable', it: 'Cavo', de: 'Kabel', ar: 'ÙƒØ§Ø¨Ù„' },
+      ecouteurs: { fr: 'Ã‰couteurs', en: 'Earphones', es: 'Auriculares', it: 'Auricolari', de: 'KopfhÃ¶rer', ar: 'Ø³Ù…Ø§Ø¹Ø§Øª' },
+      headphones: { fr: 'Casque', en: 'Headphones', es: 'Auriculares', it: 'Cuffie', de: 'KopfhÃ¶rer', ar: 'Ø³Ù…Ø§Ø¹Ø§Øª Ø±Ø£Ø³' },
+      telecommande: { fr: 'TÃ©lÃ©commande', en: 'Remote control', es: 'Mando a distancia', it: 'Telecomando', de: 'Fernbedienung', ar: 'Ø¬Ù‡Ø§Ø² ØªØ­ÙƒÙ…' },
+      remote: { fr: 'TÃ©lÃ©commande', en: 'Remote control', es: 'Mando a distancia', it: 'Telecomando', de: 'Fernbedienung', ar: 'Ø¬Ù‡Ø§Ø² ØªØ­ÙƒÙ…' },
+      batterie: { fr: 'Batterie', en: 'Battery', es: 'BaterÃ­a', it: 'Batteria', de: 'Akku', ar: 'Ø¨Ø·Ø§Ø±ÙŠØ©' },
+      battery: { fr: 'Batterie', en: 'Battery', es: 'BaterÃ­a', it: 'Batteria', de: 'Akku', ar: 'Ø¨Ø·Ø§Ø±ÙŠØ©' },
+      coque: { fr: 'Coque', en: 'Case', es: 'Funda', it: 'Cover', de: 'HÃ¼lle', ar: 'ØºØ·Ø§Ø¡' },
+      case: { fr: 'Coque', en: 'Case', es: 'Funda', it: 'Cover', de: 'HÃ¼lle', ar: 'ØºØ·Ø§Ø¡' },
+      housse: { fr: 'Housse', en: 'Cover', es: 'Funda', it: 'Custodia', de: 'SchutzhÃ¼lle', ar: 'Ø­Ø§ÙØ¸Ø©' },
+      facture: { fr: 'Facture', en: 'Invoice', es: 'Factura', it: 'Fattura', de: 'Rechnung', ar: 'ÙØ§ØªÙˆØ±Ø©' },
+      invoice: { fr: 'Facture', en: 'Invoice', es: 'Factura', it: 'Fattura', de: 'Rechnung', ar: 'ÙØ§ØªÙˆØ±Ø©' },
+      garantie: { fr: 'Garantie', en: 'Warranty', es: 'GarantÃ­a', it: 'Garanzia', de: 'Garantie', ar: 'Ø¶Ù…Ø§Ù†' },
+      warranty: { fr: 'Garantie', en: 'Warranty', es: 'GarantÃ­a', it: 'Garanzia', de: 'Garantie', ar: 'Ø¶Ù…Ø§Ù†' },
+      manuel: { fr: 'Manuel', en: 'Manual', es: 'Manual', it: 'Manuale', de: 'Handbuch', ar: 'Ø¯Ù„ÙŠÙ„' },
+      manual: { fr: 'Manuel', en: 'Manual', es: 'Manual', it: 'Manuale', de: 'Handbuch', ar: 'Ø¯Ù„ÙŠÙ„' },
     };
 
     if (kind === 'document') {
@@ -918,22 +918,22 @@ const AnnouncementDetailsPage: React.FC = () => {
     if (!s) return s as any;
     let r = String(s);
     if (language === 'ar') {
-      r = r.replace(/\bGB\b|\bGo\b/gi, 'غيغابايت');
-      r = r.replace(/\bTB\b|\bTo\b/gi, 'تيرابايت');
-      r = r.replace(/\bHz\b/gi, 'هرتز');
-      r = r.replace(/(\d{1,2}(?:\.\d)?)"/g, '$1 بوصة');
-      r = r.replace(/\bcarbone\b|carbon/gi, 'كربون');
-      r = r.replace(/\baluminium\b|alu/gi, 'ألمنيوم');
-      r = r.replace(/\bacier\b|steel/gi, 'فولاذ');
-      r = r.replace(/\bfull[- ]?suspension\b|tout\s?suspendu|full/gi, 'تعليق كامل');
-      r = r.replace(/\bsemi[- ]?rigide\b|hardtail/gi, 'تعليق أمامي فقط');
-      r = r.replace(/\bdisque\b|disc/gi, 'قرصي');
-      r = r.replace(/\bhydraulique\b/gi, 'هيدروليك');
-      r = r.replace(/\bv[- ]?brake\b|patins/gi, 'حذوة');
-      r = r.replace(/\bkg\b/gi, 'كلغ');
+      r = r.replace(/\bGB\b|\bGo\b/gi, 'ØºÙŠØºØ§Ø¨Ø§ÙŠØª');
+      r = r.replace(/\bTB\b|\bTo\b/gi, 'ØªÙŠØ±Ø§Ø¨Ø§ÙŠØª');
+      r = r.replace(/\bHz\b/gi, 'Ù‡Ø±ØªØ²');
+      r = r.replace(/(\d{1,2}(?:\.\d)?)"/g, '$1 Ø¨ÙˆØµØ©');
+      r = r.replace(/\bcarbone\b|carbon/gi, 'ÙƒØ±Ø¨ÙˆÙ†');
+      r = r.replace(/\baluminium\b|alu/gi, 'Ø£Ù„Ù…Ù†ÙŠÙˆÙ…');
+      r = r.replace(/\bacier\b|steel/gi, 'ÙÙˆÙ„Ø§Ø°');
+      r = r.replace(/\bfull[- ]?suspension\b|tout\s?suspendu|full/gi, 'ØªØ¹Ù„ÙŠÙ‚ ÙƒØ§Ù…Ù„');
+      r = r.replace(/\bsemi[- ]?rigide\b|hardtail/gi, 'ØªØ¹Ù„ÙŠÙ‚ Ø£Ù…Ø§Ù…ÙŠ ÙÙ‚Ø·');
+      r = r.replace(/\bdisque\b|disc/gi, 'Ù‚Ø±ØµÙŠ');
+      r = r.replace(/\bhydraulique\b/gi, 'Ù‡ÙŠØ¯Ø±ÙˆÙ„ÙŠÙƒ');
+      r = r.replace(/\bv[- ]?brake\b|patins/gi, 'Ø­Ø°ÙˆØ©');
+      r = r.replace(/\bkg\b/gi, 'ÙƒÙ„Øº');
       if (kind === 'gears') {
         const m = r.match(/^\d{1,2}$/);
-        if (m) r = `${m[0]} سرعات`;
+        if (m) r = `${m[0]} Ø³Ø±Ø¹Ø§Øª`;
       }
     } else {
       r = r.replace(/\bGB\b|\bGo\b/gi, 'Go');
@@ -1040,27 +1040,27 @@ const AnnouncementDetailsPage: React.FC = () => {
     const year =
       (typeof a?.year === "number" ? a.year : undefined) ??
       yearFromRegistration ??
-      toNumberOrUndefined(pickAttributeValue(attrs, ["year", "annee", "année", "an", "vehicle_year"]));
+      toNumberOrUndefined(pickAttributeValue(attrs, ["year", "annee", "annÃ©e", "an", "vehicle_year"]));
 
     const fuel =
       (typeof a?.fuel === "string" ? a.fuel : undefined) ??
       (typeof a?.fuel_type === "string" ? a.fuel_type : undefined) ??
-      (typeof pickAttributeValue(attrs, ["fuel", "fuel_type", "carburant", "energie", "énergie", "carburant_energie", "energie_carburant"]) ===
+      (typeof pickAttributeValue(attrs, ["fuel", "fuel_type", "carburant", "energie", "Ã©nergie", "carburant_energie", "energie_carburant"]) ===
       "string"
-        ? (pickAttributeValue(attrs, ["fuel", "fuel_type", "carburant", "energie", "énergie", "carburant_energie", "energie_carburant"]) as string)
+        ? (pickAttributeValue(attrs, ["fuel", "fuel_type", "carburant", "energie", "Ã©nergie", "carburant_energie", "energie_carburant"]) as string)
         : undefined);
 
     const transmission =
       (typeof a?.transmission === "string" ? a.transmission : undefined) ??
       (typeof a?.gearbox === "string" ? a.gearbox : undefined) ??
-      (typeof pickAttributeValue(attrs, ["gearbox", "transmission", "boite", "boite_de_vitesse", "boite_de_vitesses", "boîte"]) ===
+      (typeof pickAttributeValue(attrs, ["gearbox", "transmission", "boite", "boite_de_vitesse", "boite_de_vitesses", "boÃ®te"]) ===
       "string"
-        ? (pickAttributeValue(attrs, ["gearbox", "transmission", "boite", "boite_de_vitesse", "boite_de_vitesses", "boîte"]) as string)
+        ? (pickAttributeValue(attrs, ["gearbox", "transmission", "boite", "boite_de_vitesse", "boite_de_vitesses", "boÃ®te"]) as string)
         : undefined);
 
     const mileage =
       (typeof a?.mileage === "number" ? a.mileage : undefined) ??
-      toNumberOrUndefined(pickAttributeValue(attrs, ["mileage", "kilometrage", "kilométrage", "km", "distance"]));
+      toNumberOrUndefined(pickAttributeValue(attrs, ["mileage", "kilometrage", "kilomÃ©trage", "km", "distance"]));
 
     const version =
       (typeof a?.version === "string" ? a.version : undefined) ??
@@ -1075,16 +1075,16 @@ const AnnouncementDetailsPage: React.FC = () => {
     const technicalControl =
       (typeof a?.technical_control === "boolean" ? a.technical_control : undefined) ??
       toBooleanOrUndefined(a?.technical_control) ??
-      toBooleanOrUndefined(pickAttributeValue(attrs, ["technical_control", "controle_technique", "contrôle_technique"]));
+      toBooleanOrUndefined(pickAttributeValue(attrs, ["technical_control", "controle_technique", "contrÃ´le_technique"]));
 
     const greyCardCrossed =
       (typeof a?.grey_card_crossed === "boolean" ? a.grey_card_crossed : undefined) ??
       toBooleanOrUndefined(a?.grey_card_crossed) ??
-      toBooleanOrUndefined(pickAttributeValue(attrs, ["grey_card_crossed", "carte_grise_barree", "carte_grise_barrée"]));
+      toBooleanOrUndefined(pickAttributeValue(attrs, ["grey_card_crossed", "carte_grise_barree", "carte_grise_barrÃ©e"]));
 
     const equipment =
       toStringArrayOrUndefined(a?.equipment) ??
-      toStringArrayOrUndefined(pickAttributeValue(attrs, ["equipment", "equipement", "équipement", "options", "equipements"]));
+      toStringArrayOrUndefined(pickAttributeValue(attrs, ["equipment", "equipement", "Ã©quipement", "options", "equipements"]));
 
     const purchaseYear =
       (typeof a?.purchase_year === "number" ? a.purchase_year : undefined) ??
@@ -1093,11 +1093,11 @@ const AnnouncementDetailsPage: React.FC = () => {
           "purchase_year",
           "purchaseYear",
           "annee_achat",
-          "année_achat",
+          "annÃ©e_achat",
           "annee_dachat",
-          "année_dachat",
+          "annÃ©e_dachat",
           "annee_fabrication",
-          "année_fabrication",
+          "annÃ©e_fabrication",
           "annee_achat_fabrication",
           "annee_dachat_fabrication",
           "annee_achatfabrication",
@@ -1127,41 +1127,41 @@ const AnnouncementDetailsPage: React.FC = () => {
     const titleText = typeof a?.title === "string" ? a.title.toLowerCase() : "";
     const frameSize =
       (typeof a?.frame_size === "string" ? a.frame_size : undefined) ??
-      (typeof pickAttributeValue(attrs, ["frame_size","taille_cadre","cadre","مقاس_الإطار","الإطار"]) === "string"
-        ? (pickAttributeValue(attrs, ["frame_size","taille_cadre","cadre","مقاس_الإطار","الإطار"]) as string)
+      (typeof pickAttributeValue(attrs, ["frame_size","taille_cadre","cadre","Ù…Ù‚Ø§Ø³_Ø§Ù„Ø¥Ø·Ø§Ø±","Ø§Ù„Ø¥Ø·Ø§Ø±"]) === "string"
+        ? (pickAttributeValue(attrs, ["frame_size","taille_cadre","cadre","Ù…Ù‚Ø§Ø³_Ø§Ù„Ø¥Ø·Ø§Ø±","Ø§Ù„Ø¥Ø·Ø§Ø±"]) as string)
         : undefined);
     const wheelSize =
       (typeof a?.wheel_size === "string" ? a.wheel_size : undefined) ??
-      (typeof pickAttributeValue(attrs, ["wheel_size","taille_roue","roue","diametre_roue","حجم_العجلة","العجلة","قطر_العجلة"]) === "string"
-        ? (pickAttributeValue(attrs, ["wheel_size","taille_roue","roue","diametre_roue","حجم_العجلة","العجلة","قطر_العجلة"]) as string)
+      (typeof pickAttributeValue(attrs, ["wheel_size","taille_roue","roue","diametre_roue","Ø­Ø¬Ù…_Ø§Ù„Ø¹Ø¬Ù„Ø©","Ø§Ù„Ø¹Ø¬Ù„Ø©","Ù‚Ø·Ø±_Ø§Ù„Ø¹Ø¬Ù„Ø©"]) === "string"
+        ? (pickAttributeValue(attrs, ["wheel_size","taille_roue","roue","diametre_roue","Ø­Ø¬Ù…_Ø§Ù„Ø¹Ø¬Ù„Ø©","Ø§Ù„Ø¹Ø¬Ù„Ø©","Ù‚Ø·Ø±_Ø§Ù„Ø¹Ø¬Ù„Ø©"]) as string)
         : undefined);
     const wheelMatch = titleText.match(/(\d{2}(?:\.\d)?)\s*(?:"|pouces|inch|in)/);
     const wheelResolved = wheelSize ?? (wheelMatch ? `${wheelMatch[1]}"` : undefined);
-    const isElectricAttr = pickAttributeValue(attrs, ["electric","electrique","électrique","e_bike","velo_electrique","كهربائي","دراجة_كهربائية"]);
+    const isElectricAttr = pickAttributeValue(attrs, ["electric","electrique","Ã©lectrique","e_bike","velo_electrique","ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ","Ø¯Ø±Ø§Ø¬Ø©_ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠØ©"]);
     const isElectric =
       typeof a?.bikeElectric === "boolean"
         ? a.bikeElectric
         : (typeof isElectricAttr === "string"
-            ? ["oui","true","electrique","électrique","e_bike","electric","كهربائي"].some(s => (isElectricAttr as string).toLowerCase().includes(s))
-            : (/(electri|électri|كهرب)/.test(titleText) ? true : undefined));
-    const motorizedAttr = pickAttributeValue(attrs, ["motorized","velo_motorise","vélo_motorisé","motorise","moteur","مزود بمحرك","مزوّد بمحرك"]);
+            ? ["oui","true","electrique","Ã©lectrique","e_bike","electric","ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ"].some(s => (isElectricAttr as string).toLowerCase().includes(s))
+            : (/(electri|Ã©lectri|ÙƒÙ‡Ø±Ø¨)/.test(titleText) ? true : undefined));
+    const motorizedAttr = pickAttributeValue(attrs, ["motorized","velo_motorise","vÃ©lo_motorisÃ©","motorise","moteur","Ù…Ø²ÙˆØ¯ Ø¨Ù…Ø­Ø±Ùƒ","Ù…Ø²ÙˆÙ‘Ø¯ Ø¨Ù…Ø­Ø±Ùƒ"]);
     const isMotorized =
       typeof a?.bikeMotorized === "boolean"
         ? a.bikeMotorized
         : (typeof motorizedAttr === "string"
-            ? ["oui","true","motorise","motorisé","moteur"].some(s => (motorizedAttr as string).toLowerCase().includes(s))
-            : (/(motoris|محرك)/.test(titleText) ? true : undefined));
-    const frameMaterialAttr = pickAttributeValue(attrs, ["frame_material","material","materiau","matériau","cadre_materiau","cadre_matériau","مادة_الإطار","المادة"]);
+            ? ["oui","true","motorise","motorisÃ©","moteur"].some(s => (motorizedAttr as string).toLowerCase().includes(s))
+            : (/(motoris|Ù…Ø­Ø±Ùƒ)/.test(titleText) ? true : undefined));
+    const frameMaterialAttr = pickAttributeValue(attrs, ["frame_material","material","materiau","matÃ©riau","cadre_materiau","cadre_matÃ©riau","Ù…Ø§Ø¯Ø©_Ø§Ù„Ø¥Ø·Ø§Ø±","Ø§Ù„Ù…Ø§Ø¯Ø©"]);
     const frameMaterial = typeof frameMaterialAttr === "string" ? frameMaterialAttr : (titleText.match(/(carbone|aluminium|alu|acier|steel|carbon)/)?.[1]);
-    const suspensionAttr = pickAttributeValue(attrs, ["suspension","suspension_avant","suspension_arriere","type_suspension","سuspension","تعليق"]);
+    const suspensionAttr = pickAttributeValue(attrs, ["suspension","suspension_avant","suspension_arriere","type_suspension","Ø³uspension","ØªØ¹Ù„ÙŠÙ‚"]);
     const suspension = typeof suspensionAttr === "string" ? suspensionAttr : (titleText.match(/(full|tout\s?suspendu|full[- ]suspension|semi[- ]rigide|hardtail)/)?.[1]);
-    const brakeAttr = pickAttributeValue(attrs, ["brake","brake_type","freins","type_de_frein","الفرامل","نوع_الفرامل"]);
+    const brakeAttr = pickAttributeValue(attrs, ["brake","brake_type","freins","type_de_frein","Ø§Ù„ÙØ±Ø§Ù…Ù„","Ù†ÙˆØ¹_Ø§Ù„ÙØ±Ø§Ù…Ù„"]);
     const brake = typeof brakeAttr === "string" ? brakeAttr : (titleText.match(/(disque|hydraulique|v[- ]?brake|patins|disc)/)?.[1]);
-    const gearsAttr = pickAttributeValue(attrs, ["gears","vitesses","nbr_vitesses","nombre_vitesses","عدد_السرعات"]);
+    const gearsAttr = pickAttributeValue(attrs, ["gears","vitesses","nbr_vitesses","nombre_vitesses","Ø¹Ø¯Ø¯_Ø§Ù„Ø³Ø±Ø¹Ø§Øª"]);
     const gears = typeof gearsAttr === "string" ? gearsAttr : (titleText.match(/(\d{1,2})\s?(?:vitesses|v|speeds)/)?.[1]);
-    const bikeTypeAttr = pickAttributeValue(attrs, ["bike_type","type","style","categorie","catégorie","نوع"]);
+    const bikeTypeAttr = pickAttributeValue(attrs, ["bike_type","type","style","categorie","catÃ©gorie","Ù†ÙˆØ¹"]);
     const bikeType = typeof bikeTypeAttr === "string" ? bikeTypeAttr : (titleText.match(/(vtt|route|gravel|bmx|fixie|hybride|city)/)?.[1]);
-    const weightAttr = pickAttributeValue(attrs, ["weight","poids","الوزن"]);
+    const weightAttr = pickAttributeValue(attrs, ["weight","poids","Ø§Ù„ÙˆØ²Ù†"]);
     const weight = typeof weightAttr === "string" ? weightAttr : (titleText.match(/(\d{1,2}(?:\.\d)?)\s?kg/)?.[1]);
     return { frameSize, wheelResolved, isElectric, isMotorized, frameMaterial, suspension, brake, gears, bikeType, weight };
   };
@@ -1185,8 +1185,8 @@ const AnnouncementDetailsPage: React.FC = () => {
   const rawCategorySlug =
     typeof announcement.categorySlug === "string" && announcement.categorySlug.trim()
       ? announcement.categorySlug
-      : typeof (announcement as any).category_slug === "string" && (announcement as any).category_slug.trim()
-        ? (announcement as any).category_slug
+      : typeof announcement.category_slug === "string" && announcement.category_slug.trim()
+        ? announcement.category_slug
         : "";
   const categoryLookupKey = rawCategorySlug || rawCategoryId;
   
@@ -1226,7 +1226,7 @@ const AnnouncementDetailsPage: React.FC = () => {
     }
 
     // Default fallback
-    return t('createAd.category') || 'Catégorie';
+    return t('createAd.category') || 'CatÃ©gorie';
   })();
 
   const resolvedCategorySlug = categoryFromMenu?.slug || rawCategorySlug || "";
@@ -1238,8 +1238,8 @@ const AnnouncementDetailsPage: React.FC = () => {
         ? announcement.subcategory.trim()
         : "";
     const explicitSubcategorySlug =
-      typeof (announcement as any).subcategory_slug === "string" && (announcement as any).subcategory_slug.trim()
-        ? (announcement as any).subcategory_slug.trim()
+      typeof announcement.subcategory_slug === "string" && announcement.subcategory_slug.trim()
+        ? announcement.subcategory_slug.trim()
         : "";
     if (!subId || subId === rawCategoryId) return "";
     
@@ -1293,8 +1293,8 @@ const AnnouncementDetailsPage: React.FC = () => {
   const resolvedSubcategorySlug = (() => {
     const subId = announcement.subcategory_id || announcement.subcategory;
     const explicitSubcategorySlug =
-      typeof (announcement as any).subcategory_slug === "string" && (announcement as any).subcategory_slug.trim()
-        ? (announcement as any).subcategory_slug.trim()
+      typeof announcement.subcategory_slug === "string" && announcement.subcategory_slug.trim()
+        ? announcement.subcategory_slug.trim()
         : "";
     if (!subId) return "";
 
@@ -1332,7 +1332,7 @@ const AnnouncementDetailsPage: React.FC = () => {
   const seoDescription = (() => {
     const rawDescription = typeof announcement.description === "string" ? announcement.description.trim() : "";
     if (!rawDescription) {
-      return `${announcement.title} - ${resolvedCategoryName}${resolvedSubcategoryName ? ` - ${resolvedSubcategoryName}` : ""} - Aladdin Annonces Algérie`;
+      return `${announcement.title} - ${resolvedCategoryName}${resolvedSubcategoryName ? ` - ${resolvedSubcategoryName}` : ""} - Aladdin Annonces AlgÃ©rie`;
     }
     return rawDescription.length > 180 ? `${rawDescription.slice(0, 177)}...` : rawDescription;
   })();
@@ -1363,12 +1363,12 @@ const AnnouncementDetailsPage: React.FC = () => {
         onClose={() => setShowReportModal(false)}
         target={{
           type: "announcement",
-          id: (announcement as any).id || id || "",
+          id: announcement.id || id || "",
           globalNumber:
             typeof (announcement.global_listing_number ?? announcement.global_announcement_number) === "number"
               ? (announcement.global_listing_number ?? announcement.global_announcement_number)
               : null,
-          ownerUserId: (announcement as any).user_id ?? null,
+          ownerUserId: announcement.user_id ?? null,
           title: announcement.title ?? null,
           wilaya: announcement.wilaya ?? null,
         }}
@@ -1454,7 +1454,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                     {typeof (announcement.global_listing_number ?? announcement.global_announcement_number) === "number" ? (
                       <span className="flex items-center gap-1">
                         <Info className="w-4 h-4" />
-                        N° {announcement.global_listing_number ?? announcement.global_announcement_number}
+                        NÂ° {announcement.global_listing_number ?? announcement.global_announcement_number}
                       </span>
                     ) : null}
                   </div>
@@ -1539,7 +1539,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       </div>
                       {resolvedSubcategoryName && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.subcategory') || 'Sous-catégorie'}</dt>
+                          <dt className="text-gray-500">{t('createAd.subcategory') || 'Sous-catÃ©gorie'}</dt>
                           <dd className="font-medium">
                             <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
                               {resolvedSubcategoryName}
@@ -1557,7 +1557,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {announcement.surface && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
                           <dt className="text-gray-500">{t('createAd.realEstate.surface')}</dt>
-                          <dd className="font-medium">{announcement.surface} m²</dd>
+                          <dd className="font-medium">{announcement.surface} mÂ²</dd>
                         </div>
                       )}
                       {announcement.rooms && (
@@ -1664,7 +1664,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                               es: 'Motivo de venta',
                               it: 'Motivo della vendita',
                               de: 'Verkaufsgrund',
-                              ar: 'سبب البيع',
+                              ar: 'Ø³Ø¨Ø¨ Ø§Ù„Ø¨ÙŠØ¹',
                             })}
                           </dt>
                           <dd className="font-medium">{translateFreeValueLabel(announcement.selling_reason, 'sellingReason')}</dd>
@@ -1679,7 +1679,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                               es: 'Embalaje',
                               it: 'Imballaggio',
                               de: 'Verpackung',
-                              ar: 'التغليف',
+                              ar: 'Ø§Ù„ØªØºÙ„ÙŠÙ',
                             })}
                           </dt>
                           <dd className="font-medium">{translateFreeValueLabel(announcement.packaging_info, 'packaging')}</dd>
@@ -1687,7 +1687,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       )}
                       {!isVehicleCategory && announcement.purchase_year && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.purchaseYear') || "Année d'achat/fabrication"}</dt>
+                          <dt className="text-gray-500">{t('createAd.purchaseYear') || "AnnÃ©e d'achat/fabrication"}</dt>
                           <dd className="font-medium">{announcement.purchase_year}</dd>
                         </div>
                       )}
@@ -1695,13 +1695,13 @@ const AnnouncementDetailsPage: React.FC = () => {
                       {/* Vehicle Specific Details */}
                       {vehicle.year != null && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.vehicle.year') || 'Année de mise en circulation'}</dt>
+                          <dt className="text-gray-500">{t('createAd.vehicle.year') || 'AnnÃ©e de mise en circulation'}</dt>
                           <dd className="font-medium">{vehicle.year}</dd>
                         </div>
                       )}
                       {isVehicleCategory && purchaseYearForDisplay != null && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.purchaseYear') || "Année d'achat/fabrication"}</dt>
+                          <dt className="text-gray-500">{t('createAd.purchaseYear') || "AnnÃ©e d'achat/fabrication"}</dt>
                           <dd className="font-medium">{purchaseYearForDisplay}</dd>
                         </div>
                       )}
@@ -1713,13 +1713,13 @@ const AnnouncementDetailsPage: React.FC = () => {
                       )}
                       {vehicle.transmission && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.vehicle.gearbox') || 'Boîte de vitesse'}</dt>
+                          <dt className="text-gray-500">{t('createAd.vehicle.gearbox') || 'BoÃ®te de vitesse'}</dt>
                           <dd className="font-medium">{translateGearboxLabel(vehicle.transmission)}</dd>
                         </div>
                       )}
                       {typeof vehicle.mileage === "number" && Number.isFinite(vehicle.mileage) && vehicle.mileage > 0 && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.vehicle.mileage') || 'Kilométrage'}</dt>
+                          <dt className="text-gray-500">{t('createAd.vehicle.mileage') || 'KilomÃ©trage'}</dt>
                           <dd className="font-medium">{vehicle.mileage.toLocaleString()} km</dd>
                         </div>
                       )}
@@ -1737,27 +1737,27 @@ const AnnouncementDetailsPage: React.FC = () => {
                       )}
                       {typeof vehicle.technicalControl === 'boolean' && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.vehicle.technicalControl') || 'Contrôle technique'}</dt>
+                          <dt className="text-gray-500">{t('createAd.vehicle.technicalControl') || 'ContrÃ´le technique'}</dt>
                           <dd className={`font-medium ${vehicle.technicalControl ? 'text-green-600' : 'text-amber-700'}`}>
                             {vehicle.technicalControl
-                              ? (t('createAd.vehicle.technicalControl.valid') || 'Claire à 100%')
-                              : (t('createAd.vehicle.technicalControl.invalid') || 'Pas claire / À prévoir')}
+                              ? (t('createAd.vehicle.technicalControl.valid') || 'Claire Ã  100%')
+                              : (t('createAd.vehicle.technicalControl.invalid') || 'Pas claire / Ã€ prÃ©voir')}
                           </dd>
                         </div>
                       )}
                       {typeof vehicle.greyCardCrossed === 'boolean' && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.vehicle.greyCard') || 'Carte grise barrée'}</dt>
+                          <dt className="text-gray-500">{t('createAd.vehicle.greyCard') || 'Carte grise barrÃ©e'}</dt>
                           <dd className={`font-medium ${vehicle.greyCardCrossed ? 'text-amber-700' : 'text-green-600'}`}>
                             {vehicle.greyCardCrossed
-                              ? (t('createAd.vehicle.greyCard.crossed') || 'Barrée')
-                              : (t('createAd.vehicle.greyCard.clear') || 'Claire à 100% (Non barrée)')}
+                              ? (t('createAd.vehicle.greyCard.crossed') || 'BarrÃ©e')
+                              : (t('createAd.vehicle.greyCard.clear') || 'Claire Ã  100% (Non barrÃ©e)')}
                           </dd>
                         </div>
                       )}
                       {vehicle.equipment && vehicle.equipment.length > 0 && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.vehicle.options') || 'Équipements et options'}</dt>
+                          <dt className="text-gray-500">{t('createAd.vehicle.options') || 'Ã‰quipements et options'}</dt>
                           <dd className="font-medium">{vehicle.equipment.map((item) => translateFreeValueLabel(item, 'equipment')).join(', ')}</dd>
                         </div>
                       )}
@@ -1769,7 +1769,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       )}
                       {announcement.type && (
                         <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.type', isRTL ? 'النوع' : 'Type')}</dt>
+                          <dt className="text-gray-500">{t('createAd.type', isRTL ? 'Ø§Ù„Ù†ÙˆØ¹' : 'Type')}</dt>
                           <dd className="font-medium">
                             {isVehicleCategory
                               ? translateVehicleDictionaryValue("type", announcement.type)
@@ -1779,7 +1779,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                       )}
                       {announcement.papers && announcement.papers.length > 0 && typeof announcement.papers[0] === 'string' && (
                          <div className={`flex justify-between py-1 border-b border-gray-50 ${isRTL ? "flex-row-reverse" : ""}`}>
-                          <dt className="text-gray-500">{t('createAd.documents', isRTL ? 'الوثائق' : 'Documents')}</dt>
+                          <dt className="text-gray-500">{t('createAd.documents', isRTL ? 'Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚' : 'Documents')}</dt>
                           <dd className="font-medium">
                             {Array.isArray(announcement.papers)
                               ? announcement.papers.map(formatDocumentLabel).filter(Boolean).join(', ')
@@ -2176,3 +2176,4 @@ const AnnouncementDetailsPage: React.FC = () => {
 };
 
 export default AnnouncementDetailsPage;
+

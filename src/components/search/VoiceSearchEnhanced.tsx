@@ -335,7 +335,7 @@ const VoiceSearchEnhanced: React.FC<VoiceSearchEnhancedProps> = ({
         }`}
         title={
           !isSupported 
-            ? "La recherche vocale n'est pas supportée par votre navigateur" 
+            ? t('search.voice.unsupportedTitle') 
             : isListening 
               ? t('search.voice.stop') 
               : t('search.voice.start')
@@ -353,7 +353,7 @@ const VoiceSearchEnhanced: React.FC<VoiceSearchEnhancedProps> = ({
         <div className="absolute top-full left-0 mt-1 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-50 max-w-xs">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4" />
-            <span>La recherche vocale n'est pas supportée par votre navigateur. Essayez avec Chrome ou Edge.</span>
+            <span>{t('search.voice.unsupported')}</span>
           </div>
         </div>
       )}

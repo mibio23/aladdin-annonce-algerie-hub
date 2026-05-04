@@ -191,7 +191,7 @@ const PremiumAnnouncementsSection = () => {
                               {isRTL ? "علاء الدين" : "Aladdin"}
                             </span>
                             <span className="text-[9px] font-bold text-red-600 uppercase tracking-wider leading-none drop-shadow-sm">
-                              {isRTL ? "الإختيار الأفضل" : "Sélection Or"}
+                              {t('premium.selectionOr')}
                             </span>
                           </div>
                           <div className="w-8 h-8 bg-white/50 backdrop-blur-sm rounded-lg shadow-inner flex items-center justify-center border border-white/50 p-1 group-hover:scale-110 transition-transform duration-300">
@@ -235,7 +235,7 @@ const PremiumAnnouncementsSection = () => {
                   <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                     <span className="flex items-center mb-1">
                       <MapPin className="w-3 h-3 mr-1" />
-                      {wilayaLabel || announcement.location || 'Non spécifiée'}
+                      {wilayaLabel || announcement.location || t('common.notSpecifiedFemale')}
                     </span>
                     {hasPrice ? (
                       <span className="font-bold text-emerald-600 whitespace-nowrap">
@@ -247,7 +247,7 @@ const PremiumAnnouncementsSection = () => {
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
                     <span className="flex items-center">
                       <Phone className="w-3 h-3 mr-1" />
-                      {announcement.phone_number || 'Contact sur demande'}
+                      {announcement.phone_number || t('common.contactOnRequest')}
                     </span>
                     <div className="flex items-center bg-primary/5 px-2 py-0.5 rounded-full">
                       <Eye className="w-3 h-3 mr-1 text-primary" />
@@ -262,13 +262,13 @@ const PremiumAnnouncementsSection = () => {
                         if (announcement.phone_number) {
                           window.location.href = `tel:${announcement.phone_number}`;
                         } else {
-                          toast.error('Aucun numéro de téléphone disponible');
+                          toast.error(t('common.noPhoneAvailable'));
                         }
                       }}
                       className="flex-1 flex items-center justify-center min-w-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-lg text-sm font-medium transition-colors shadow-sm"
                     >
                       <Phone className="w-3.5 h-3.5 mr-2 flex-shrink-0" />
-                      <span className="truncate">Contacter</span>
+                      <span className="truncate">{t('common.contact')}</span>
                     </button>
                     <button
                       onClick={(e) => {

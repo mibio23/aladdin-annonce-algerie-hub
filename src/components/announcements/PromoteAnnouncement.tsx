@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/silentLogger';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 interface PromoteAnnouncementProps {
   announcementId: string;
@@ -27,6 +28,7 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
   currentStatus
 }) => {
   const { toast } = useToast();
+  const { t } = useSafeI18nWithRouter();
   const [availableSystems, setAvailableSystems] = useState<PaymentSystem>({
     stripe: false,
     algerian: false,
@@ -145,21 +147,21 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
         window.open(data.url, '_blank');
         
         toast({
-          title: "Redirection vers le paiement",
+          title: t('promote.redirecting'),
           description: selectedSystem === 'algerian' 
-            ? `Paiement avec ${selectedCard.toUpperCase()} - Redirection en cours...`
+            ? `${selectedCard.toUpperCase()} - Redirection...`
             : selectedSystem === 'paypal'
-            ? "Redirection vers PayPal en cours..."
+            ? t('promote.paypalRedirect')
             : selectedSystem === 'card'
-            ? `Paiement par carte ${selectedCardType.toUpperCase()} - Redirection en cours...`
-            : "Redirection vers Stripe en cours...",
+            ? `${selectedCardType.toUpperCase()} - Redirection...`
+            : t('promote.stripeRedirect'),
         });
       }
     } catch (error) {
       logger.error('Erreur promotion:', error);
       toast({
-        title: "Erreur",
-        description: error instanceof Error ? error.message : "Impossible de démarrer le processus de paiement",
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('promote.paymentError'),
         variant: "destructive"
       });
     }
@@ -180,10 +182,10 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
   if (!availableSystems.stripe && !availableSystems.algerian && !availableSystems.paypal && !availableSystems.card) {
     return (
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
-        <h4 className="font-medium text-gray-800 mb-2">Booster votre annonce</h4>
+        <h4 className="font-medium text-gray-800 mb-2">{t('promote.boostAd')}</h4>
         <p className="text-sm text-gray-600">
-          Aucun système de paiement n'est actuellement disponible. 
-          Contactez l'administrateur pour plus d'informations.
+          {t('promote.noPaymentSystem')} 
+          {t('promote.contactAdmin')}
         </p>
       </div>
     );
@@ -193,12 +195,12 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200 space-y-4">
-      <h4 className="font-medium text-gray-800">Booster votre annonce</h4>
+      <h4 className="font-medium text-gray-800">{t('promote.boostAd')}</h4>
       
       {/* Payment System Selection */}
       {hasMultipleSystems && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Méthode de paiement</label>
+          <label className="text-sm font-medium text-gray-700">{t('promote.paymentMethod')}</label>
           <div className="flex space-x-2">
             {availableSystems.algerian && (
               <Button
@@ -230,7 +232,7 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
                 className="flex items-center space-x-1"
               >
                 <Building className="w-4 h-4" />
-                <span>Carte Bancaire</span>
+                <span>{t('promote.bankCard')}</span>
               </Button>
             )}
             {availableSystems.paypal && (
@@ -251,7 +253,7 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
       {/* Card Selection for Algerian System */}
       {selectedSystem === 'algerian' && availableSystems.algerian && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Type de carte</label>
+          <label className="text-sm font-medium text-gray-700">{t('promote.cardType')}</label>
           <Select value={selectedCard} onValueChange={(value: 'eddahabia' | 'cib') => setSelectedCard(value)}>
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -275,7 +277,7 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
       {/* Card Type Selection for Card System */}
       {selectedSystem === 'card' && availableSystems.card && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Type de carte</label>
+          <label className="text-sm font-medium text-gray-700">{t('promote.cardType')}</label>
           <Select value={selectedCardType} onValueChange={(value: 'visa' | 'mastercard') => setSelectedCardType(value)}>
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -302,16 +304,16 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
           <div className="space-y-2">
             <div className="flex items-center text-yellow-600">
               <Star className="w-4 h-4 mr-1" />
-              <span className="font-medium">À la Une</span>
+              <span className="font-medium">{t('promote.featured')}</span>
             </div>
-            <p className="text-xs text-gray-600">5x plus de visibilité</p>
+            <p className="text-xs text-gray-600">{t('promote.visibility5x')}</p>
             <Button 
               size="sm" 
               variant="outline"
               className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-50"
               onClick={() => handlePromotion('featured')}
             >
-              Promouvoir
+              {t('promote.promoteBtn')}
             </Button>
           </div>
         )}
@@ -320,16 +322,16 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
           <div className="space-y-2">
             <div className="flex items-center text-red-600">
               <Zap className="w-4 h-4 mr-1" />
-              <span className="font-medium">Urgent</span>
+              <span className="font-medium">{t('promote.urgent')}</span>
             </div>
-            <p className="text-xs text-gray-600">Affichage prioritaire</p>
+            <p className="text-xs text-gray-600">{t('promote.priorityDisplay')}</p>
             <Button 
               size="sm" 
               variant="outline"
               className="w-full border-red-500 text-red-600 hover:bg-red-50"
               onClick={() => handlePromotion('urgent')}
             >
-              Rendre urgent
+              {t('promote.makeUrgent')}
             </Button>
           </div>
         )}
@@ -338,16 +340,16 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
       {/* Status Display */}
       {currentStatus.isFeatured && currentStatus.isUrgent && (
         <div className="text-center py-2">
-          <p className="text-sm text-green-600 font-medium">✓ Annonce entièrement optimisée</p>
+          <p className="text-sm text-green-600 font-medium">✓ {t('promote.fullyOptimized')}</p>
         </div>
       )}
 
       {/* Payment System Info */}
       <div className="text-xs text-gray-500 text-center">
-        {selectedSystem === 'stripe' && 'Paiement sécurisé via Stripe'}
-        {selectedSystem === 'algerian' && `Paiement local avec ${selectedCard.toUpperCase()}`}
-        {selectedSystem === 'paypal' && 'Paiement sécurisé via PayPal'}
-        {selectedSystem === 'card' && `Paiement par carte ${selectedCardType.toUpperCase()}`}
+        {selectedSystem === 'stripe' && t('promote.secureStripe')}
+        {selectedSystem === 'algerian' && `${selectedCard.toUpperCase()}`}
+        {selectedSystem === 'paypal' && t('promote.securePaypal')}
+        {selectedSystem === 'card' && `${selectedCardType.toUpperCase()}`}
       </div>
     </div>
   );

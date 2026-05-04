@@ -54,7 +54,7 @@ const MyJobOffers = () => {
         logger.error('Error fetching my offers:', err);
         toast({
           title: t('common.error'),
-          description: "Impossible de charger vos offres.",
+          description: t('myJobOffers.loadError'),
           variant: "destructive"
         });
       } finally {
@@ -77,13 +77,13 @@ const MyJobOffers = () => {
       setOffers(prev => prev.filter(offer => offer.id !== id));
       toast({
         title: t('common.success'),
-        description: "Offre supprimée avec succès.",
+        description: t('myJobOffers.deleteSuccess'),
       });
     } catch (err) {
       logger.error('Error deleting offer:', err);
       toast({
         title: t('common.error'),
-        description: "Erreur lors de la suppression.",
+        description: t('myJobOffers.deleteError'),
         variant: "destructive"
       });
     }
@@ -105,7 +105,7 @@ const MyJobOffers = () => {
     return (
       <div className="container mx-auto px-4 py-8 flex justify-center">
         <AuthRequiredBubble
-          message="Connectez-vous pour gérer vos offres de service."
+          message={t('myJobOffers.loginRequired')}
           className="w-full max-w-md"
         />
       </div>
@@ -137,12 +137,12 @@ const MyJobOffers = () => {
             <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Briefcase className="h-8 w-8 text-blue-500" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Aucune offre publiée</h3>
+            <h3 className="text-xl font-semibold mb-2">{t('myJobOffers.noOffers')}</h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Vous n'avez pas encore publié d'offre de service. Commencez dès maintenant pour trouver des clients !
+              {t('myJobOffers.noOffersDesc')}
             </p>
             <LocalizedLink to="/deposer-offre-metier">
-              <Button>Créer ma première offre</Button>
+              <Button>{t('myJobOffers.createFirst')}</Button>
             </LocalizedLink>
           </CardContent>
         </Card>
@@ -153,7 +153,7 @@ const MyJobOffers = () => {
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <Badge variant={offer.is_active ? "default" : "secondary"} className={offer.is_active ? "bg-green-500" : ""}>
-                    {offer.is_active ? "Active" : "Inacitve"}
+                    {offer.is_active ? t('myJobOffers.active') : t('myJobOffers.inactive')}
                   </Badge>
                   <div className="text-xs text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
@@ -184,7 +184,7 @@ const MyJobOffers = () => {
                 <LocalizedLink to={`/offre-metier/${offer.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full gap-1">
                     <Eye className="h-3 w-3" />
-                    Voir
+                    {t('myJobOffers.view')}
                   </Button>
                 </LocalizedLink>
                 
@@ -196,15 +196,15 @@ const MyJobOffers = () => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('myJobOffers.confirmDelete')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Cette action est irréversible. Votre offre sera définitivement supprimée.
+                        {t('myJobOffers.confirmDeleteDesc')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogCancel>{t('myJobOffers.cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => handleDelete(offer.id)} className="bg-red-600 hover:bg-red-700">
-                        Supprimer
+                        {t('myJobOffers.delete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

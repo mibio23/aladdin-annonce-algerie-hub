@@ -101,8 +101,8 @@ export const useSavedSearches = () => {
       localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
 
       toast({
-        title: 'Recherche sauvegardée',
-        description: `La recherche "${name}" a été sauvegardée avec succès`,
+        title: t('savedSearch.saved'),
+        description: t('savedSearch.savedDesc'),
       });
 
       setSavedSearches(savedSearches);
@@ -110,8 +110,8 @@ export const useSavedSearches = () => {
     } catch (error) {
       logger.error('Error saving search:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de sauvegarder la recherche',
+        title: t('common.error'),
+        description: t('savedSearch.saveError'),
         variant: 'destructive',
       });
       return false;
@@ -128,8 +128,8 @@ export const useSavedSearches = () => {
       localStorage.setItem('savedSearches', JSON.stringify(filteredSearches));
 
       toast({
-        title: 'Recherche supprimée',
-        description: 'La recherche sauvegardée a été supprimée',
+        title: t('savedSearch.deleted'),
+        description: t('savedSearch.deletedDesc'),
       });
 
       setSavedSearches(filteredSearches);
@@ -137,8 +137,8 @@ export const useSavedSearches = () => {
     } catch (error) {
       logger.error('Error deleting saved search:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer la recherche',
+        title: t('common.error'),
+        description: t('savedSearch.deleteError'),
         variant: 'destructive',
       });
       return false;
@@ -193,8 +193,8 @@ export const useSavedSearches = () => {
     }
     setSearchHistory([]);
     toast({
-      title: 'Historique effacé',
-      description: 'L\'historique de recherche a été effacé',
+      title: t('savedSearch.historyCleared'),
+      description: t('savedSearch.historyClearedDesc'),
     });
   }, [user, toast]);
 

@@ -3,6 +3,7 @@ import { Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { logger } from '@/utils/silentLogger';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 interface CameraCaptureProps {
   onImageCapture: (blob: Blob) => void;
@@ -19,6 +20,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const { toast } = useToast();
+  const { t } = useSafeI18nWithRouter();
 
   const startCamera = useCallback(async () => {
     try {
@@ -39,8 +41,8 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     } catch (error) {
       logger.error('Erreur accès caméra:', error);
       toast({
-        title: "Erreur caméra",
-        description: "Impossible d'accéder à la caméra",
+        title: t('search.errors.cameraErrorTitle'),
+        description: t('search.errors.cameraError'),
         variant: "destructive",
       });
     }

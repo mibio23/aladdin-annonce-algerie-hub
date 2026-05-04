@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { LocalizedLink } from '@/utils/linkUtils';
 import { useLanguageFromURL } from '@/hooks/useLanguageFromURL';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { CheckCircle, ArrowRight, Eye, MessageCircle, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ const PaymentSuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getLocalizedPath } = useLanguageFromURL();
+  const { t } = useSafeI18nWithRouter();
   interface AnnouncementDetails {
     id: string;
     title: string;
@@ -73,8 +75,8 @@ const PaymentSuccessPage: React.FC = () => {
         if (error) {
           logger.error('Error fetching announcement:', error);
           toast({
-            title: "Erreur",
-            description: "Impossible de récupérer les détails de l'annonce",
+            title: t('common.error'),
+            description: t('payment.fetchError'),
             variant: "destructive",
           });
         } else {
@@ -94,24 +96,24 @@ const PaymentSuccessPage: React.FC = () => {
     switch (paymentType) {
       case 'featured':
         return {
-          title: 'Mise à la Une',
-          description: 'Votre annonce apparaîtra en tête des résultats de recherche',
+          title: t('payment.featured.title'),
+          description: t('payment.featured.description'),
           icon: <Star className="h-6 w-6 text-yellow-500" />,
-          badge: <Badge variant="default" className="bg-yellow-500">À la Une</Badge>
+          badge: <Badge variant="default" className="bg-yellow-500">{t('payment.featured.badge')}</Badge>
         };
       case 'urgent':
         return {
-          title: 'Marquage Urgent',
-          description: 'Votre annonce sera marquée comme urgente avec une priorité élevée',
+          title: t('payment.urgent.title'),
+          description: t('payment.urgent.description'),
           icon: <ArrowRight className="h-6 w-6 text-red-500" />,
-          badge: <Badge variant="destructive">Urgent</Badge>
+          badge: <Badge variant="destructive">{t('payment.urgent.badge')}</Badge>
         };
       default:
         return {
-          title: 'Promotion',
-          description: 'Votre annonce a été promue avec succès',
+          title: t('payment.promotion.title'),
+          description: t('payment.promotion.description'),
           icon: <CheckCircle className="h-6 w-6 text-green-500" />,
-          badge: <Badge variant="default">Promue</Badge>
+          badge: <Badge variant="default">{t('payment.promotion.badge')}</Badge>
         };
     }
   };
@@ -133,10 +135,10 @@ const PaymentSuccessPage: React.FC = () => {
         <div className="text-center mb-8">
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Paiement Confirmé !
+            {t('payment.confirmed')}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Votre transaction a été traitée avec succès
+            {t('payment.transactionSuccess')}
           </p>
         </div>
 
@@ -156,7 +158,7 @@ const PaymentSuccessPage: React.FC = () => {
               {sessionId && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    ID de Transaction
+                    {t('payment.transactionId')}
                   </label>
                   <p className="text-sm font-mono bg-muted p-2 rounded">
                     {sessionId}
@@ -165,7 +167,7 @@ const PaymentSuccessPage: React.FC = () => {
               )}
               
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Statut :</span>
+                <span className="text-sm font-medium">{t('payment.statusLabel')}</span>
                 {paymentInfo.badge}
               </div>
 
@@ -173,14 +175,14 @@ const PaymentSuccessPage: React.FC = () => {
                 <Button asChild className="w-full">
                   <LocalizedLink to="/my-announcements">
                     <Eye className="h-4 w-4 mr-2" />
-                    Voir mes annonces
+                    {t('payment.viewMyAds')}
                   </LocalizedLink>
                 </Button>
                 
                 <Button variant="outline" asChild className="w-full">
                   <LocalizedLink to="/chat">
                     <MessageCircle className="h-4 w-4 mr-2" />
-                    Gérer les messages
+                    {t('payment.manageMessages')}
                   </LocalizedLink>
                 </Button>
               </div>
@@ -191,9 +193,9 @@ const PaymentSuccessPage: React.FC = () => {
           {announcementDetails && (
             <Card>
               <CardHeader>
-                <CardTitle>Détails de l'annonce</CardTitle>
+                <CardTitle>{t('payment.adDetails')}</CardTitle>
                 <CardDescription>
-                  Annonce promue avec succès
+                  {t('payment.adPromoted')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -208,7 +210,7 @@ const PaymentSuccessPage: React.FC = () => {
 
                 {announcementDetails.price && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Prix :</span>
+                    <span className="text-sm font-medium">{t('payment.priceLabel')}</span>
                     <span className="text-lg font-bold text-primary">
                       {announcementDetails.price} {announcementDetails.currency}
                     </span>
@@ -216,7 +218,7 @@ const PaymentSuccessPage: React.FC = () => {
                 )}
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Localisation :</span>
+                  <span className="text-sm font-medium">{t('payment.locationLabel')}</span>
                   <span className="text-sm">
                     {announcementDetails.location}, {announcementDetails.wilaya}
                   </span>
@@ -225,7 +227,7 @@ const PaymentSuccessPage: React.FC = () => {
                 <div className="flex gap-2 flex-wrap">
                   {announcementDetails.is_featured && (
                     <Badge variant="default" className="bg-yellow-500">
-                      À la Une
+                      {t('payment.featured.badge')}
                     </Badge>
                   )}
                   {announcementDetails.is_urgent && (
@@ -249,7 +251,7 @@ const PaymentSuccessPage: React.FC = () => {
                   className="w-full"
                 >
                   <LocalizedLink to={`/announcement/${announcementDetails.id}`}>
-                    Voir l'annonce publique
+                    {t('payment.viewPublicAd')}
                   </LocalizedLink>
                 </Button>
               </CardContent>
@@ -260,34 +262,34 @@ const PaymentSuccessPage: React.FC = () => {
         {/* Next Steps */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Prochaines étapes</CardTitle>
+            <CardTitle>{t('payment.nextSteps')}</CardTitle>
             <CardDescription>
-              Optimisez davantage votre annonce pour de meilleurs résultats
+              {t('payment.nextStepsDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="text-center p-4 rounded-lg bg-muted/50">
                 <Eye className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <h4 className="font-medium mb-1">Surveillez les vues</h4>
+                <h4 className="font-medium mb-1">{t('payment.monitorViews')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Consultez les statistiques de votre annonce
+                  {t('payment.monitorViewsDesc')}
                 </p>
               </div>
               
               <div className="text-center p-4 rounded-lg bg-muted/50">
                 <MessageCircle className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <h4 className="font-medium mb-1">Répondez rapidement</h4>
+                <h4 className="font-medium mb-1">{t('payment.respondQuickly')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Restez réactif aux messages des acheteurs
+                  {t('payment.respondQuicklyDesc')}
                 </p>
               </div>
               
               <div className="text-center p-4 rounded-lg bg-muted/50">
                 <Star className="h-8 w-8 mx-auto mb-2 text-primary" />
-                <h4 className="font-medium mb-1">Ajoutez des photos</h4>
+                <h4 className="font-medium mb-1">{t('payment.addPhotos')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Plus de photos = plus d'intérêt
+                  {t('payment.addPhotosDesc')}
                 </p>
               </div>
             </div>
@@ -301,12 +303,12 @@ const PaymentSuccessPage: React.FC = () => {
             onClick={() => navigate(getLocalizedPath('/'))}
             className="mr-4"
           >
-            Retour à l'accueil
+            {t('payment.backHome')}
           </Button>
           
           <Button asChild>
             <LocalizedLink to="/deposer-annonce">
-              Créer une nouvelle annonce
+              {t('payment.createNewAd')}
             </LocalizedLink>
           </Button>
         </div>

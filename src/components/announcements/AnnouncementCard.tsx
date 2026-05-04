@@ -84,33 +84,33 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(announcementUrl);
-    toast.success(t('common.linkCopied') || "Lien copié !", {
-      description: t('common.linkCopiedDesc') || "Le lien a été copié dans votre presse-papiers."
+    toast.success(t('common.linkCopied') || "Lien copiÃ© !", {
+      description: t('common.linkCopiedDesc') || "Le lien a Ã©tÃ© copiÃ© dans votre presse-papiers."
     });
   };
   const localizeLabel = (s: string | undefined, language: string, kind?: string) => {
     if (!s) return s as any;
     let r = String(s);
     if (language === 'ar') {
-      r = r.replace(/\bGB\b|\bGo\b/gi, 'غيغابايت');
-      r = r.replace(/\bTB\b|\bTo\b/gi, 'تيرابايت');
-      r = r.replace(/\bHz\b/gi, 'هرتز');
-      r = r.replace(/(\d{1,2}(?:\.\d)?)"/g, '$1 بوصة');
-      r = r.replace(/\bcarbone\b|carbon/gi, 'كربون');
-      r = r.replace(/\baluminium\b|alu/gi, 'ألمنيوم');
-      r = r.replace(/\bacier\b|steel/gi, 'فولاذ');
-      r = r.replace(/\bfull[- ]?suspension\b|tout\s?suspendu|full/gi, 'تعليق كامل');
-      r = r.replace(/\bsemi[- ]?rigide\b|hardtail/gi, 'تعليق أمامي فقط');
-      r = r.replace(/\bdisque\b|disc/gi, 'قرصي');
-      r = r.replace(/\bhydraulique\b/gi, 'هيدروليك');
-      r = r.replace(/\bv[- ]?brake\b|patins/gi, 'حذوة');
-      r = r.replace(/\bkg\b/gi, 'كلغ');
+      r = r.replace(/\bGB\b|\bGo\b/gi, 'ØºÙŠØºØ§Ø¨Ø§ÙŠØª');
+      r = r.replace(/\bTB\b|\bTo\b/gi, 'ØªÙŠØ±Ø§Ø¨Ø§ÙŠØª');
+      r = r.replace(/\bHz\b/gi, 'Ù‡Ø±ØªØ²');
+      r = r.replace(/(\d{1,2}(?:\.\d)?)"/g, '$1 Ø¨ÙˆØµØ©');
+      r = r.replace(/\bcarbone\b|carbon/gi, 'ÙƒØ±Ø¨ÙˆÙ†');
+      r = r.replace(/\baluminium\b|alu/gi, 'Ø£Ù„Ù…Ù†ÙŠÙˆÙ…');
+      r = r.replace(/\bacier\b|steel/gi, 'ÙÙˆÙ„Ø§Ø°');
+      r = r.replace(/\bfull[- ]?suspension\b|tout\s?suspendu|full/gi, 'ØªØ¹Ù„ÙŠÙ‚ ÙƒØ§Ù…Ù„');
+      r = r.replace(/\bsemi[- ]?rigide\b|hardtail/gi, 'ØªØ¹Ù„ÙŠÙ‚ Ø£Ù…Ø§Ù…ÙŠ ÙÙ‚Ø·');
+      r = r.replace(/\bdisque\b|disc/gi, 'Ù‚Ø±ØµÙŠ');
+      r = r.replace(/\bhydraulique\b/gi, 'Ù‡ÙŠØ¯Ø±ÙˆÙ„ÙŠÙƒ');
+      r = r.replace(/\bv[- ]?brake\b|patins/gi, 'Ø­Ø°ÙˆØ©');
+      r = r.replace(/\bkg\b/gi, 'ÙƒÙ„Øº');
       if (kind === 'gears') {
         const m = r.match(/^\d{1,2}$/);
-        if (m) r = `${m[0]} سرعات`;
+        if (m) r = `${m[0]} Ø³Ø±Ø¹Ø§Øª`;
       }
       if (kind === 'os') {
-        r = r.replace(/windows/gi, 'ويندوز').replace(/macos/gi, 'ماك أو إس').replace(/linux/gi, 'لينكس').replace(/ubuntu/gi, 'أوبونتو');
+        r = r.replace(/windows/gi, 'ÙˆÙŠÙ†Ø¯ÙˆØ²').replace(/macos/gi, 'Ù…Ø§Ùƒ Ø£Ùˆ Ø¥Ø³').replace(/linux/gi, 'Ù„ÙŠÙ†ÙƒØ³').replace(/ubuntu/gi, 'Ø£ÙˆØ¨ÙˆÙ†ØªÙˆ');
       }
     } else {
       r = r.replace(/\bGB\b|\bGo\b/gi, 'Go');
@@ -134,7 +134,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
       );
     }
     
-    // Conversion en millions de centimes (standard algérien)
+    // Conversion en millions de centimes (standard algÃ©rien)
     // 1 million de centimes = 10 000 DZD
     const millionsCentimes = Math.floor(price / 10_000);
     return `${millionsCentimes.toLocaleString()} M`;
@@ -142,11 +142,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
 
   const getConditionBadge = (condition: string | null) => {
     const badges = {
-      new: { label: 'Neuf', variant: 'default' as const },
-      like_new: { label: 'Comme neuf', variant: 'secondary' as const },
-      good: { label: 'Bon état', variant: 'outline' as const },
-      fair: { label: 'État correct', variant: 'outline' as const },
-      poor: { label: 'À rénover', variant: 'destructive' as const },
+      new: { label: t('announcements.condition.new') || 'Neuf', variant: 'default' as const },
+      like_new: { label: t('announcements.condition.likeNew') || 'Comme neuf', variant: 'secondary' as const },
+      good: { label: t('announcements.condition.good') || 'Bon état', variant: 'outline' as const },
+      fair: { label: t('announcements.condition.fair') || 'État correct', variant: 'outline' as const },
+      poor: { label: t('announcements.condition.poor') || 'À rénover', variant: 'destructive' as const },
     };
     return badges[(condition as keyof typeof badges)] || badges.good;
   };
@@ -154,7 +154,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   const conditionBadge = getConditionBadge(announcement.condition);
   const isFav = isFavorite(announcement.id);
 
-  const hasStorage = announcement.storage || (announcement as any).attributes?.storage;
+  const hasStorage = announcement.storage || announcement.attributes?.storage;
   const isTelephonie = announcement.category_id === 'telephonie' || announcement.categorySlug === 'telephonie' || announcement.categories?.slug === 'telephonie';
   const isComputer = announcement.category_id === 'informatique-electronique' || announcement.categorySlug === 'informatique-electronique' || announcement.categories?.slug === 'informatique-electronique';
   const isBike = announcement.category_id === 'velo-cyclisme-equipements' || announcement.categorySlug === 'velo-cyclisme-equipements' || announcement.categories?.slug === 'velo-cyclisme-equipements';
@@ -200,102 +200,102 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
   };
 
   const compStorage =
-    (typeof (announcement as any).storage === "string" ? (announcement as any).storage : undefined) ??
-    (typeof pickAttributeValue((announcement as any).attributes, ["storage","stockage","ssd","hdd","disque","disque_dur","carte_memoire","تخزين","اس_اس_دي","اتش_دي_دي","القرص","القرص_الصلب"]) === "string"
-      ? (pickAttributeValue((announcement as any).attributes, ["storage","stockage","ssd","hdd","disque","disque_dur","carte_memoire","تخزين","اس_اس_دي","اتش_دي_دي","القرص","القرص_الصلب"]) as string)
+    (typeof announcement.storage === "string" ? announcement.storage : undefined) ??
+    (typeof pickAttributeValue(announcement.attributes, ["storage","stockage","ssd","hdd","disque","disque_dur","carte_memoire","ØªØ®Ø²ÙŠÙ†","Ø§Ø³_Ø§Ø³_Ø¯ÙŠ","Ø§ØªØ´_Ø¯ÙŠ_Ø¯ÙŠ","Ø§Ù„Ù‚Ø±Øµ","Ø§Ù„Ù‚Ø±Øµ_Ø§Ù„ØµÙ„Ø¨"]) === "string"
+      ? (pickAttributeValue(announcement.attributes, ["storage","stockage","ssd","hdd","disque","disque_dur","carte_memoire","ØªØ®Ø²ÙŠÙ†","Ø§Ø³_Ø§Ø³_Ø¯ÙŠ","Ø§ØªØ´_Ø¯ÙŠ_Ø¯ÙŠ","Ø§Ù„Ù‚Ø±Øµ","Ø§Ù„Ù‚Ø±Øµ_Ø§Ù„ØµÙ„Ø¨"]) as string)
       : undefined);
   const compRam =
-    (typeof (announcement as any).ram === "string" ? (announcement as any).ram : undefined) ??
-    (typeof pickAttributeValue((announcement as any).attributes, ["ram","memoire","mémoire","mémoire_vive","memory","رام","ذاكرة","ذاكرة_عشوائية"]) === "string"
-      ? (pickAttributeValue((announcement as any).attributes, ["ram","memoire","mémoire","mémoire_vive","memory","رام","ذاكرة","ذاكرة_عشوائية"]) as string)
+    (typeof announcement.ram === "string" ? announcement.ram : undefined) ??
+    (typeof pickAttributeValue(announcement.attributes, ["ram","memoire","mÃ©moire","mÃ©moire_vive","memory","Ø±Ø§Ù…","Ø°Ø§ÙƒØ±Ø©","Ø°Ø§ÙƒØ±Ø©_Ø¹Ø´ÙˆØ§Ø¦ÙŠØ©"]) === "string"
+      ? (pickAttributeValue(announcement.attributes, ["ram","memoire","mÃ©moire","mÃ©moire_vive","memory","Ø±Ø§Ù…","Ø°Ø§ÙƒØ±Ø©","Ø°Ø§ÙƒØ±Ø©_Ø¹Ø´ÙˆØ§Ø¦ÙŠØ©"]) as string)
       : undefined);
   const compScreen =
-    (typeof (announcement as any).screen_size === "string" ? (announcement as any).screen_size : undefined) ??
-    (typeof pickAttributeValue((announcement as any).attributes, ["screen_size","taille_ecran","ecran","écran","pouces","inch","حجم_الشاشة","الشاشة","بوصة"]) === "string"
-      ? (pickAttributeValue((announcement as any).attributes, ["screen_size","taille_ecran","ecran","écran","pouces","inch","حجم_الشاشة","الشاشة","بوصة"]) as string)
+    (typeof announcement.screen_size === "string" ? announcement.screen_size : undefined) ??
+    (typeof pickAttributeValue(announcement.attributes, ["screen_size","taille_ecran","ecran","Ã©cran","pouces","inch","Ø­Ø¬Ù…_Ø§Ù„Ø´Ø§Ø´Ø©","Ø§Ù„Ø´Ø§Ø´Ø©","Ø¨ÙˆØµØ©"]) === "string"
+      ? (pickAttributeValue(announcement.attributes, ["screen_size","taille_ecran","ecran","Ã©cran","pouces","inch","Ø­Ø¬Ù…_Ø§Ù„Ø´Ø§Ø´Ø©","Ø§Ù„Ø´Ø§Ø´Ø©","Ø¨ÙˆØµØ©"]) as string)
       : undefined);
   const titleText = (announcement.title || '').toLowerCase();
-  const screenMatch = titleText.match(/(\d{1,2}(?:\.\d)?)\s*(?:"|inch|pouce|pouces|in|بوصة)/);
+  const screenMatch = titleText.match(/(\d{1,2}(?:\.\d)?)\s*(?:"|inch|pouce|pouces|in|Ø¨ÙˆØµØ©)/);
   const compScreenResolved = compScreen ?? (screenMatch ? `${screenMatch[1]}"` : undefined);
 
   const frameSize =
-    (typeof (announcement as any).frame_size === "string" ? (announcement as any).frame_size : undefined) ??
-    (typeof pickAttributeValue((announcement as any).attributes, ["frame_size","taille_cadre","cadre","مقاس_الإطار","الإطار"]) === "string"
-      ? (pickAttributeValue((announcement as any).attributes, ["frame_size","taille_cadre","cadre","مقاس_الإطار","الإطار"]) as string)
+    (typeof announcement.frame_size === "string" ? announcement.frame_size : undefined) ??
+    (typeof pickAttributeValue(announcement.attributes, ["frame_size","taille_cadre","cadre","Ù…Ù‚Ø§Ø³_Ø§Ù„Ø¥Ø·Ø§Ø±","Ø§Ù„Ø¥Ø·Ø§Ø±"]) === "string"
+      ? (pickAttributeValue(announcement.attributes, ["frame_size","taille_cadre","cadre","Ù…Ù‚Ø§Ø³_Ø§Ù„Ø¥Ø·Ø§Ø±","Ø§Ù„Ø¥Ø·Ø§Ø±"]) as string)
       : undefined);
   const wheelSize =
-    (typeof (announcement as any).wheel_size === "string" ? (announcement as any).wheel_size : undefined) ??
-    (typeof pickAttributeValue((announcement as any).attributes, ["wheel_size","taille_roue","roue","diametre_roue","حجم_العجلة","العجلة","قطر_العجلة"]) === "string"
-      ? (pickAttributeValue((announcement as any).attributes, ["wheel_size","taille_roue","roue","diametre_roue","حجم_العجلة","العجلة","قطر_العجلة"]) as string)
+    (typeof announcement.wheel_size === "string" ? announcement.wheel_size : undefined) ??
+    (typeof pickAttributeValue(announcement.attributes, ["wheel_size","taille_roue","roue","diametre_roue","Ø­Ø¬Ù…_Ø§Ù„Ø¹Ø¬Ù„Ø©","Ø§Ù„Ø¹Ø¬Ù„Ø©","Ù‚Ø·Ø±_Ø§Ù„Ø¹Ø¬Ù„Ø©"]) === "string"
+      ? (pickAttributeValue(announcement.attributes, ["wheel_size","taille_roue","roue","diametre_roue","Ø­Ø¬Ù…_Ø§Ù„Ø¹Ø¬Ù„Ø©","Ø§Ù„Ø¹Ø¬Ù„Ø©","Ù‚Ø·Ø±_Ø§Ù„Ø¹Ø¬Ù„Ø©"]) as string)
       : undefined);
-  const wheelMatch = titleText.match(/(\d{2}(?:\.\d)?)\s*(?:"|pouces|inch|in|بوصة)/);
+  const wheelMatch = titleText.match(/(\d{2}(?:\.\d)?)\s*(?:"|pouces|inch|in|Ø¨ÙˆØµØ©)/);
   const wheelResolved = wheelSize ?? (wheelMatch ? `${wheelMatch[1]}"` : undefined);
-  const isElectricAttr = pickAttributeValue((announcement as any).attributes, ["electric","electrique","électrique","e_bike","velo_electrique","كهربائي","دراجة_كهربائية"]);
+  const isElectricAttr = pickAttributeValue(announcement.attributes, ["electric","electrique","Ã©lectrique","e_bike","velo_electrique","ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ","Ø¯Ø±Ø§Ø¬Ø©_ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠØ©"]);
   const isElectric =
-    typeof (announcement as any).bikeElectric === "boolean"
-      ? (announcement as any).bikeElectric
+    typeof announcement.bikeElectric === "boolean"
+      ? announcement.bikeElectric
       : (typeof isElectricAttr === "string"
-          ? ["oui","true","electrique","électrique","e_bike","electric","كهربائي"].some(s => (isElectricAttr as string).toLowerCase().includes(s))
-          : (/(electri|électri|كهرب)/.test(titleText) ? true : undefined));
-  const motorizedAttr = pickAttributeValue((announcement as any).attributes, ["motorized","velo_motorise","vélo_motorisé","motorise","moteur","مزود بمحرك","مزوّد بمحرك","sans_moteur","غير_مزودة_بمحرك","بدون_محرك"]);
+          ? ["oui","true","electrique","Ã©lectrique","e_bike","electric","ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ"].some(s => (isElectricAttr as string).toLowerCase().includes(s))
+          : (/(electri|Ã©lectri|ÙƒÙ‡Ø±Ø¨)/.test(titleText) ? true : undefined));
+  const motorizedAttr = pickAttributeValue(announcement.attributes, ["motorized","velo_motorise","vÃ©lo_motorisÃ©","motorise","moteur","Ù…Ø²ÙˆØ¯ Ø¨Ù…Ø­Ø±Ùƒ","Ù…Ø²ÙˆÙ‘Ø¯ Ø¨Ù…Ø­Ø±Ùƒ","sans_moteur","ØºÙŠØ±_Ù…Ø²ÙˆØ¯Ø©_Ø¨Ù…Ø­Ø±Ùƒ","Ø¨Ø¯ÙˆÙ†_Ù…Ø­Ø±Ùƒ"]);
   const isMotorized =
-    typeof (announcement as any).bikeMotorized === "boolean"
-      ? (announcement as any).bikeMotorized
+    typeof announcement.bikeMotorized === "boolean"
+      ? announcement.bikeMotorized
       : (typeof motorizedAttr === "boolean"
           ? motorizedAttr
           : Array.isArray(motorizedAttr) && motorizedAttr.length > 0 && typeof motorizedAttr[0] === "string"
             ? (() => {
                 const v = (motorizedAttr[0] as string).toLowerCase();
-                if (["oui","yes","true","motorise","motorisé","moteur","مزود بمحرك","محرك"].some(s => v.includes(s))) return true;
-                if (["non","no","false","sans","not","غير","بدون"].some(s => v.includes(s))) return false;
+                if (["oui","yes","true","motorise","motorisÃ©","moteur","Ù…Ø²ÙˆØ¯ Ø¨Ù…Ø­Ø±Ùƒ","Ù…Ø­Ø±Ùƒ"].some(s => v.includes(s))) return true;
+                if (["non","no","false","sans","not","ØºÙŠØ±","Ø¨Ø¯ÙˆÙ†"].some(s => v.includes(s))) return false;
                 return undefined;
               })()
             : (typeof motorizedAttr === "string"
                 ? (() => {
                     const v = (motorizedAttr as string).toLowerCase();
-                    if (["oui","yes","true","motorise","motorisé","moteur","مزود بمحرك","محرك"].some(s => v.includes(s))) return true;
-                    if (["non","no","false","sans","not","غير","بدون"].some(s => v.includes(s))) return false;
+                    if (["oui","yes","true","motorise","motorisÃ©","moteur","Ù…Ø²ÙˆØ¯ Ø¨Ù…Ø­Ø±Ùƒ","Ù…Ø­Ø±Ùƒ"].some(s => v.includes(s))) return true;
+                    if (["non","no","false","sans","not","ØºÙŠØ±","Ø¨Ø¯ÙˆÙ†"].some(s => v.includes(s))) return false;
                     return undefined;
                   })()
-                : (/(motoris|محرك)/.test(titleText) ? true : undefined)));
-  const ramMatch = titleText.match(/(\d{1,2})\s*(?:go|gb)\s*(?:ram|mémoire|memory|رام|ذاكرة)/);
+                : (/(motoris|Ù…Ø­Ø±Ùƒ)/.test(titleText) ? true : undefined)));
+  const ramMatch = titleText.match(/(\d{1,2})\s*(?:go|gb)\s*(?:ram|mÃ©moire|memory|Ø±Ø§Ù…|Ø°Ø§ÙƒØ±Ø©)/);
   const compRamResolved = compRam ?? (ramMatch ? `${ramMatch[1]} GB RAM` : undefined);
-  const storageMatch = titleText.match(/(\d{2,4})\s*(?:go|gb|to|tb)\s*(?:ssd|hdd|storage|stockage|اس ?اس ?دي|اتش ?دي ?دي)?/);
+  const storageMatch = titleText.match(/(\d{2,4})\s*(?:go|gb|to|tb)\s*(?:ssd|hdd|storage|stockage|Ø§Ø³ ?Ø§Ø³ ?Ø¯ÙŠ|Ø§ØªØ´ ?Ø¯ÙŠ ?Ø¯ÙŠ)?/);
   const compStorageResolved = compStorage ?? (storageMatch ? `${storageMatch[1]} ${storageMatch[0].includes('to') || storageMatch[0].includes('tb') ? 'TB' : 'GB'}${storageMatch[0].includes('ssd') ? ' SSD' : storageMatch[0].includes('hdd') ? ' HDD' : ''}` : undefined);
-  const cpuAttr = pickAttributeValue((announcement as any).attributes, ["processor","processeur","cpu","chip","puce","المعالج","بروسيسور"]);
+  const cpuAttr = pickAttributeValue(announcement.attributes, ["processor","processeur","cpu","chip","puce","Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬","Ø¨Ø±ÙˆØ³ÙŠØ³ÙˆØ±"]);
   const compCpuResolved = typeof cpuAttr === "string" ? cpuAttr : (titleText.match(/(i[3579][- ]?\d{3,5}[a-z]?|ryzen\s?\d\s?\d{3,4}|m[1-3](?:\spro|\smax)?)/i)?.[1]);
-  const gpuAttr = pickAttributeValue((announcement as any).attributes, ["gpu","graphics","graphics_card","carte_graphique","graphiques","بطاقة_رسومات","كارت_غرافيك"]);
+  const gpuAttr = pickAttributeValue(announcement.attributes, ["gpu","graphics","graphics_card","carte_graphique","graphiques","Ø¨Ø·Ø§Ù‚Ø©_Ø±Ø³ÙˆÙ…Ø§Øª","ÙƒØ§Ø±Øª_ØºØ±Ø§ÙÙŠÙƒ"]);
   const compGpuResolved = typeof gpuAttr === "string" ? gpuAttr : (titleText.match(/(rtx\s?\d{3,4}|gtx\s?\d{3,4}|rx\s?\d{3,4}|radeon\s?\w+|iris\s\w+|arc\s\w+)/i)?.[1]);
-  const osAttr = pickAttributeValue((announcement as any).attributes, ["os","operating_system","systeme","système","windows","macos","linux","ubuntu","manjaro","نظام","ويندوز","ماك","لينكس"]);
+  const osAttr = pickAttributeValue(announcement.attributes, ["os","operating_system","systeme","systÃ¨me","windows","macos","linux","ubuntu","manjaro","Ù†Ø¸Ø§Ù…","ÙˆÙŠÙ†Ø¯ÙˆØ²","Ù…Ø§Ùƒ","Ù„ÙŠÙ†ÙƒØ³"]);
   const compOsResolved = typeof osAttr === "string" ? osAttr : (titleText.match(/(windows\s?\d{1,2}|macos|linux|ubuntu|sonoma|ventura)/i)?.[1]);
-  const hzAttr = pickAttributeValue((announcement as any).attributes, ["refresh_rate","hz","frequence","fréquence","تردد","هرتز"]);
+  const hzAttr = pickAttributeValue(announcement.attributes, ["refresh_rate","hz","frequence","frÃ©quence","ØªØ±Ø¯Ø¯","Ù‡Ø±ØªØ²"]);
   const hzMatch = titleText.match(/(\d{2,3})\s?hz/i);
   const compHzResolved = typeof hzAttr === "string" ? hzAttr : (hzMatch ? `${hzMatch[1]}Hz` : undefined);
-  const frameMaterialAttr = pickAttributeValue((announcement as any).attributes, ["frame_material","material","materiau","matériau","cadre_materiau","cadre_matériau","مادة_الإطار","المادة"]);
+  const frameMaterialAttr = pickAttributeValue(announcement.attributes, ["frame_material","material","materiau","matÃ©riau","cadre_materiau","cadre_matÃ©riau","Ù…Ø§Ø¯Ø©_Ø§Ù„Ø¥Ø·Ø§Ø±","Ø§Ù„Ù…Ø§Ø¯Ø©"]);
   const frameMaterialResolved = typeof frameMaterialAttr === "string" ? frameMaterialAttr : (titleText.match(/(carbone|aluminium|alu|acier|steel|carbon)/)?.[1]);
-  const suspensionAttr = pickAttributeValue((announcement as any).attributes, ["suspension","suspension_avant","suspension_arriere","type_suspension","سuspension","تعليق"]);
+  const suspensionAttr = pickAttributeValue(announcement.attributes, ["suspension","suspension_avant","suspension_arriere","type_suspension","Ø³uspension","ØªØ¹Ù„ÙŠÙ‚"]);
   const suspensionResolved = typeof suspensionAttr === "string" ? suspensionAttr : (titleText.match(/(full|tout\s?suspendu|full[- ]suspension|semi[- ]rigide|hardtail)/)?.[1]);
-  const brakeAttr = pickAttributeValue((announcement as any).attributes, ["brake","brake_type","freins","type_de_frein","الفرامل","نوع_الفرامل"]);
+  const brakeAttr = pickAttributeValue(announcement.attributes, ["brake","brake_type","freins","type_de_frein","Ø§Ù„ÙØ±Ø§Ù…Ù„","Ù†ÙˆØ¹_Ø§Ù„ÙØ±Ø§Ù…Ù„"]);
   const brakeResolved = typeof brakeAttr === "string" ? brakeAttr : (titleText.match(/(disque|hydraulique|v[- ]?brake|patins|disc)/)?.[1]);
-  const gearsAttr = pickAttributeValue((announcement as any).attributes, ["gears","vitesses","nbr_vitesses","nombre_vitesses","عدد_السرعات"]);
+  const gearsAttr = pickAttributeValue(announcement.attributes, ["gears","vitesses","nbr_vitesses","nombre_vitesses","Ø¹Ø¯Ø¯_Ø§Ù„Ø³Ø±Ø¹Ø§Øª"]);
   const gearsResolved = typeof gearsAttr === "string" ? gearsAttr : (titleText.match(/(\d{1,2})\s?(?:vitesses|v|speeds)/)?.[1]);
-  const bikeTypeAttr = pickAttributeValue((announcement as any).attributes, ["bike_type","type","style","categorie","catégorie","نوع"]);
+  const bikeTypeAttr = pickAttributeValue(announcement.attributes, ["bike_type","type","style","categorie","catÃ©gorie","Ù†ÙˆØ¹"]);
   const bikeTypeResolved = typeof bikeTypeAttr === "string" ? bikeTypeAttr : (titleText.match(/(vtt|route|gravel|bmx|fixie|hybride|city)/)?.[1]);
-  const weightAttr = pickAttributeValue((announcement as any).attributes, ["weight","poids","الوزن"]);
+  const weightAttr = pickAttributeValue(announcement.attributes, ["weight","poids","Ø§Ù„ÙˆØ²Ù†"]);
   const weightResolved = typeof weightAttr === "string" ? weightAttr : (titleText.match(/(\d{1,2}(?:\.\d)?)\s?kg/)?.[1]);
 
-  const vehicleDetailsRaw = (announcement as any).vehicleDetails || (announcement as any).vehicle_details;
+  const vehicleDetailsRaw = announcement.vehicleDetails || announcement.vehicle_details;
   const vehicleDetails = Array.isArray(vehicleDetailsRaw) ? vehicleDetailsRaw[0] : vehicleDetailsRaw;
   const registrationDate =
     (vehicleDetails && typeof vehicleDetails.registration_date === "string" ? vehicleDetails.registration_date : undefined) ||
-    (typeof (announcement as any).registration_date === "string" ? (announcement as any).registration_date : undefined) ||
-    (typeof pickAttributeValue((announcement as any).attributes, ["registration_date","registrationDate","date_mise_en_circulation","date_de_mise_en_circulation","date_immatriculation","mise_en_circulation"]) === "string"
-      ? (pickAttributeValue((announcement as any).attributes, ["registration_date","registrationDate","date_mise_en_circulation","date_de_mise_en_circulation","date_immatriculation","mise_en_circulation"]) as string)
+    (typeof announcement.registration_date === "string" ? announcement.registration_date : undefined) ||
+    (typeof pickAttributeValue(announcement.attributes, ["registration_date","registrationDate","date_mise_en_circulation","date_de_mise_en_circulation","date_immatriculation","mise_en_circulation"]) === "string"
+      ? (pickAttributeValue(announcement.attributes, ["registration_date","registrationDate","date_mise_en_circulation","date_de_mise_en_circulation","date_immatriculation","mise_en_circulation"]) as string)
       : undefined);
   const yearFromDetails = typeof vehicleDetails?.year === "number" ? vehicleDetails.year : undefined;
   const yearFromRegistration =
     typeof registrationDate === "string" && registrationDate ? new Date(registrationDate).getFullYear() : undefined;
-  const yearAttr = pickAttributeValue((announcement as any).attributes, ["year","annee","année","an","vehicle_year","annee_de_mise_en_circulation","سنة","سنة_الموديل","سنة_التصنيع"]);
+  const yearAttr = pickAttributeValue(announcement.attributes, ["year","annee","annÃ©e","an","vehicle_year","annee_de_mise_en_circulation","Ø³Ù†Ø©","Ø³Ù†Ø©_Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„","Ø³Ù†Ø©_Ø§Ù„ØªØµÙ†ÙŠØ¹"]);
   const yearFromAttr =
     typeof yearAttr === "number" ? yearAttr :
     typeof yearAttr === "string" ? (() => {
@@ -383,7 +383,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               
               <div className="flex items-center text-xs text-muted-foreground">
                 <MapPin className="w-3 h-3 mr-1" />
-                <span className="truncate">{announcement.location || 'Non spécifié'}</span>
+                <span className="truncate">{announcement.location || (t('common.notSpecified') || 'Non spécifié')}</span>
               </div>
             </div>
           </div>
@@ -397,11 +397,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
       className="group flex flex-col transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 rounded-[24px] overflow-hidden relative h-full bg-slate-50 shadow-[0_10px_30px_-10px_rgba(22,163,74,0.25),0_6px_10px_-2px_rgba(22,163,74,0.15)] border border-[rgba(22,163,74,0.05)] dark:bg-[linear-gradient(145deg,#1e293b,#0f172a)] dark:shadow-[0_0_20px_rgba(255,255,255,0.25)] dark:border-none" 
       onClick={handleViewClick}
     >
-      {/* Cadre supérieur - Photo avec effet de retrait (recessed) */}
+      {/* Cadre supÃ©rieur - Photo avec effet de retrait (recessed) */}
       <div className="p-2 pb-0">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[24px] border-[3px] border-red-500/80 bg-white p-1.5 shadow-[0_8px_16px_rgba(0,0,0,0.1)] group-hover:border-red-600 group-hover:shadow-[0_12px_24px_rgba(220,38,38,0.2)] transition-all duration-300">
           <div className="w-full h-full overflow-hidden rounded-[16px] shadow-[inset_0_10px_20px_rgba(0,0,0,0.25),inset_0_-2px_6px_rgba(255,255,255,0.3)] bg-slate-100 relative">
-            {/* Badge incurvé style "Boutique" */}
+            {/* Badge incurvÃ© style "Boutique" */}
             <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} z-30`}>
                 <div className={`bg-white/70 backdrop-blur-md pb-3 pt-1 shadow-lg flex items-center gap-1.5 border-b border-white/40 ${
                   isRTL 
@@ -410,10 +410,10 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                 }`}>
                   <div className={cn("flex flex-col", isRTL ? "items-start" : "items-end")}>
                     <span className="text-xs font-extrabold text-slate-900 leading-none mb-0.5 drop-shadow-sm">
-                      {isRTL ? "علاء الدين" : "Aladdin"}
+                      {isRTL ? "Ø¹Ù„Ø§Ø¡ Ø§Ù„Ø¯ÙŠÙ†" : "Aladdin"}
                     </span>
                     <span className="text-[9px] font-bold text-red-600 uppercase tracking-wider leading-none drop-shadow-sm">
-                      {isRTL ? "الإختيار الأفضل" : "Sélection Or"}
+                      {isRTL ? "Ø§Ù„Ø¥Ø®ØªÙŠØ§Ø± Ø§Ù„Ø£ÙØ¶Ù„" : "SÃ©lection Or"}
                     </span>
                   </div>
                   <div className="w-8 h-8 bg-white/50 backdrop-blur-sm rounded-lg shadow-inner flex items-center justify-center border border-white/50 p-1 group-hover:scale-110 transition-transform duration-300">
@@ -438,7 +438,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               <div className={cn("absolute top-3 z-20 flex flex-col gap-1", isRTL ? "left-3 items-start" : "left-3 items-start")}>
                 {(variant === 'featured' || announcement.is_featured) ? (
                   <span className="bg-white/95 backdrop-blur-md text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
-                    Coup de cœur
+                    {t('common.featuredPick') || 'Coup de cœur'}
                   </span>
                 ) : null}
                 <span className="bg-black/60 text-white px-2 py-1 rounded text-xs font-bold">
@@ -462,7 +462,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             {!announcement.is_active && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-30">
                 <Badge variant="destructive" className="text-lg px-4 py-2">
-                  VENDU
+                  {t('common.sold') || 'VENDU'}
                 </Badge>
               </div>
             )}
@@ -478,7 +478,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             {!isVehicle && announcement.is_urgent && (
               <div className={cn("absolute bottom-2", isRTL ? "left-2" : "left-2")}>
                 <Badge variant="destructive" className="animate-pulse">
-                  Urgent
+                  {t('urgent') || 'Urgent'}
                 </Badge>
               </div>
             )}
@@ -486,7 +486,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
                 {announcement.is_urgent ? (
                   <Badge variant="destructive" className="animate-pulse">
-                    Urgent
+                    {t('urgent') || 'Urgent'}
                   </Badge>
                 ) : null}
                 {typeof vehicleYear === "number" ? (
@@ -513,7 +513,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                 <Cog className="w-3 h-3" />
                 {isMotorized
                   ? (language === 'ar'
-                      ? "مزودة بمحرك"
+                      ? "Ù…Ø²ÙˆØ¯Ø© Ø¨Ù…Ø­Ø±Ùƒ"
                       : language === 'en'
                         ? "Motorized"
                         : language === 'de'
@@ -522,9 +522,9 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                             ? "Motorizzata"
                             : language === 'es'
                               ? "Motorizada"
-                              : "Motorisé")
+                              : "MotorisÃ©")
                   : (language === 'ar'
-                      ? "غير مزودة بمحرك"
+                      ? "ØºÙŠØ± Ù…Ø²ÙˆØ¯Ø© Ø¨Ù…Ø­Ø±Ùƒ"
                       : language === 'en'
                         ? "Not motorized"
                         : language === 'de'
@@ -533,41 +533,41 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                             ? "Non motorizzata"
                             : language === 'es'
                               ? "No motorizada"
-                              : "Non motorisé")}
+                              : "Non motorisÃ©")}
               </span>
             </div>
         )}
       </div>
       
-      {/* Cadre inférieur - Informations principales */}
+      {/* Cadre infÃ©rieur - Informations principales */}
       <div className="p-4 space-y-3 flex-1 flex flex-col relative z-10">
-        {/* Caractéristiques spécifiques (ex: Téléphonie) */}
+        {/* CaractÃ©ristiques spÃ©cifiques (ex: TÃ©lÃ©phonie) */}
         {(isTelephonie || hasStorage) && (
           <div className="flex flex-wrap gap-2 mb-1">
             {hasStorage && (
               <div className="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-800 shadow-sm">
                 <HardDrive className="w-3 h-3" />
                 {localizeLabel(
-                  compStorageResolved ?? (announcement as any).storage ?? (announcement as any).attributes?.storage,
+                  compStorageResolved ?? announcement.storage ?? announcement.attributes?.storage,
                   language,
                   'storage'
                 )}
               </div>
             )}
-            {(announcement.ram || (announcement as any).attributes?.ram || compRamResolved) && (
+            {(announcement.ram || announcement.attributes?.ram || compRamResolved) && (
               <div className="flex items-center gap-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-100 dark:border-purple-800 shadow-sm">
                 <Smartphone className="w-3 h-3" />
                 {localizeLabel(
-                  compRamResolved ?? (announcement as any).ram ?? (announcement as any).attributes?.ram,
+                  compRamResolved ?? announcement.ram ?? announcement.attributes?.ram,
                   language,
                   'ram'
                 )}
               </div>
             )}
-            {(announcement.battery_health || (announcement as any).attributes?.battery_health) && (
+            {(announcement.battery_health || announcement.attributes?.battery_health) && (
               <div className="flex items-center gap-1 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-100 dark:border-green-800 shadow-sm">
                 <Zap className="w-3 h-3" />
-                {announcement.battery_health || (announcement as any).attributes?.battery_health}
+                {announcement.battery_health || announcement.attributes?.battery_health}
               </div>
             )}
           </div>
@@ -637,13 +637,13 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
             {typeof isElectric === 'boolean' && (
               <div className="flex items-center gap-1 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-100 dark:border-green-800 shadow-sm">
                 <Zap className="w-3 h-3" />
-                {isElectric ? (isRTL ? "كهربائي" : "Électrique") : (isRTL ? "غير كهربائي" : "Non électrique")}
+                {isElectric ? (isRTL ? "ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ" : "Ã‰lectrique") : (isRTL ? "ØºÙŠØ± ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ" : "Non Ã©lectrique")}
               </div>
             )}
             {typeof isMotorized === 'boolean' && (
               <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-800 shadow-sm">
                 <Cog className="w-3 h-3" />
-                {isMotorized ? (isRTL ? "مزودة بمحرك" : "Motorisé") : (isRTL ? "غير مزودة بمحرك" : "Non motorisé")}
+                {isMotorized ? (isRTL ? "Ù…Ø²ÙˆØ¯Ø© Ø¨Ù…Ø­Ø±Ùƒ" : "MotorisÃ©") : (isRTL ? "ØºÙŠØ± Ù…Ø²ÙˆØ¯Ø© Ø¨Ù…Ø­Ø±Ùƒ" : "Non motorisÃ©")}
               </div>
             )}
             {bikeTypeResolved && (
@@ -689,14 +689,14 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         <div className="flex items-center gap-3">
           <AvatarDisplay
             src={announcement.profiles?.avatar_url}
-            alt={announcement.profiles?.full_name || 'Utilisateur'}
+            alt={announcement.profiles?.full_name || (t('common.user') || 'Utilisateur')}
             fallback={announcement.profiles?.full_name?.charAt(0)?.toUpperCase() || 'U'}
             size="sm"
             className="border-2 border-white dark:border-slate-700 shadow-sm"
           />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-muted-foreground truncate">
-              {announcement.profiles?.full_name || 'Utilisateur'}
+              {announcement.profiles?.full_name || (t('common.user') || 'Utilisateur')}
             </p>
           </div>
         </div>
@@ -720,7 +720,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               return s;
             })();
             const loc = (announcement.location || '').trim();
-            const delim = language === 'ar' ? '، ' : ', ';
+            const delim = language === 'ar' ? 'ØŒ ' : ', ';
             const label = loc && (loc.toLowerCase() !== wilayaLabel.toLowerCase())
               ? `${wilayaLabel}${delim}${loc}`
               : wilayaLabel || loc;
@@ -739,7 +739,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         </div>
 
         <div className="space-y-2 text-xs text-muted-foreground pt-2 border-t border-border/10">
-          {/* Ligne wilaya + prix déjà affichée au-dessus; on ne répète pas ici */}
+          {/* Ligne wilaya + prix dÃ©jÃ  affichÃ©e au-dessus; on ne rÃ©pÃ¨te pas ici */}
           
           <div className="flex items-center justify-end">
             <div className="flex items-center bg-primary/5 px-2 py-0.5 rounded-full">
@@ -759,7 +759,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
               className="flex-1 flex items-center justify-center min-w-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-lg text-sm font-medium transition-colors shadow-sm"
             >
               <Phone className="w-3.5 h-3.5 mr-2 flex-shrink-0" />
-              <span className="truncate">Contacter</span>
+              <span className="truncate">{t('common.contact') || 'Contacter'}</span>
             </button>
            
             <Button3D 
@@ -786,7 +786,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           </div>
         )}
 
-        {/* Overlay "Aperçu" avec effet jupe */}
+        {/* Overlay "AperÃ§u" avec effet jupe */}
         <div className="overflow-hidden h-0 group-hover:h-12 transition-all duration-300 ease-in-out">
           <div className="pt-2 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
             <div className="bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-xl font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700 mb-2 flex items-center justify-between px-3">
@@ -831,3 +831,4 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
 };
 
 export default AnnouncementCard;
+

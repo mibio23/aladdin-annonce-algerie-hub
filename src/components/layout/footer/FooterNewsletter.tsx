@@ -18,7 +18,7 @@ const FooterNewsletter = () => {
     
     // Simulate API call
     setTimeout(() => {
-      toast.success("Inscription réussie !");
+      toast.success(t('footer.newsletterSuccess'));
       setEmail("");
       setIsSubmitting(false);
     }, 1000);

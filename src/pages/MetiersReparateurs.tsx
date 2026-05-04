@@ -307,7 +307,7 @@ const MetiersReparateurs: React.FC = () => {
       .maybeSingle();
 
     if (existingError) {
-      toast.error("Impossible de mettre à jour le favori");
+      toast.error(t('metiers.favoriteUpdateError'));
       return;
     }
 
@@ -318,7 +318,7 @@ const MetiersReparateurs: React.FC = () => {
         .eq('id', existing.id)
         .eq('user_id', user.id);
       if (error) {
-        toast.error("Impossible de retirer le favori");
+        toast.error(t('metiers.favoriteRemoveError'));
         return;
       }
       await loadProFavorites();
@@ -330,7 +330,7 @@ const MetiersReparateurs: React.FC = () => {
       .upsert({ user_id: user.id, pro_id: id }, { onConflict: 'user_id,pro_id' });
 
     if (error) {
-      toast.error("Impossible d'ajouter aux favoris");
+      toast.error(t('metiers.favoriteAddError'));
       return;
     }
 
@@ -519,13 +519,13 @@ const MetiersReparateurs: React.FC = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">
-              Erreur de chargement
+              {t('metiers.loadingError')}
             </h1>
             <p className="text-gray-600 mb-4">
-              Une erreur s'est produite lors du chargement des annonces.
+              {t('metiers.loadingErrorDesc')}
             </p>
             <Button onClick={() => window.location.reload()}>
-              Réessayer
+              {t('metiers.retry')}
             </Button>
           </div>
         </div>
@@ -577,7 +577,7 @@ const MetiersReparateurs: React.FC = () => {
         <div className="flex items-center gap-3 mb-3">
           <div className="text-2xl">📈</div>
           <h1 className="text-2xl font-bold text-red-500">
-            Métiers & Réparateurs 🔥
+            {t('sections.tradesAndRepairers') !== 'sections.tradesAndRepairers' ? t('sections.tradesAndRepairers') : 'Métiers & Réparateurs'} 🔥
           </h1>
         </div>
 
@@ -588,15 +588,15 @@ const MetiersReparateurs: React.FC = () => {
                 <CardContent className="p-4 flex items-center justify-between gap-3">
                   <div className="text-sm">
                     <div className="font-semibold text-gray-900 dark:text-white">
-                      Filtre indisponible
+                      {t('metiers.filterUnavailable')}
                     </div>
                     <div className="text-gray-600 dark:text-gray-300">
-                      Le métier "{professionLabel}" n’est pas reconnu. Affichage de toutes les annonces.
+                      {t('metiers.filterUnavailableDesc').replace('{profession}', professionLabel)}
                     </div>
                   </div>
                   <Button asChild variant="outline">
                     <LocalizedLink to="/metiers-reparateurs">
-                      Voir tout
+                      {t('metiers.viewAll')}
                     </LocalizedLink>
                   </Button>
                 </CardContent>
@@ -604,11 +604,11 @@ const MetiersReparateurs: React.FC = () => {
             ) : (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
-                  Filtré par : {professionLabel}
+                  {t('metiers.filteredBy')} {professionLabel}
                 </span>
                 <Button asChild variant="outline" size="sm">
                   <LocalizedLink to="/metiers-reparateurs">
-                    Retirer le filtre
+                    {t('metiers.removeFilter')}
                   </LocalizedLink>
                 </Button>
               </div>
@@ -618,7 +618,7 @@ const MetiersReparateurs: React.FC = () => {
 
         <p className="text-black dark:text-white text-sm flex items-center gap-2 mb-4">
           <span>⚡</span>
-          Trouvez des professionnels qualifiés et des artisans expérimentés pour tous vos projets de réparation, rénovation et services spécialisés
+          {t('metiers.heroDesc')}
         </p>
         
         {/* Examples Section */}
@@ -626,7 +626,7 @@ const MetiersReparateurs: React.FC = () => {
           {/* Métiers & Réparateurs Examples */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
             <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-3 flex items-center gap-2">
-              🔧 Métiers & Réparateurs
+              {t('metiers.tradesTitle')}
             </h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
@@ -653,7 +653,7 @@ const MetiersReparateurs: React.FC = () => {
           {/* Services Professionnels Examples */}
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
             <h3 className="text-lg font-semibold text-green-700 dark:text-green-300 mb-3 flex items-center gap-2">
-              💼 Services Professionnels
+              {t('metiers.servicesTitle')}
             </h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
@@ -680,7 +680,7 @@ const MetiersReparateurs: React.FC = () => {
 
         <div className="flex items-center gap-3 mb-2">
           <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
-            ({sortedAnnouncements.length} Annonces disponibles)
+            ({sortedAnnouncements.length} {t('metiers.availableAds')})
           </span>
         </div>
       </div>
@@ -709,7 +709,7 @@ const MetiersReparateurs: React.FC = () => {
                   <SelectValue placeholder="Toutes les wilayas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('common.allWilayas') || "Toutes les wilayas"}</SelectItem>
+                  <SelectItem value="all">{t('metiers.allWilayas')}</SelectItem>
                   {wilayas.map((wilaya) => (
                     <SelectItem key={wilaya.code} value={wilaya.name}>
                       {wilaya.code.toString().padStart(2, '0')} - {language === 'ar' ? (wilaya.name_ar || wilaya.name) : wilaya.name}
@@ -726,8 +726,8 @@ const MetiersReparateurs: React.FC = () => {
                   <SelectValue placeholder="Trier par" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Plus récent</SelectItem>
-                  <SelectItem value="views">Plus de vus</SelectItem>
+                  <SelectItem value="recent">{t('metiers.sortRecent')}</SelectItem>
+                  <SelectItem value="views">{t('metiers.sortViews')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -744,7 +744,7 @@ const MetiersReparateurs: React.FC = () => {
                 <Users className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total annonces</p>
+                <p className="text-sm text-gray-600">{t('metiers.totalAds')}</p>
                 <p className="text-xl font-semibold">{sortedAnnouncements.length}</p>
               </div>
             </CardContent>
@@ -756,7 +756,7 @@ const MetiersReparateurs: React.FC = () => {
                 <CheckCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Professionnels vérifiés</p>
+                <p className="text-sm text-gray-600">{t('metiers.verifiedPros')}</p>
                 <p className="text-xl font-semibold">0</p>
               </div>
             </CardContent>
@@ -768,7 +768,7 @@ const MetiersReparateurs: React.FC = () => {
                 <Clock className="w-5 h-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Disponibles</p>
+                <p className="text-sm text-gray-600">{t('metiers.available')}</p>
                 <p className="text-xl font-semibold">
                   {sortedAnnouncements.filter(a => a.is_active).length}
                 </p>
@@ -782,7 +782,7 @@ const MetiersReparateurs: React.FC = () => {
                 <Star className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Note moyenne</p>
+                <p className="text-sm text-gray-600">{t('metiers.averageRating')}</p>
                 <p className="text-xl font-semibold">4.8</p>
               </div>
             </CardContent>
@@ -977,7 +977,7 @@ const MetiersReparateurs: React.FC = () => {
                             <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                               <span className="flex items-center gap-2 truncate">
                                 <MapPin className="w-3 h-3 text-primary" />
-                                <span className="truncate">{announcement.wilaya || 'Non spécifiée'}</span>
+                                <span className="truncate">{announcement.wilaya || t('common.notSpecifiedFemale')}</span>
                                 <span className="text-slate-400">•</span>
                                 <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
                                   {formatRelativeTime(announcement.created_at)}
@@ -1038,10 +1038,10 @@ const MetiersReparateurs: React.FC = () => {
             <CardContent className="p-8 text-center">
               <Wrench className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Aucune annonce trouvée
+                {t('metiers.noResults')}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Aucune annonce de métiers et réparateurs disponible avec les critères sélectionnés.
+                {t('metiers.noResultsDesc')}
               </p>
               <Button 
                 onClick={() => {
@@ -1050,7 +1050,7 @@ const MetiersReparateurs: React.FC = () => {
                 }}
                 variant="outline"
               >
-                Réinitialiser les filtres
+                {t('metiers.resetFilters')}
               </Button>
             </CardContent>
           </Card>

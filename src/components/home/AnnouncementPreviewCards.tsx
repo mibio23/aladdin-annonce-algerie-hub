@@ -5,6 +5,7 @@ import { useAnnouncements, Announcement } from '@/hooks/useAnnouncements';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 import { mockVehicleAnnouncements } from '@/data/mock/vehicleAnnouncements';
 
@@ -12,6 +13,7 @@ const AnnouncementPreviewCards = React.memo(() => {
   const { announcements: realAnnouncements, fetchAnnouncements, loading } = useAnnouncements();
   const { toast } = useToast();
   const { navigateWithLanguage } = useLanguageNavigation();
+  const { t } = useSafeI18nWithRouter();
 
   // Merge real and mock announcements
   const announcements = React.useMemo(() => {
@@ -71,8 +73,8 @@ const AnnouncementPreviewCards = React.memo(() => {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(url).then(() => {
         toast({
-          title: "Lien copié !",
-          description: "Le lien de l'annonce a été copié dans votre presse-papiers.",
+          title: t('preview.linkCopied'),
+          description: t('preview.linkCopiedDesc'),
         });
       });
     }
@@ -101,7 +103,7 @@ const AnnouncementPreviewCards = React.memo(() => {
         ))
       ) : (
         <p className="col-span-full text-center text-muted-foreground">
-          Aucune annonce disponible pour le moment.
+          {t('announcements.noResults')}
         </p>
       )}
     </div>

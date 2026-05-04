@@ -10,8 +10,10 @@ import {
   Mail, // Added Mail icon
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
 const ShareButtons = () => {
+  const { t } = useSafeI18nWithRouter();
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
   const title = typeof document !== 'undefined' ? document.title : '';
 
@@ -20,9 +22,9 @@ const ShareButtons = () => {
   };
 
   const shareOnInstagram = () => {
-    navigator.clipboard.writeText(`Découvrez ceci : ${shareUrl}`);
-    toast.info("Lien copié pour Instagram !", {
-      description: "Ouvrez Instagram et collez le lien ou le message.",
+    navigator.clipboard.writeText(`${t('share.linkCopiedForInstagram')}: ${shareUrl}`);
+    toast.info(t('common.linkCopiedInstagram'), {
+      description: t('common.linkCopiedInstagramDesc'),
     });
   };
 
@@ -43,13 +45,13 @@ const ShareButtons = () => {
   };
 
   const shareByEmail = () => {
-    window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`Découvrez cette page: ${shareUrl}`)}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${shareUrl}`)}`;
   };
 
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success("Lien copié !", {
-      description: "Le lien a été copié dans votre presse-papiers."
+    toast.success(t('common.linkCopiedToast'), {
+      description: t('common.linkCopiedOfferDesc')
     });
   };
 
@@ -97,14 +99,14 @@ const ShareButtons = () => {
       hoverColor: "#006699",
     },
     {
-      name: "Envoyer par E-mail",
+      name: "Email",
       icon: <Mail />,
       action: shareByEmail,
       color: "#7856ff", 
       hoverColor: "#5c3dd0",
     },
     {
-      name: "Copier le lien",
+      name: t('common.linkCopiedToast'),
       icon: <Copy />,
       action: copyLink,
       color: "#6B7280", 

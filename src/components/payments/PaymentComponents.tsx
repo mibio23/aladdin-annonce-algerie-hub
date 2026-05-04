@@ -64,8 +64,8 @@ const StripeCheckoutButton: React.FC<StripeCheckoutButtonProps> = ({
     } catch (error) {
       logger.error('Payment error:', error);
       toast({
-        title: "Erreur de paiement",
-        description: error instanceof Error ? error.message : "Une erreur est survenue",
+        title: t('payment.error'),
+        description: error instanceof Error ? error.message : t('auth.secure.unexpectedError'),
         variant: "destructive"
       });
     } finally {
@@ -117,7 +117,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
       }
     } catch (error) {
       logger.error('Algerian payment error:', error);
-      toast({ title: 'Erreur', description: 'Paiement Algérien indisponible', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('payment.error'), variant: 'destructive' });
     }
   };
   return (

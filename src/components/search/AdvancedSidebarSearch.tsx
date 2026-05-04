@@ -206,8 +206,8 @@ const AdvancedSidebarSearch: React.FC<AdvancedSidebarSearchProps> = ({
     } catch (error) {
       logger.error('Erreur reconnaissance image:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible d'analyser l'image",
+        title: t('common.error'),
+        description: t('search.errors.imageError'),
         variant: "destructive",
       });
     } finally {

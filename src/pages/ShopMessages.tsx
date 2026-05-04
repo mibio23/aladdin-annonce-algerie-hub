@@ -35,7 +35,7 @@ type ShopWithExtras = Shop & {
 };
 
 const ShopMessages = () => {
-  const { isRTL } = useSafeI18nWithRouter();
+  const { isRTL, t } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const { toast } = useToast();
   const [shops, setShops] = useState<ShopWithExtras[]>([]);
@@ -68,8 +68,8 @@ const ShopMessages = () => {
     } catch (error) {
       logger.error('Error fetching shops:', error);
       toast({
-        title: 'Erreur',
-        description: "Impossible de charger vos boutiques",
+        title: t('common.error'),
+        description: t('shopMessages.loadError'),
         variant: 'destructive',
       });
     } finally {
@@ -105,14 +105,14 @@ const ShopMessages = () => {
       }
 
       toast({
-        title: "Statut mis à jour",
-        description: `La boutique a été ${!currentStatus ? 'activée' : 'désactivée'} avec succès`,
+        title: t('shopMessages.statusUpdated'),
+        description: !currentStatus ? t('shopMessages.shopActivated') : t('shopMessages.shopDeactivated'),
       });
     } catch (error) {
       logger.error('Error updating shop status:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le statut de la boutique",
+        title: t('common.error'),
+        description: t('shopMessages.statusUpdateError'),
         variant: "destructive",
       });
     }
@@ -124,7 +124,7 @@ const ShopMessages = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <AuthRequiredBubble 
-          message="Vous devez être connecté pour consulter vos boutiques"
+          message={t('shopMessages.loginRequired')}
           className="max-w-md w-full"
         />
       </div>
@@ -142,9 +142,9 @@ const ShopMessages = () => {
                 <div className="flex items-center gap-3">
                   <Store className="h-8 w-8 text-primary" />
                   <div>
-                    <CardTitle className="text-2xl">Mes boutiques</CardTitle>
+                    <CardTitle className="text-2xl">{t('shopMessages.title')}</CardTitle>
                     <CardDescription>
-                      Gérez vos boutiques et consultez les messages des clients
+                      {t('shopMessages.subtitle')}
                     </CardDescription>
                   </div>
                 </div>
@@ -166,21 +166,21 @@ const ShopMessages = () => {
                   size="sm"
                   onClick={() => setFilter('all')}
                 >
-                  Toutes les boutiques
+                  {t('shopMessages.allShops')}
                 </Button>
                 <Button
                   variant={filter === 'active' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilter('active')}
                 >
-                  Actives {activeCount > 0 && `(${activeCount})`}
+                  {t('shopMessages.actives')} {activeCount > 0 && `(${activeCount})`}
                 </Button>
                 <Button
                   variant={filter === 'inactive' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilter('inactive')}
                 >
-                  Inactives
+                  {t('shopMessages.inactives')}
                 </Button>
               </div>
             </CardContent>
@@ -192,25 +192,25 @@ const ShopMessages = () => {
               <Card className="h-[600px]">
                 <CardHeader>
                   <CardTitle className="text-lg">
-                    {filter === 'active' ? 'Boutiques actives' : 
-                     filter === 'inactive' ? 'Boutiques inactives' : 
-                     'Toutes les boutiques'}
+                    {filter === 'active' ? t('shopMessages.activeShops') : 
+                     filter === 'inactive' ? t('shopMessages.inactiveShops') : 
+                     t('shopMessages.allShops')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="h-[500px] overflow-y-auto">
                     {loading ? (
                       <div className="flex items-center justify-center h-32">
-                        <div className="text-sm text-muted-foreground">Chargement...</div>
+                        <div className="text-sm text-muted-foreground">{t('shopMessages.loading')}</div>
                       </div>
                     ) : shops.length === 0 ? (
                       <div className="flex items-center justify-center h-32">
                         <div className="text-center">
                           <Store className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
                           <div className="text-sm text-muted-foreground">
-                            {filter === 'active' ? 'Aucune boutique active' : 
-                             filter === 'inactive' ? 'Aucune boutique inactive' : 
-                             'Aucune boutique'}
+                            {filter === 'active' ? t('shopMessages.noActiveShop') : 
+                             filter === 'inactive' ? t('shopMessages.noInactiveShop') : 
+                             t('shopMessages.noShop')}
                           </div>
                         </div>
                       </div>
@@ -237,12 +237,12 @@ const ShopMessages = () => {
                                   {isActive ? (
                                     <Badge variant="default" className="text-xs">
                                       <Eye className="h-3 w-3 mr-1" />
-                                      Active
+                                      {t('shopMessages.active')}
                                     </Badge>
                                   ) : (
                                     <Badge variant="secondary" className="text-xs">
                                       <EyeOff className="h-3 w-3 mr-1" />
-                                      Inactive
+                                      {t('shopMessages.inactive')}
                                     </Badge>
                                   )}
                                 </div>
@@ -288,7 +288,7 @@ const ShopMessages = () => {
                           {selectedShop.name}
                         </CardTitle>
                         <CardDescription>
-                          Boutique créée le {new Date(selectedShop.created_at).toLocaleDateString('fr-FR')}
+                          {t('shopMessages.createdOn')} {new Date(selectedShop.created_at).toLocaleDateString('fr-FR')}
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
@@ -300,12 +300,12 @@ const ShopMessages = () => {
                           {selectedShop.shop_status === 'active' ? (
                             <>
                               <EyeOff className="h-4 w-4 mr-1" />
-                              Désactiver
+                              {t('shopMessages.deactivate')}
                             </>
                           ) : (
                             <>
                               <Eye className="h-4 w-4 mr-1" />
-                              Activer
+                              {t('shopMessages.activate')}
                             </>
                           )}
                         </Button>
@@ -315,7 +315,7 @@ const ShopMessages = () => {
                           onClick={() => window.open(`/shop/${selectedShop.id}`)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          Voir
+                          {t('shopMessages.view')}
                         </Button>
                       </div>
                     </div>
@@ -324,13 +324,13 @@ const ShopMessages = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Nom:</span>
+                        <span className="text-sm font-medium">{t('shopMessages.nameLabel')}</span>
                         <span className="text-sm">{selectedShop.name}</span>
                       </div>
                       {selectedShop.category_ids && selectedShop.category_ids.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Store className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Catégories:</span>
+                          <span className="text-sm font-medium">{t('shopMessages.categoriesLabel')}</span>
                           <span className="text-sm">{selectedShop.category_ids.length} sélectionnée{selectedShop.category_ids.length > 1 ? 's' : ''}</span>
                         </div>
                       )}
@@ -349,7 +349,7 @@ const ShopMessages = () => {
                       {selectedShop.phone_numbers && selectedShop.phone_numbers.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Phone className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Téléphone:</span>
+                          <span className="text-sm font-medium">{t('shopMessages.phoneLabel')}</span>
                           <a
                             href={`tel:${selectedShop.phone_numbers[0]}`}
                             className="text-sm text-primary hover:underline"
@@ -361,20 +361,20 @@ const ShopMessages = () => {
                       {selectedShop.address && (
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Adresse:</span>
+                          <span className="text-sm font-medium">{t('shopMessages.addressLabel')}</span>
                           <span className="text-sm">{selectedShop.address}</span>
                         </div>
                       )}
                       {selectedShop.wilaya && (
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Wilaya:</span>
+                          <span className="text-sm font-medium">{t('shopMessages.wilayaLabel')}</span>
                           <span className="text-sm">{selectedShop.wilaya}</span>
                         </div>
                       )}
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Créée le:</span>
+                        <span className="text-sm font-medium">{t('shopMessages.createdOnLabel')}</span>
                         <span className="text-sm">
                           {new Date(selectedShop.created_at).toLocaleDateString('fr-FR', {
                             day: 'numeric',
@@ -391,7 +391,7 @@ const ShopMessages = () => {
 
                     {selectedShop.description && (
                       <div>
-                        <h4 className="text-sm font-medium mb-2">Description:</h4>
+                        <h4 className="text-sm font-medium mb-2">{t('shopMessages.descriptionLabel')}</h4>
                         <div className="p-4 bg-muted/30 rounded-lg">
                           <p className="text-sm whitespace-pre-wrap">
                             {selectedShop.description}
@@ -404,12 +404,12 @@ const ShopMessages = () => {
                       {selectedShop.shop_status === 'active' ? (
                         <Badge variant="default" className="text-xs">
                           <CheckCircle className="h-3 w-3 mr-1" />
-                          Boutique active
+                          {t('shopMessages.activeShop')}
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="text-xs">
                           <AlertCircle className="h-3 w-3 mr-1" />
-                          Boutique inactive
+                          {t('shopMessages.inactiveShop')}
                         </Badge>
                       )}
                     </div>
@@ -420,7 +420,7 @@ const ShopMessages = () => {
                         className="flex-1"
                       >
                         <Eye className="h-4 w-4 mr-2" />
-                        Voir la boutique
+                        {t('shopMessages.viewShop')}
                       </Button>
                       {selectedShop.email && (
                         <Button
@@ -428,7 +428,7 @@ const ShopMessages = () => {
                           onClick={() => window.open(`mailto:${selectedShop.email}`)}
                         >
                           <Mail className="h-4 w-4 mr-2" />
-                          Contacter
+                          {t('shopMessages.contact')}
                         </Button>
                       )}
                       <Button
@@ -436,7 +436,7 @@ const ShopMessages = () => {
                         onClick={() => window.open(`/creer-boutique`)}
                       >
                         <Edit className="h-4 w-4 mr-2" />
-                        Modifier
+                        {t('shopMessages.edit')}
                       </Button>
                     </div>
                   </CardContent>
@@ -446,10 +446,10 @@ const ShopMessages = () => {
                   <CardContent className="text-center">
                     <Store className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-xl font-semibold mb-2">
-                      Sélectionnez une boutique
+                      {t('shopMessages.selectShop')}
                     </h3>
                     <p className="text-muted-foreground">
-                      Choisissez une boutique dans la liste pour voir les détails
+                      {t('shopMessages.selectShopDesc')}
                     </p>
                   </CardContent>
                 </Card>

@@ -693,7 +693,7 @@ const CategorySection = ({
                               {isRTL ? "علاء الدين" : "Aladdin"}
                             </span>
                             <span className="text-[9px] font-bold text-red-600 uppercase tracking-wider leading-none drop-shadow-sm">
-                              {isRTL ? "الإختيار الأفضل" : "Sélection Or"}
+                              {t('premium.selectionOr')}
                             </span>
                           </div>
                           <div className="w-8 h-8 bg-white/50 backdrop-blur-sm rounded-lg shadow-inner flex items-center justify-center border border-white/50 p-1 group-hover:scale-110 transition-transform duration-300">

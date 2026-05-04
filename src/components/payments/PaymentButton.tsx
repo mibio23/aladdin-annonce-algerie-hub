@@ -70,8 +70,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     } catch (error) {
       logger.error('Payment error:', error);
       toast({
-        title: "Erreur de paiement",
-        description: error instanceof Error ? error.message : "Une erreur est survenue",
+        title: t('payment.error'),
+        description: error instanceof Error ? error.message : t('auth.secure.unexpectedError'),
         variant: "destructive"
       });
     } finally {

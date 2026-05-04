@@ -65,15 +65,28 @@ export interface Announcement {
   battery_health?: string;
   expires_at: string | null;
   delivery_options: string[];
-          profiles?: {
-            full_name: string;
-            id: string;
-            avatar_url?: string;
-          };
+  profiles?: {
+    full_name: string;
+    id: string;
+    avatar_url?: string;
+  };
   categories?: {
     name: string;
     slug: string;
   };
+  // Vehicle-specific properties (populated from vehicle_details join or attributes)
+  vehicleDetails?: Record<string, unknown>;
+  vehicle_details?: Record<string, unknown>;
+  registration_date?: string;
+  // Computer/phone-specific properties
+  screen_size?: string;
+  // Bike-specific properties
+  frame_size?: string;
+  wheel_size?: string;
+  bikeElectric?: boolean;
+  bikeMotorized?: boolean;
+  // Dynamic index for any additional Supabase columns
+  [key: string]: unknown;
 }
 
 export interface CreateAnnouncementData {
@@ -182,7 +195,7 @@ export const useAnnouncements = () => {
     expires_at: dbAnnouncement.expires_at,
     delivery_options: [],
     categories: dbAnnouncement.categories || {
-      name: 'Non classé',
+      name: t('common.uncategorized') || 'Non classé',
       slug: 'non-classe'
     }
   }), []);
@@ -190,7 +203,7 @@ export const useAnnouncements = () => {
   // Transform banner data to announcement format (Legacy support)
   const transformBannerToAnnouncement = (banner: any): Announcement => ({
     id: banner.id,
-    title: banner.title || 'Titre manquant',
+    title: banner.title || (t('common.missingTitle') || 'Titre manquant'),
     description: banner.description || '',
     price: 0,
     category_id: '',
@@ -212,7 +225,7 @@ export const useAnnouncements = () => {
     expires_at: banner.end_at,
     delivery_options: [],
         profiles: {
-          full_name: 'Utilisateur',
+          full_name: t('common.user') || 'Utilisateur',
           id: banner.created_by || '',
           avatar_url: undefined
         },
@@ -315,7 +328,7 @@ export const useAnnouncements = () => {
               return {
                 ...announcement,
                 profiles: {
-                  full_name: profile.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : 'Utilisateur',
+                  full_name: profile.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : (t('common.user') || 'Utilisateur'),
                   id: profile.user_id,
                   avatar_url: profile.avatar_url
                 }
@@ -370,8 +383,8 @@ export const useAnnouncements = () => {
     } catch (error) {
       logger.error('Error fetching my announcements:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger vos annonces',
+        title: t('common.error') || 'Erreur',
+        description: t('common.loadAnnouncementsError') || 'Impossible de charger vos annonces',
         variant: 'destructive',
       });
       return [];
@@ -486,16 +499,16 @@ export const useAnnouncements = () => {
       if (error) throw error;
 
       toast({
-        title: 'Succès',
-        description: 'Votre annonce a été créée avec succès',
+        title: t('common.success') || 'Succès',
+        description: t('common.announcementCreated') || 'Votre annonce a été créée avec succès',
       });
 
       return transformAnnouncementData(data as DbAnnouncement);
     } catch (error) {
       logger.error('Error creating announcement:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de créer l\'annonce',
+        title: t('common.error') || 'Erreur',
+        description: t('common.createAnnouncementError') || 'Impossible de créer l\'annonce',
         variant: 'destructive',
       });
       return null;
@@ -527,16 +540,16 @@ export const useAnnouncements = () => {
       if (error) throw error;
 
       toast({
-        title: 'Succès',
-        description: 'Annonce mise à jour avec succès',
+        title: t('common.success') || 'Succès',
+        description: t('common.announcementUpdated') || 'Annonce mise à jour avec succès',
       });
 
       return true;
     } catch (error) {
       logger.error('Error updating announcement:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour l\'annonce',
+        title: t('common.error') || 'Erreur',
+        description: t('common.updateAnnouncementError') || 'Impossible de mettre à jour l\'annonce',
         variant: 'destructive',
       });
       return false;
@@ -573,16 +586,16 @@ export const useAnnouncements = () => {
       if (error) throw error;
 
       toast({
-        title: 'Succès',
-        description: 'Annonce supprimée avec succès',
+        title: t('common.success') || 'Succès',
+        description: t('common.announcementDeleted') || 'Annonce supprimée avec succès',
       });
 
       return true;
     } catch (error) {
       logger.error('Error deleting announcement:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer l\'annonce',
+        title: t('common.error') || 'Erreur',
+        description: t('common.deleteAnnouncementError') || 'Impossible de supprimer l\'annonce',
         variant: 'destructive',
       });
       return false;
@@ -603,16 +616,16 @@ export const useAnnouncements = () => {
       if (error) throw error;
 
       toast({
-        title: 'Succès',
-        description: 'Annonce marquée comme vendue',
+        title: t('common.success') || 'Succès',
+        description: t('common.announcementSold') || 'Annonce marquée comme vendue',
       });
 
       return true;
     } catch (error) {
       logger.error('Error marking as sold:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de marquer comme vendu',
+        title: t('common.error') || 'Erreur',
+        description: t('common.markAsSoldError') || 'Impossible de marquer comme vendu',
         variant: 'destructive',
       });
       return false;

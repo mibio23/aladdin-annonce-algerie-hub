@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Eye, MessageCircle, Grid3X3, List } from 'lucide-react';
 import { Announcement } from '@/hooks/useAnnouncements';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 interface MapViewProps {
   announcements: Announcement[];
@@ -19,6 +20,7 @@ const MapView: React.FC<MapViewProps> = ({
   onSwitchToGrid
 }) => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const { t } = useSafeI18nWithRouter();
 
   // Mock coordinates for demonstration (would be geocoded from location in real app)
   const getCoordinatesForLocation = (location: string): [number, number] => {
@@ -41,7 +43,7 @@ const MapView: React.FC<MapViewProps> = ({
   };
 
   const groupedByLocation = announcements.reduce((acc, announcement) => {
-    const location = announcement.location || 'Non spécifié';
+    const location = announcement.location || t('common.notSpecified');
     if (!acc[location]) {
       acc[location] = [];
     }
@@ -58,7 +60,7 @@ const MapView: React.FC<MapViewProps> = ({
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Carte des résultats
+                {t('map.resultsTitle')}
               </CardTitle>
               <Button
                 variant="outline"
@@ -67,7 +69,7 @@ const MapView: React.FC<MapViewProps> = ({
                 className="flex items-center gap-2"
               >
                 <Grid3X3 className="h-4 w-4" />
-                Vue grille
+                {t('map.gridView')}
               </Button>
             </div>
           </CardHeader>
@@ -123,13 +125,13 @@ const MapView: React.FC<MapViewProps> = ({
               
               {/* Map Legend */}
               <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 text-xs">
-                <div className="font-medium mb-2">Légende</div>
+                <div className="font-medium mb-2">{t('map.legend')}</div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-3 h-3 bg-primary rounded-full"></div>
-                  <span>Annonces disponibles</span>
+                  <span>{t('map.availableAds')}</span>
                 </div>
                 <div className="text-muted-foreground">
-                  Cliquez sur un marqueur pour voir les détails
+                  {t('map.clickMarker')}
                 </div>
               </div>
             </div>
@@ -143,7 +145,7 @@ const MapView: React.FC<MapViewProps> = ({
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <List className="h-5 w-5" />
-              {selectedAnnouncement ? 'Détails' : 'Sélectionnez une zone'}
+              {selectedAnnouncement ? t('map.details') : t('map.selectArea')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -182,7 +184,7 @@ const MapView: React.FC<MapViewProps> = ({
                     className="flex-1"
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    Voir
+                    {t('map.view')}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -199,7 +201,7 @@ const MapView: React.FC<MapViewProps> = ({
                 {groupedByLocation[selectedAnnouncement.location]?.length > 1 && (
                   <div>
                     <h4 className="font-medium text-sm mb-2">
-                      Autres annonces à {selectedAnnouncement.location}
+                      {t('map.otherAdsAt')} {selectedAnnouncement.location}
                     </h4>
                     <div className="space-y-2 max-h-40 overflow-y-auto">
                       {groupedByLocation[selectedAnnouncement.location]
@@ -224,7 +226,7 @@ const MapView: React.FC<MapViewProps> = ({
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Cliquez sur un marqueur de la carte pour voir les détails des annonces</p>
+                <p>{t('map.clickMarkerFull')}</p>
                 <div className="mt-4 space-y-2 text-sm">
                   {Object.entries(groupedByLocation).map(([location, announcements]) => (
                     <div 

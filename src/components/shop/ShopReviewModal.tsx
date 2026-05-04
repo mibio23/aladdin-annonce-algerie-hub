@@ -6,6 +6,7 @@ import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/silentLogger';
 import { useAuth } from '@/contexts/useAuth';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,7 @@ interface ShopReviewModalProps {
 const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shopId, shopName, onReviewSubmitted, existingReview }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useSafeI18nWithRouter();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -41,8 +43,8 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
   const handleSubmit = async () => {
     if (!user) {
       toast({
-        title: 'Connexion requise',
-        description: 'Vous devez être connecté pour laisser un avis.',
+        title: t('shopReview.loginRequired'),
+        description: t('shopReview.loginRequiredDesc'),
         variant: 'destructive',
       });
       window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
@@ -52,8 +54,8 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
 
     if (rating === 0) {
       toast({
-        title: 'Note requise',
-        description: 'Veuillez sélectionner une note entre 1 et 5 étoiles.',
+        title: t('shopReview.ratingRequired'),
+        description: t('shopReview.ratingRequiredDesc'),
         variant: 'destructive',
       });
       return;
@@ -97,10 +99,10 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
       }
 
       toast({
-        title: existingReview ? 'Avis mis à jour' : 'Avis publié',
+        title: existingReview ? t('shopReview.updated') : t('shopReview.published'),
         description: existingReview
-          ? 'Votre avis a bien été mis à jour.'
-          : 'Merci d\'avoir partagé votre expérience !',
+          ? t('shopReview.updatedDesc')
+          : t('shopReview.publishedDesc'),
       });
 
       await onReviewSubmitted();
@@ -111,9 +113,9 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
       logger.error('Error submitting review:', error);
       const errorMessage =
         (error as { message?: string })?.message ||
-        'Une erreur est survenue lors de l\'envoi de votre avis.';
+        t('shopReview.errorDesc');
       toast({
-        title: 'Erreur',
+        title: t('shopReview.error'),
         description: errorMessage,
         variant: 'destructive',
       });
@@ -127,18 +129,18 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            {existingReview ? `Modifier votre avis sur ${shopName}` : `Évaluer ${shopName}`}
+            {existingReview ? `${t('shopReview.editTitle')} ${shopName}` : `${t('shopReview.rateTitle')} ${shopName}`}
           </DialogTitle>
         </DialogHeader>
         
         <div className="py-6 space-y-6">
           {existingReview && (
             <div className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
-              Vous avez déjà laissé un avis sur cette boutique. Vous pouvez le modifier ici.
+              {t('shopReview.alreadyReviewed')}
             </div>
           )}
           <div className="flex flex-col items-center gap-4">
-            <p className="text-sm font-medium text-slate-500">Quelle est votre note globale ?</p>
+            <p className="text-sm font-medium text-slate-500">{t('shopReview.ratingQuestion')}</p>
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -164,10 +166,10 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
 
           <div className="space-y-3">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Partagez votre expérience en détail (optionnel)
+              {t('shopReview.shareExperience')}
             </label>
             <Textarea
-              placeholder="Comment s'est passée votre interaction avec cette boutique ?"
+              placeholder={t('shopReview.placeholder')}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               className="min-h-[120px] resize-none"
@@ -177,14 +179,14 @@ const ShopReviewModal: React.FC<ShopReviewModalProps> = ({ isOpen, onClose, shop
 
         <div className="flex justify-end gap-3 pt-4 border-t">
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Annuler
+            {t('common.cancel')}
           </Button>
           <Button 
             className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6" 
             onClick={handleSubmit}
             disabled={isSubmitting || rating === 0}
           >
-            {isSubmitting ? 'Envoi...' : existingReview ? 'Mettre à jour mon avis' : 'Publier l\'avis'}
+            {isSubmitting ? t('common.sending') : existingReview ? t('shopReview.updateBtn') : t('shopReview.publishBtn')}
           </Button>
         </div>
       </DialogContent>

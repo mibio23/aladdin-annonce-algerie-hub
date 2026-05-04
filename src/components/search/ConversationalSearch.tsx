@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import VoiceSearchEnhanced from './VoiceSearchEnhanced';
 import { logger } from '@/utils/silentLogger';
+import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 
 interface Message {
   id: string;
@@ -40,6 +41,7 @@ const ConversationalSearch: React.FC<ConversationalSearchProps> = ({
   const [_searchHistory, _setSearchHistory] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { t } = useSafeI18nWithRouter();
 
   // Défilement automatique vers le bas
   const scrollToBottom = () => {
@@ -146,8 +148,8 @@ const ConversationalSearch: React.FC<ConversationalSearchProps> = ({
     } catch (error) {
       logger.error('Erreur lors du traitement du message:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de traiter votre message. Réessayez.",
+        title: t('common.error'),
+        description: t('search.errors.processingError'),
         variant: "destructive",
       });
     } finally {

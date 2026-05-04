@@ -48,8 +48,8 @@ const VisualSearchModal: React.FC<VisualSearchModalProps> = ({
     } catch (error) {
       logger.error('Erreur traitement image:', error);
       toast({
-        title: "Erreur de traitement",
-        description: "Impossible d'analyser l'image. Réessayez.",
+        title: t('search.errors.imageAnalysisTitle'),
+        description: t('search.errors.imageAnalysisError'),
         variant: "destructive",
       });
     } finally {

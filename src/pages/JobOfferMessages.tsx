@@ -46,7 +46,7 @@ interface JobOffer {
 import AuthRequiredBubble from '@/components/auth/AuthRequiredBubble';
 
 const JobOfferMessages = () => {
-  const { isRTL } = useSafeI18nWithRouter();
+  const { t, isRTL } = useSafeI18nWithRouter();
   const { user } = useAuth();
   const { toast } = useToast();
   const { getLocalizedPath } = useLanguageFromURL();
@@ -79,8 +79,8 @@ const JobOfferMessages = () => {
     } catch (error) {
       logger.error('Error fetching job offers:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les offres de métiers",
+        title: t('common.error'),
+        description: t('jobOfferMessages.loadError'),
         variant: "destructive",
       });
     } finally {
@@ -112,14 +112,14 @@ const JobOfferMessages = () => {
       }
 
       toast({
-        title: "Statut mis à jour",
-        description: `L'offre a été ${!currentStatus ? 'activée' : 'désactivée'} avec succès`,
+        title: t('jobOfferMessages.statusUpdated'),
+        description: !currentStatus ? t('jobOfferMessages.activated') : t('jobOfferMessages.deactivated'),
       });
     } catch (error) {
       logger.error('Error updating offer status:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le statut de l'offre",
+        title: t('common.error'),
+        description: t('jobOfferMessages.statusError'),
         variant: "destructive",
       });
     }
@@ -131,7 +131,7 @@ const JobOfferMessages = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <AuthRequiredBubble 
-          message="Vous devez être connecté pour consulter vos messages"
+          message={t('jobOfferMessages.loginRequired')}
           className="max-w-md w-full"
         />
       </div>
@@ -149,9 +149,9 @@ const JobOfferMessages = () => {
                 <div className="flex items-center gap-3">
                   <Briefcase className="h-8 w-8 text-primary" />
                   <div>
-                    <CardTitle className="text-2xl">Mes offres de métiers</CardTitle>
+                    <CardTitle className="text-2xl">{t('jobOfferMessages.title')}</CardTitle>
                     <CardDescription>
-                      Gérez vos offres de métiers et consultez les contacts reçus
+                      {t('jobOfferMessages.description')}
                     </CardDescription>
                   </div>
                 </div>
@@ -173,21 +173,21 @@ const JobOfferMessages = () => {
                   size="sm"
                   onClick={() => setFilter('all')}
                 >
-                  Toutes les offres
+                  {t('jobOfferMessages.allOffers')}
                 </Button>
                 <Button
                   variant={filter === 'active' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilter('active')}
                 >
-                  Actives {activeCount > 0 && `(${activeCount})`}
+                  {t('jobOfferMessages.activeOffers')} {activeCount > 0 && `(${activeCount})`}
                 </Button>
                 <Button
                   variant={filter === 'inactive' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilter('inactive')}
                 >
-                  Inactives
+                  {t('jobOfferMessages.inactiveOffers')}
                 </Button>
               </div>
             </CardContent>
@@ -208,16 +208,16 @@ const JobOfferMessages = () => {
                   <div className="h-[500px] overflow-y-auto">
                     {loading ? (
                       <div className="flex items-center justify-center h-32">
-                        <div className="text-sm text-muted-foreground">Chargement...</div>
+                        <div className="text-sm text-muted-foreground">{t('jobOfferMessages.loading')}</div>
                       </div>
                     ) : offers.length === 0 ? (
                       <div className="flex items-center justify-center h-32">
                         <div className="text-center">
                           <Briefcase className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
                           <div className="text-sm text-muted-foreground">
-                            {filter === 'active' ? 'Aucune offre active' :
-                             filter === 'inactive' ? 'Aucune offre inactive' :
-                             'Aucune offre'}
+                            {filter === 'active' ? t('jobOfferMessages.noActiveOffer') :
+                             filter === 'inactive' ? t('jobOfferMessages.noInactiveOffer') :
+                             t('jobOfferMessages.noOffer')}
                           </div>
                         </div>
                       </div>
@@ -241,12 +241,12 @@ const JobOfferMessages = () => {
                                   {offer.is_active ? (
                                     <Badge variant="default" className="text-xs">
                                       <Eye className="h-3 w-3 mr-1" />
-                                      Active
+                                      {t('jobOfferMessages.active')}
                                     </Badge>
                                   ) : (
                                     <Badge variant="secondary" className="text-xs">
                                       <EyeOff className="h-3 w-3 mr-1" />
-                                      Inactive
+                                      {t('jobOfferMessages.inactive')}
                                     </Badge>
                                   )}
                                 </div>
@@ -288,7 +288,7 @@ const JobOfferMessages = () => {
                           {selectedOffer.title}
                         </CardTitle>
                         <CardDescription>
-                          Offre de métier créée le {new Date(selectedOffer.created_at).toLocaleDateString('fr-FR')}
+                          {t('jobOfferMessages.createdOn')} {new Date(selectedOffer.created_at).toLocaleDateString()}
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
@@ -300,12 +300,12 @@ const JobOfferMessages = () => {
                           {selectedOffer.is_active ? (
                             <>
                               <EyeOff className="h-4 w-4 mr-1" />
-                              Désactiver
+                              {t('jobOfferMessages.deactivate')}
                             </>
                           ) : (
                             <>
                               <Eye className="h-4 w-4 mr-1" />
-                              Activer
+                              {t('jobOfferMessages.activate')}
                             </>
                           )}
                         </Button>
@@ -322,7 +322,7 @@ const JobOfferMessages = () => {
                           disabled={!selectedOffer.phone_numbers || selectedOffer.phone_numbers.length === 0}
                         >
                           <Phone className="h-4 w-4 mr-1" />
-                          Contacter
+                          {t('jobOfferMessages.contact')}
                         </Button>
                       </div>
                     </div>
@@ -331,12 +331,12 @@ const JobOfferMessages = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Titre:</span>
+                        <span className="text-sm font-medium">{t('jobOfferMessages.titleLabel')}</span>
                         <span className="text-sm">{selectedOffer.title}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Contact:</span>
+                        <span className="text-sm font-medium">{t('jobOfferMessages.contactLabel')}</span>
                         {selectedOffer.phone_numbers && selectedOffer.phone_numbers.length > 0 ? (
                           <a
                             href={`tel:${selectedOffer.phone_numbers[0]}`}
@@ -350,7 +350,7 @@ const JobOfferMessages = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Créée le:</span>
+                        <span className="text-sm font-medium">{t('jobOfferMessages.createdOnLabel')}</span>
                         <span className="text-sm">
                           {new Date(selectedOffer.created_at).toLocaleDateString('fr-FR', {
                             day: 'numeric',
@@ -364,7 +364,7 @@ const JobOfferMessages = () => {
                       {selectedOffer.expires_at && (
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Expire le:</span>
+                          <span className="text-sm font-medium">{t('jobOfferMessages.expiresOnLabel')}</span>
                           <span className="text-sm">
                             {new Date(selectedOffer.expires_at).toLocaleDateString('fr-FR', {
                               day: 'numeric',
@@ -379,7 +379,7 @@ const JobOfferMessages = () => {
                     <Separator />
 
                     <div>
-                      <h4 className="text-sm font-medium mb-2">Description:</h4>
+                      <h4 className="text-sm font-medium mb-2">{t('jobOfferMessages.descriptionLabel')}</h4>
                       <div className="p-4 bg-muted/30 rounded-lg">
                         <p className="text-sm whitespace-pre-wrap">
                           {selectedOffer.description}
@@ -391,12 +391,12 @@ const JobOfferMessages = () => {
                       {selectedOffer.is_active ? (
                         <Badge variant="default" className="text-xs">
                           <CheckCircle className="h-3 w-3 mr-1" />
-                          Offre active
+                          {t('jobOfferMessages.offerActive')}
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="text-xs">
                           <AlertCircle className="h-3 w-3 mr-1" />
-                          Offre inactive
+                          {t('jobOfferMessages.offerInactive')}
                         </Badge>
                       )}
                     </div>
@@ -411,14 +411,14 @@ const JobOfferMessages = () => {
                         disabled={!selectedOffer.phone_numbers || selectedOffer.phone_numbers.length === 0}
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Contacter par téléphone
+                        {t('jobOfferMessages.contactByPhone')}
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => window.open(getLocalizedPath('/deposer-offre-metier'))}
                       >
                         <Edit className="h-4 w-4 mr-2" />
-                        Modifier
+                        {t('jobOfferMessages.edit')}
                       </Button>
                     </div>
                   </CardContent>
@@ -428,10 +428,10 @@ const JobOfferMessages = () => {
                   <CardContent className="text-center">
                     <Briefcase className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-xl font-semibold mb-2">
-                      Sélectionnez une offre
+                      {t('jobOfferMessages.selectOffer')}
                     </h3>
                     <p className="text-muted-foreground">
-                      Choisissez une offre dans la liste pour voir les détails
+                      {t('jobOfferMessages.selectOfferDesc')}
                     </p>
                   </CardContent>
                 </Card>
