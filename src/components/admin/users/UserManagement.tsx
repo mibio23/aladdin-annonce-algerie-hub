@@ -53,11 +53,6 @@ const UserManagement = () => {
 
   useEffect(() => {
     const resolvePermission = async () => {
-      const emailNormalized = String((currentUser as unknown as Record<string, unknown>)?.email || "").trim().toLowerCase();
-      if (emailNormalized === "info18shopworld@gmail.com") {
-        setCanManageSuspension(true);
-        return;
-      }
       if (!currentUser?.id) {
         setCanManageSuspension(false);
         return;
@@ -115,11 +110,9 @@ const UserManagement = () => {
 
           const role = roleMap.get(profile.user_id || "") || null;
           const profileRecord = profile as unknown as Record<string, unknown>;
-          const emailNormalized = String(profileRecord.email || "").trim().toLowerCase();
           const isProtectedAdmin =
             role === "admin" ||
             role === "moderator" ||
-            emailNormalized === "info18shopworld@gmail.com" ||
             (!!currentUser?.id && profile.user_id === currentUser.id);
 
           return {

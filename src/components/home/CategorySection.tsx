@@ -563,7 +563,7 @@ const CategorySection = ({
               // Fallback: use raw
               return s;
             })();
-            const rawCommune = typeof anyAnnouncement.commune === "string" ? anyAnnouncement.commune : "";
+            const rawCommune = typeof ann.commune === "string" ? ann.commune : "";
             const rawLocation = typeof announcement.location === "string" ? announcement.location : "";
             const locality = rawCommune.trim() || rawLocation.trim();
             const imageUrl = announcement.imageUrl || announcement.imageUrls?.[0] || "";
@@ -575,9 +575,9 @@ const CategorySection = ({
 
             const isTelephonie =
               category.slug === "telephonie" ||
-              anyAnnouncement.category_id === "telephonie" ||
-              anyAnnouncement.categorySlug === "telephonie" ||
-              anyAnnouncement.categories?.slug === "telephonie";
+              ann.category_id === "telephonie" ||
+              ann.categorySlug === "telephonie" ||
+              ann.categories?.slug === "telephonie";
             const hasStorage = typeof storage === "string" && storage.trim().length > 0;
             const hasRam = typeof ram === "string" && ram.trim().length > 0;
             const hasBatteryHealth = typeof batteryHealth === "string" && batteryHealth.trim().length > 0;
@@ -585,9 +585,9 @@ const CategorySection = ({
             
             const isRealEstate =
               category.slug === "immobilier-maison" ||
-              anyAnnouncement.category_id === "immobilier-maison" ||
-              anyAnnouncement.categorySlug === "immobilier-maison" ||
-              anyAnnouncement.categories?.slug === "immobilier-maison";
+              ann.category_id === "immobilier-maison" ||
+              ann.categorySlug === "immobilier-maison" ||
+              ann.categories?.slug === "immobilier-maison";
             const hasSurface = typeof surface === "number" && Number.isFinite(surface) && surface > 0;
             const hasRooms = typeof rooms === "number" && Number.isFinite(rooms) && rooms > 0;
             const hasBedrooms = typeof bedrooms === "number" && Number.isFinite(bedrooms) && bedrooms > 0;
@@ -595,9 +595,9 @@ const CategorySection = ({
             
             const isComputer =
               category.slug === "informatique-electronique" ||
-              anyAnnouncement.category_id === "informatique-electronique" ||
-              anyAnnouncement.categorySlug === "informatique-electronique" ||
-              anyAnnouncement.categories?.slug === "informatique-electronique";
+              ann.category_id === "informatique-electronique" ||
+              ann.categorySlug === "informatique-electronique" ||
+              ann.categories?.slug === "informatique-electronique";
             const hasCompStorage = typeof compStorage === "string" && compStorage.trim().length > 0;
             const hasCompRam = typeof compRam === "string" && compRam.trim().length > 0;
             const hasCompScreen = typeof compScreen === "string" && compScreen.trim().length > 0;
@@ -609,22 +609,22 @@ const CategorySection = ({
 
             const isBike =
               category.slug === "velo-cyclisme-equipements" ||
-              anyAnnouncement.category_id === "velo-cyclisme-equipements" ||
-              anyAnnouncement.categorySlug === "velo-cyclisme-equipements" ||
-              anyAnnouncement.categories?.slug === "velo-cyclisme-equipements";
+              ann.category_id === "velo-cyclisme-equipements" ||
+              ann.categorySlug === "velo-cyclisme-equipements" ||
+              ann.categories?.slug === "velo-cyclisme-equipements";
             const isVehicle =
               category.slug === "vehicules" ||
-              anyAnnouncement.category_id === "vehicules" ||
-              anyAnnouncement.categorySlug === "vehicules" ||
-              anyAnnouncement.categories?.slug === "vehicules" ||
+              ann.category_id === "vehicules" ||
+              ann.categorySlug === "vehicules" ||
+              ann.categories?.slug === "vehicules" ||
               category.slug === "vehicules-equipements" ||
-              anyAnnouncement.category_id === "vehicules-equipements" ||
-              anyAnnouncement.categorySlug === "vehicules-equipements" ||
-              anyAnnouncement.categories?.slug === "vehicules-equipements" ||
+              ann.category_id === "vehicules-equipements" ||
+              ann.categorySlug === "vehicules-equipements" ||
+              ann.categories?.slug === "vehicules-equipements" ||
               category.slug === "vehicules-camions-motos" ||
-              anyAnnouncement.category_id === "vehicules-camions-motos" ||
-              anyAnnouncement.categorySlug === "vehicules-camions-motos" ||
-              anyAnnouncement.categories?.slug === "vehicules-camions-motos";
+              ann.category_id === "vehicules-camions-motos" ||
+              ann.categorySlug === "vehicules-camions-motos" ||
+              ann.categories?.slug === "vehicules-camions-motos";
             const hasFrame = typeof frameSize === "string" && frameSize.trim().length > 0;
             const hasWheel = typeof wheelSize === "string" && wheelSize.trim().length > 0;
             const hasFrameMaterial = typeof frameMaterial === "string" && frameMaterial.trim().length > 0;

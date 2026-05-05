@@ -142,14 +142,10 @@ const AdminUserDetails = () => {
       setIsProtectedAdminAccount(
         role === "admin" ||
         role === "moderator" ||
-        emailNormalized === "info18shopworld@gmail.com" ||
         (!!user?.id && p?.user_id === user.id)
       )
 
-      const actorEmailNormalized = String((user as unknown as Record<string, unknown>)?.email || "").trim().toLowerCase()
-      if (actorEmailNormalized === "info18shopworld@gmail.com") {
-        setCanManageSuspension(true)
-      } else if (user?.id) {
+      if (user?.id) {
         const { data: actorRoleRows } = await supabase
           .from("user_roles")
           .select("role")
