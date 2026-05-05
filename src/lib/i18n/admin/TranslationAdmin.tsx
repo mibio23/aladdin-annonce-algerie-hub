@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { logger } from '@/utils/silentLogger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -127,7 +128,7 @@ const TranslationAdmin: React.FC<AdminProps> = ({ onClose }) => {
       const validationMetrics = await translationValidator.validateAll();
       setMetrics(validationMetrics);
     } catch (error) {
-      console.error('Failed to load metrics:', error);
+      logger.error('Failed to load metrics:', error);
     }
     setIsLoading(false);
   }, []);
@@ -224,7 +225,7 @@ const TranslationAdmin: React.FC<AdminProps> = ({ onClose }) => {
           hasChanges: true,
         })));
       } catch (error) {
-        console.error('Failed to import translations:', error);
+        logger.error('Failed to import translations:', error);
       }
     };
     reader.readAsText(file);

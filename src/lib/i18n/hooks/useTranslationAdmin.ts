@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Language } from '../types/comprehensive';
+import { logger } from '@/utils/silentLogger';
 
 interface AdminHookState {
   isAdminOpen: boolean;
@@ -119,13 +120,13 @@ export function useTranslationDebug() {
   const logTranslation = useCallback((key: string, value: string, language: Language, source: 'direct' | 'fallback') => {
     if (debugMode) {
       const style = source === 'fallback' ? 'color: orange' : 'color: green';
-      console.log(`%c[i18n] ${language}: ${key} → ${value}`, style);
+      logger.info(`[i18n] ${language}: ${key} → ${value}`, source);
     }
   }, [debugMode]);
 
   const logMissingTranslation = useCallback((key: string, language: Language) => {
     if (debugMode) {
-      console.warn(`[i18n] Missing translation: ${key} (${language})`);
+      logger.warn(`[i18n] Missing translation: ${key} (${language})`);
     }
   }, [debugMode]);
 

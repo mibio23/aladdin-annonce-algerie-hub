@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/utils/silentLogger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -173,7 +174,7 @@ const TranslationMonitor: React.FC<MonitorProps> = ({
 
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Failed to load monitoring data:', error);
+      logger.error('Failed to load monitoring data:', error);
     }
     setIsLoading(false);
   }, [generateMockMonitoringData]);

@@ -2,6 +2,7 @@
  * Custom ESLint plugin to detect hardcoded text and enforce translation usage
  */
 import { Rule } from 'eslint';
+import { logger } from '@/utils/silentLogger';
 
 interface EslintPluginTranslations {
   rules: Record<string, Rule.RuleModule>;
@@ -21,11 +22,11 @@ const ALLOWED_HARDCODED_PATTERNS = [
 ];
 
 const COMPONENT_EXCEPTIONS = [
-  'console.log',
-  'console.error',
-  'console.warn',
-  'console.info',
-  'console.debug',
+  'logger.log',
+  'logger.error',
+  'logger.warn',
+  'logger.info',
+  'logger.debug',
   'className',
   'id',
   'data-testid',
@@ -153,14 +154,14 @@ const noHardcodedStrings: Rule.RuleModule = {
       const suggestedKey = generateTranslationKey(text);
       
       context.report({
-        node: node as never,
+        node: node as unknown as Rule.Node,
         messageId: 'hardcodedString',
         data: {
           text: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
           key: suggestedKey,
         },
         fix(fixer) {
-          return fixer.replaceText(node as never, `t("${suggestedKey}")`);
+          return fixer.replaceText(node as unknown as Rule.Node, `t("${suggestedKey}")`);
         },
       });
     }
@@ -177,14 +178,14 @@ const noHardcodedStrings: Rule.RuleModule = {
       const suggestedKey = generateTranslationKey(text);
       
       context.report({
-        node: node as never,
+        node: node as unknown as Rule.Node,
         messageId: 'hardcodedString',
         data: {
           text: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
           key: suggestedKey,
         },
         fix(fixer) {
-          return fixer.replaceText(node as never, `{t("${suggestedKey}")}`);
+          return fixer.replaceText(node as unknown as Rule.Node, `{t("${suggestedKey}")}`);
         },
       });
     }
@@ -230,7 +231,7 @@ const requireTranslationKeys: Rule.RuleModule = {
       // Validate key format
       if (!/^[a-z][a-zA-Z0-9.]*$/.test(key)) {
         context.report({
-          node: firstArg as never,
+          node: firstArg as unknown as Rule.Node,
           messageId: 'invalidTranslationKey',
           data: { key },
         });
@@ -241,7 +242,7 @@ const requireTranslationKeys: Rule.RuleModule = {
       // This is a simplified check - in real implementation, we'd load the actual translation files
       if (key.length < 3 || key.split('.').length > 5) {
         context.report({
-          node: firstArg as never,
+          node: firstArg as unknown as Rule.Node,
           messageId: 'missingTranslationKey',
           data: { key },
         });
@@ -289,7 +290,7 @@ const translationBestPractices: Rule.RuleModule = {
       // Check for generic/non-semantic keys
       if (/^(text|label|title|button|link)\d+$/.test(key)) {
         context.report({
-          node: firstArg as never,
+          node: firstArg as unknown as Rule.Node,
           messageId: 'useSemanticKeys',
         });
       }
@@ -298,7 +299,7 @@ const translationBestPractices: Rule.RuleModule = {
       const parts = key.split('.');
       if (parts.length < 2) {
         context.report({
-          node: firstArg as never,
+          node: firstArg as unknown as Rule.Node,
           messageId: 'consistentKeyFormat',
         });
       }

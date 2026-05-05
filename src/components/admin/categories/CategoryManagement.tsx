@@ -178,7 +178,7 @@ const CategoryManagement = () => {
             position_order: Number(categoryData.sortOrder ?? editingCategory.sortOrder ?? 0),
             is_active: categoryData.isActive ?? editingCategory.isActive,
             icon: categoryData.icon ?? null,
-          } as never)
+          } as Record<string, unknown>)
           .eq("id", editingCategory.id);
 
         if (error) throw error;
@@ -198,7 +198,7 @@ const CategoryManagement = () => {
           is_active: categoryData.isActive ?? true,
         };
 
-        const { error } = await supabase.from("categories").insert(insertPayload as never);
+        const { error } = await supabase.from("categories").insert(insertPayload as Record<string, unknown>);
         if (error) throw error;
 
         toast({
@@ -245,7 +245,7 @@ const CategoryManagement = () => {
       if (error) {
         const { error: archiveError } = await supabase
           .from("categories")
-          .update({ is_active: false } as never)
+          .update({ is_active: false } as Record<string, unknown>)
           .eq("id", categoryId);
         if (archiveError) throw archiveError;
         toast({
@@ -287,7 +287,7 @@ const CategoryManagement = () => {
     try {
       const { error } = await supabase
         .from("categories")
-        .update({ is_active: isActive } as never)
+        .update({ is_active: isActive } as Record<string, unknown>)
         .eq("id", categoryId);
       if (error) throw error;
 
@@ -360,7 +360,7 @@ const CategoryManagement = () => {
     try {
       const { error } = await supabase
         .from("categories")
-        .update({ parent_id: newParentId || null } as never)
+        .update({ parent_id: newParentId || null } as Record<string, unknown>)
         .eq("id", categoryId);
       if (error) throw error;
 
