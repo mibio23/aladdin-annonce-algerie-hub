@@ -68,7 +68,7 @@ const MediaSettingsPanel: React.FC = () => {
         .from("site_settings")
         .upsert({
           setting_key: "media_compression",
-          setting_value: settings as any,
+          setting_value: settings as unknown as Record<string, unknown>,
           is_active: true,
           updated_at: new Date().toISOString(),
         }, { onConflict: "setting_key" });

@@ -27,11 +27,11 @@ const AuthDrawer: React.FC<AuthDrawerProps> = ({ children }) => {
 
   // Gestion de l'ouverture automatique via l'URL ou l'état de navigation
   useEffect(() => {
-    const handleCustomEvent = (e: any) => {
-      const type = e.detail as string;
+    const handleCustomEvent = (e: CustomEvent<string>) => {
+      const type = e.detail;
       if (type === 'login' || type === 'register' || type === 'forgot-password') {
         setIsOpen(true);
-        setActiveTab(type as any);
+        setActiveTab(type);
       }
     };
 
@@ -43,7 +43,7 @@ const AuthDrawer: React.FC<AuthDrawerProps> = ({ children }) => {
     const isInscriptionPath = location.pathname.includes('/inscription');
     const isForgotPasswordPath = location.pathname.includes('/mot-de-passe-oublie');
     const state = location.state as Record<string, unknown> | null;
-    const openAuth = (state && typeof state === 'object' ? (state as any).openAuth : undefined) as
+    const openAuth = (state && typeof state === 'object' ? (state as Record<string, unknown>).openAuth : undefined) as
       | 'login'
       | 'register'
       | 'forgot-password'
@@ -77,7 +77,7 @@ const AuthDrawer: React.FC<AuthDrawerProps> = ({ children }) => {
 
       let nextState: Record<string, unknown> | null = state;
       if (openAuth) {
-        const { openAuth: _ignored, ...rest } = (state ?? {}) as any;
+        const { openAuth: _ignored, ...rest } = (state ?? {}) as Record<string, unknown>;
         nextState = Object.keys(rest).length ? rest : null;
         shouldCleanUrl = true;
       }

@@ -18,10 +18,10 @@ const languageOptions: LanguageOption[] = [
 
 const FooterLanguageSelector = () => {
   const { changeLanguage, currentURLLanguage } = useLanguageFromURL();
-  const language = currentURLLanguage || (typeof window !== 'undefined' ? (window.document.documentElement.lang as any) : 'fr');
+  const language = currentURLLanguage || (typeof window !== 'undefined' ? (window.document.documentElement.lang as LanguageOption['code']) : 'fr');
 
   const handleLanguageChange = (newLanguage: 'fr' | 'en' | 'ar' | 'de' | 'es' | 'it') => {
-    changeLanguage(newLanguage as any);
+    changeLanguage(newLanguage);
   };
 
   return (

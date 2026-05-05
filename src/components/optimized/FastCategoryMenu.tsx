@@ -51,7 +51,7 @@ const CategoryItem = memo<{
       `}
     >
       <LazyIcon 
-        name={iconName as any} 
+        name={iconName} 
         className="w-4 h-4 mr-2 flex-shrink-0"
       />
       <span className="truncate">{displayName}</span>

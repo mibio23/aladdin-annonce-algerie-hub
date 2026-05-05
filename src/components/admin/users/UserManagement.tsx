@@ -53,7 +53,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     const resolvePermission = async () => {
-      const emailNormalized = String((currentUser as any)?.email || "").trim().toLowerCase();
+      const emailNormalized = String((currentUser as unknown as Record<string, unknown>)?.email || "").trim().toLowerCase();
       if (emailNormalized === "info18shopworld@gmail.com") {
         setCanManageSuspension(true);
         return;
@@ -114,7 +114,8 @@ const UserManagement = () => {
             .eq('created_by', profile.user_id || '');
 
           const role = roleMap.get(profile.user_id || "") || null;
-          const emailNormalized = String((profile as any).email || "").trim().toLowerCase();
+          const profileRecord = profile as unknown as Record<string, unknown>;
+          const emailNormalized = String(profileRecord.email || "").trim().toLowerCase();
           const isProtectedAdmin =
             role === "admin" ||
             role === "moderator" ||
@@ -125,13 +126,13 @@ const UserManagement = () => {
             id: profile.id,
             user_id: profile.user_id || '',
             public_user_id: profile.public_user_id || null,
-            display_name: (profile as any).display_name,
+            display_name: profileRecord.display_name as string | null,
             avatar_url: profile.avatar_url,
             bio: profile.bio,
             created_at: profile.created_at || new Date().toISOString(),
             updated_at: profile.updated_at || new Date().toISOString(),
-            email: (profile as any).email || '',
-            phone: (profile as any).phone || null,
+            email: (profileRecord.email as string) || '',
+            phone: (profileRecord.phone as string) || null,
             announcements_count: bannersCount || 0,
             is_premium: (bannersCount || 0) > 2, // Simple premium logic
             profile_locked: profile.profile_locked || false,

@@ -83,7 +83,7 @@ const HeroCarouselManagement = () => {
         logger.error("Settings error:", settingsError);
         // Don't throw here to allow UI to render even if empty
       }
-      setSettings((settingsData as any) || []);
+      setSettings((settingsData as unknown as CarouselSettings[]) || []);
 
       // Fetch slides - Using 'any' cast
       const { data: slidesData, error: slidesError } = await supabase
@@ -94,7 +94,7 @@ const HeroCarouselManagement = () => {
       if (slidesError) {
         logger.error("Slides error:", slidesError);
       }
-      setSlides((slidesData as any) || []);
+      setSlides((slidesData as unknown as CarouselSlide[]) || []);
       
     } catch (error) {
       logger.error("Error fetching data:", error);

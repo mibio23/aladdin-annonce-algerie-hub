@@ -228,7 +228,7 @@ const VoiceSearchEnhanced: React.FC<VoiceSearchEnhancedProps> = ({
     const isSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
     
     if (isSupported) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = (window as unknown as Record<string, unknown>).SpeechRecognition || (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       
       if (recognitionRef.current) {

@@ -4,6 +4,7 @@ import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { usePreferredLanguageDetection } from '@/hooks/useLanguageFromURL';
 import { extractLanguageFromPath, addLanguageToPath, detectUserPreferredLanguage } from '@/lib/i18n/utils/languageDetector';
 import { languageConfig } from '@/lib/i18n/config';
+import type { Language } from '@/lib/i18n/translations';
 
 interface LanguageRouterProps {
   children: React.ReactNode;
@@ -39,7 +40,7 @@ const LanguageRouter: React.FC<LanguageRouterProps> = ({ children }) => {
   }
 
   // Si l'URL a une langue mais qu'elle n'est pas supportée
-  if (!languageConfig.supportedLanguages.includes(urlLanguage as any)) {
+  if (!languageConfig.supportedLanguages.includes(urlLanguage as Language)) {
     // Rediriger vers la langue par défaut
     const newPath = addLanguageToPath(location.pathname + location.search + location.hash, languageConfig.defaultLanguage);
     return <Navigate to={newPath} replace />;
@@ -47,7 +48,7 @@ const LanguageRouter: React.FC<LanguageRouterProps> = ({ children }) => {
 
   // Si la langue de l'URL est différente de celle du contexte
   if (urlLanguage !== language) {
-    setLanguageFromURL(urlLanguage as any);
+    setLanguageFromURL(urlLanguage as Language);
   }
 
   return <>{children}</>;

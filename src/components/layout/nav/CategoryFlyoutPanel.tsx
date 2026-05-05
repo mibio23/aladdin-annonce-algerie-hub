@@ -31,7 +31,7 @@ const CategoryFlyoutPanel = ({ category, isRTL, language: _language }: CategoryF
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join('');
     
-    const IconComponent = (LucideIcons as any)[iconKey] || LucideIcons.Folder;
+    const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconKey] || LucideIcons.Folder;
     return <IconComponent className={`${size} text-primary/80`} />;
   };
 

@@ -308,10 +308,11 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                     {/* Description supprimée sur cette carte */}
 
                     {(() => {
-                      const isGraduate = (offer as any)?.is_graduate === true;
-                      const homeService = (offer as any)?.home_service === true;
-                      const years = typeof (offer as any)?.years_experience === 'number' ? (offer as any)?.years_experience : undefined;
-                      const level = (offer as any)?.experience_level;
+                      const attrs = offer as unknown as import('@/integrations/supabase/types.extended').MetierAttributes & { wilaya?: string };
+                      const isGraduate = attrs?.is_graduate === true;
+                      const homeService = attrs?.home_service === true;
+                      const years = typeof attrs?.years_experience === 'number' ? attrs.years_experience : undefined;
+                      const level = attrs?.experience_level;
                       const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
 
                       const graduateLabel = isRTL ? "دبلوم/معتمد" : (language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié");
@@ -344,7 +345,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                           <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                             <span className="flex items-center gap-2 truncate">
                               <MapPin className="w-3 h-3 text-primary" />
-                              <span className="truncate">{(offer as any)?.wilaya || t('common.notSpecifiedFemale')}</span>
+                              <span className="truncate">{attrs?.wilaya || t('common.notSpecifiedFemale')}</span>
                               <span className="text-slate-400">•</span>
                               <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
                                 {formatRelativeTime(offer.created_at)}

@@ -69,7 +69,7 @@ export const LazySemanticSearch = withLazyLoading(LazySemanticSearchEngine);
 export const preloadComponent = (lazyComponent: React.LazyExoticComponent<any>) => {
   // Méthode plus sûre pour précharger les composants lazy
   try {
-    const componentImport = (lazyComponent as any)._payload?._result || (lazyComponent as any)._payload;
+    const componentImport = (lazyComponent as unknown as Record<string, unknown> & { _payload?: { _result?: () => Promise<unknown> } })._payload?._result || (lazyComponent as unknown as Record<string, unknown> & { _payload?: () => Promise<unknown> })._payload;
     if (typeof componentImport === 'function') {
       return componentImport();
     }

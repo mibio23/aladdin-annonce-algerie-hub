@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { languageConfig } from '@/lib/i18n/config';
+import type { Language } from '@/lib/i18n/translations';
 
 const LanguageRouteWrapper: React.FC = () => {
   const { lang } = useParams<{ lang?: string }>();
@@ -10,14 +11,14 @@ const LanguageRouteWrapper: React.FC = () => {
 
   useEffect(() => {
     // Si un paramètre de langue est présent dans l'URL et qu'il est valide
-    if (lang && languageConfig.supportedLanguages.includes(lang as any)) {
+    if (lang && languageConfig.supportedLanguages.includes(lang as Language)) {
       // Mettre à jour la langue depuis l'URL sans sauvegarder dans localStorage
-      setLanguageFromURL(lang as any);
+      setLanguageFromURL(lang as Language);
     }
   }, [lang, setLanguageFromURL]);
 
   // Si la langue dans l'URL n'est pas valide, rediriger vers la langue par défaut
-  if (lang && !languageConfig.supportedLanguages.includes(lang as any)) {
+  if (lang && !languageConfig.supportedLanguages.includes(lang as Language)) {
     const fullPath = location.pathname.split('/').filter(Boolean).join('/');
     const remainingPath = fullPath ? `/${fullPath}` : '';
     const targetPath = `/${languageConfig.defaultLanguage}${remainingPath}${location.search}${location.hash}`;

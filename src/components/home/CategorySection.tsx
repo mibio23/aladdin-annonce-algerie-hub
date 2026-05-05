@@ -35,7 +35,7 @@ const normalizeKey = (key: string) =>
     .replace(/[^\p{L}\p{N}_]/gu, "")
     .trim();
 
-const pickAttributeValue = (attributes: any, candidateKeys: string[]) => {
+const pickAttributeValue = (attributes: Record<string, unknown> | undefined | null, candidateKeys: string[]): unknown => {
   if (!attributes || typeof attributes !== "object") return undefined;
   const normalizedCandidates = candidateKeys.map(normalizeKey).filter(Boolean);
   const exact = new Set(normalizedCandidates);
@@ -44,7 +44,7 @@ const pickAttributeValue = (attributes: any, candidateKeys: string[]) => {
     const nk = normalizeKey(rawKey);
     if (!exact.has(nk)) continue;
     if (Array.isArray(rawValue)) return rawValue.length ? rawValue[0] : undefined;
-    return rawValue as any;
+    return rawValue;
   }
 
   for (const [rawKey, rawValue] of Object.entries(attributes)) {
@@ -53,7 +53,7 @@ const pickAttributeValue = (attributes: any, candidateKeys: string[]) => {
     const matches = normalizedCandidates.some((c) => (c.length >= 4 ? nk.includes(c) || c.includes(nk) : nk === c));
     if (!matches) continue;
     if (Array.isArray(rawValue)) return rawValue.length ? rawValue[0] : undefined;
-    return rawValue as any;
+    return rawValue;
   }
   return undefined;
 };
@@ -75,7 +75,7 @@ const normalizeText = (value: string) =>
     .trim();
 
 const localizeLabel = (s: string | undefined, language: string, kind?: string) => {
-  if (!s) return s as any;
+  if (!s) return s;
   let r = String(s);
   if (language === 'ar') {
     r = r.replace(/\bGB\b|\bGo\b/gi, 'غيغابايت');
@@ -111,7 +111,7 @@ const localizeLabel = (s: string | undefined, language: string, kind?: string) =
   return r;
 };
 
-const getVehicleCardData = (announcement: any) => {
+const getVehicleCardData = (announcement: Record<string, unknown>) => {
   const details =
     announcement?.vehicleDetails ??
     announcement?.vehicle_details ??
@@ -537,18 +537,18 @@ const CategorySection = ({
       {announcements.length > 0 ? (
         <SmartAnnouncementsGrid itemsPerRow={3}>
           {announcements.slice(0, maxItems).map((announcement) => {
-            const { year, fuel, transmission, mileage } = getVehicleCardData(announcement as any);
-            const { storage, ram, batteryHealth } = getTelephonieCardData(announcement as any);
-            const { surface, rooms, bedrooms, floor, furnished } = getRealEstateCardData(announcement as any);
-            const { storage: compStorage, ram: compRam, screen: compScreen, cpu: compCpu, gpu: compGpu, os: compOs, hz: compHz } = getComputerCardData(announcement as any);
-            const { frameSize, wheelSize, electric, motorized, frameMaterial, suspension, brake, gears, bikeType, weight } = getBikeCardData(announcement as any);
-            const anyAnnouncement = announcement as any;
+            const ann = announcement as unknown as Record<string, unknown>;
+            const { year, fuel, transmission, mileage } = getVehicleCardData(ann);
+            const { storage, ram, batteryHealth } = getTelephonieCardData(ann);
+            const { surface, rooms, bedrooms, floor, furnished } = getRealEstateCardData(ann);
+            const { storage: compStorage, ram: compRam, screen: compScreen, cpu: compCpu, gpu: compGpu, os: compOs, hz: compHz } = getComputerCardData(ann);
+            const { frameSize, wheelSize, electric, motorized, frameMaterial, suspension, brake, gears, bikeType, weight } = getBikeCardData(ann);
             const createdAt =
-              anyAnnouncement?.created_at ??
-              anyAnnouncement?.createdAt ??
-              (typeof (announcement as any)?.date === "string" ? (announcement as any).date : undefined);
+              ann?.created_at ??
+              ann?.createdAt ??
+              (typeof ann?.date === "string" ? ann.date : undefined);
             const hasCreatedAt = createdAt != null && String(createdAt).trim().length > 0;
-            const rawWilaya = anyAnnouncement.wilaya;
+            const rawWilaya = ann.wilaya;
             const wilayaLabel = (() => {
               if (rawWilaya == null) return "";
               const s = String(rawWilaya).trim();
@@ -717,9 +717,9 @@ const CategorySection = ({
                       )}
 
                       {/* Overlay Badges inside Recessed Container */}
-                      {isVehicle && ((announcement as any).is_urgent || announcement.isUrgent || year) ? (
+                      {isVehicle && ((ann as Record<string, unknown>).is_urgent || announcement.isUrgent || year) ? (
                         <div className={cn("absolute top-2 z-20 flex flex-col gap-1", isRTL ? "left-2 items-start" : "left-2 items-start")}>
-                          {(announcement as any).is_urgent || announcement.isUrgent ? (
+                          {(ann as Record<string, unknown>).is_urgent || announcement.isUrgent ? (
                             <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
                               Urgent
                             </span>

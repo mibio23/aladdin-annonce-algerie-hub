@@ -72,7 +72,7 @@ const AnnouncementManagement = () => {
       // Transform data to match Announcement interface
       const transformedData = data?.map(item => ({
         id: item.id,
-        global_listing_number: (item as any).global_listing_number ?? (item as any).global_announcement_number ?? null,
+        global_listing_number: (item as Record<string, unknown>).global_listing_number as number ?? (item as Record<string, unknown>).global_announcement_number as number ?? null,
         title: item.title,
         description: item.description,
         price: item.price,

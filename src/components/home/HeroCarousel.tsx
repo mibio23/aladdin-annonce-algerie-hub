@@ -64,7 +64,7 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
           .single();
         
         if (settingsData) {
-          setIntervalMs((settingsData as any).interval_ms);
+          setIntervalMs((settingsData as Record<string, unknown>).interval_ms as number);
         }
 
         // Fetch slides - Cast to any
@@ -78,13 +78,13 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
         if (slidesData && slidesData.length > 0) {
           // Filter by end_at date if present
           const now = new Date();
-          const validSlides = slidesData.filter((s: any) => {
+          const validSlides = slidesData.filter((s: Record<string, unknown>) => {
              if (!s.end_at) return true;
              return new Date(s.end_at) > now;
           });
 
           if (validSlides.length > 0) {
-            const formattedSlides = validSlides.map((s: any, index: number) => ({
+            const formattedSlides = validSlides.map((s: Record<string, unknown>, index: number) => ({
               ...s,
               localId: index + 1
             }));

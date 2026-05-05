@@ -146,7 +146,7 @@ const AdminUserDetails = () => {
         (!!user?.id && p?.user_id === user.id)
       )
 
-      const actorEmailNormalized = String((user as any)?.email || "").trim().toLowerCase()
+      const actorEmailNormalized = String((user as unknown as Record<string, unknown>)?.email || "").trim().toLowerCase()
       if (actorEmailNormalized === "info18shopworld@gmail.com") {
         setCanManageSuspension(true)
       } else if (user?.id) {

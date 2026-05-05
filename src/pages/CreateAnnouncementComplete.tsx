@@ -1022,9 +1022,9 @@ const CreateAnnouncementPage: React.FC = () => {
       }
 
       const normalizedExistingImages = (() => {
-        const urls = normalizeStringArray((data as any).image_urls);
+        const urls = normalizeStringArray((data as Record<string, unknown>).image_urls);
         if (urls.length > 0) return urls;
-        const single = (data as any).image_url;
+        const single = (data as Record<string, unknown>).image_url;
         if (typeof single === 'string' && single.trim()) return [single.trim()];
         return [];
       })();
@@ -1068,7 +1068,7 @@ const CreateAnnouncementPage: React.FC = () => {
         whatsappStatus: extractedPhonesData.whatsapp,
         landline: extractedLandline,
         email: data.email || '',
-        website: (data as any).website || '',
+        website: (data as Record<string, unknown>).website as string || '',
         category_id: data.category_id || '',
         subcategory_id: data.subcategory_id || '',
         existingImages: normalizedExistingImages,
@@ -1080,7 +1080,7 @@ const CreateAnnouncementPage: React.FC = () => {
         model: data.model || '',
         color: data.color || '',
         dimensions: data.dimensions || '',
-        weight: (data as any).weight_info || (data as any).weight || '',
+        weight: (data as Record<string, unknown>).weight_info as string || (data as Record<string, unknown>).weight as string || '',
         purchaseYear: data.purchase_year?.toString() || '',
         
         hasInvoice: data.has_invoice || false,
@@ -1148,8 +1148,8 @@ const CreateAnnouncementPage: React.FC = () => {
         productVideoFiles: [],
         detailPhotos: [],
         documentation: normalizeStringArray(data.documentation),
-        realEstatePapers: normalizeStringArray((data as any).real_estate_papers ?? (data as any).papers ?? prev.realEstatePapers),
-        realEstateSpecifications: normalizeStringArray((data as any).real_estate_specifications ?? (data as any).specifications ?? prev.realEstateSpecifications),
+        realEstatePapers: normalizeStringArray((data as Record<string, unknown>).real_estate_papers ?? (data as Record<string, unknown>).papers ?? prev.realEstatePapers),
+        realEstateSpecifications: normalizeStringArray((data as Record<string, unknown>).real_estate_specifications ?? (data as Record<string, unknown>).specifications ?? prev.realEstateSpecifications),
       }));
       
       setLoading(false);
@@ -1791,7 +1791,7 @@ const CreateAnnouncementPage: React.FC = () => {
 
          // Remove undefined keys
          Object.keys(updatePayload).forEach(key => 
-            (updatePayload as any)[key] === undefined && delete (updatePayload as any)[key]
+            (updatePayload as Record<string, unknown>)[key] === undefined && delete (updatePayload as Record<string, unknown>)[key]
          );
 
          logger.debug('Sending update payload:', updatePayload);
@@ -1883,7 +1883,7 @@ const CreateAnnouncementPage: React.FC = () => {
 
       // Remove undefined keys
       Object.keys(insertPayload).forEach(key => 
-         (insertPayload as any)[key] === undefined && delete (insertPayload as any)[key]
+         (insertPayload as Record<string, unknown>)[key] === undefined && delete (insertPayload as Record<string, unknown>)[key]
       );
       
       logger.debug('Sending insert payload:', insertPayload);
@@ -2449,7 +2449,7 @@ const CreateAnnouncementPage: React.FC = () => {
       let errorMessage = t('createAd.errors.createFailedDesc') || "Une erreur est survenue lors de la publication de votre annonce";
       
       // Cast explicite pour gérer les erreurs Supabase qui ne sont pas toujours instance de Error
-      const err = error as any;
+      const err = error as { code?: string; message?: string };
 
       // Gestion spécifique des erreurs connues
       if (err?.code === '22003' || (err?.message && err?.message.includes('numeric field overflow'))) {

@@ -107,8 +107,8 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
           filter: `id=eq.${shop.id}`
         },
         (payload) => {
-          if (payload.new && (payload.new as any).followers_count !== undefined) {
-            setFollowersCount((payload.new as any).followers_count);
+          if (payload.new && (payload.new as Record<string, unknown>).followers_count !== undefined) {
+            setFollowersCount((payload.new as Record<string, unknown>).followers_count as number);
           }
         }
       )

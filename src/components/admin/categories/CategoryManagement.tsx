@@ -106,14 +106,14 @@ const CategoryManagement = () => {
         const rootCounts = new Map<string, number>();
         const subCounts = new Map<string, number>();
 
-        const rootRows = ((rootCategoryCountRes as any)?.data || []) as Array<{ category_slug?: string; count?: number }>;
+        const rootRows = (rootCategoryCountRes?.data || []) as Array<{ category_slug?: string; count?: number }>;
         rootRows.forEach((row) => {
           if (typeof row?.category_slug === 'string') {
             rootCounts.set(row.category_slug, Number(row.count || 0));
           }
         });
 
-        const subRows = ((subCategoryCountRes as any)?.data || []) as Array<{ subcategory_id?: string; count?: number }>;
+        const subRows = (subCategoryCountRes?.data || []) as Array<{ subcategory_id?: string; count?: number }>;
         subRows.forEach((row) => {
           if (typeof row?.subcategory_id === 'string') {
             subCounts.set(row.subcategory_id, Number(row.count || 0));

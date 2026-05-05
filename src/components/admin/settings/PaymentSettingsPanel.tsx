@@ -215,7 +215,7 @@ const PaymentSettingsPanel: React.FC = () => {
         .from('site_settings')
         .upsert({
           setting_key: 'stripe_payments',
-          setting_value: stripeSettings as any,
+          setting_value: stripeSettings as unknown as Record<string, unknown>,
           is_active: isStripeActive,
           updated_at: new Date().toISOString()
         }, { onConflict: 'setting_key' });
@@ -227,7 +227,7 @@ const PaymentSettingsPanel: React.FC = () => {
         .from('site_settings')
         .upsert({
           setting_key: 'algerian_payments',
-          setting_value: algerianSettings as any,
+          setting_value: algerianSettings as unknown as Record<string, unknown>,
           is_active: isAlgerianActive,
           updated_at: new Date().toISOString()
         }, { onConflict: 'setting_key' });
@@ -239,7 +239,7 @@ const PaymentSettingsPanel: React.FC = () => {
         .from('site_settings')
         .upsert({
           setting_key: 'paypal_payments',
-          setting_value: paypalSettings as any,
+          setting_value: paypalSettings as unknown as Record<string, unknown>,
           is_active: isPaypalActive,
           updated_at: new Date().toISOString()
         }, { onConflict: 'setting_key' });
@@ -251,7 +251,7 @@ const PaymentSettingsPanel: React.FC = () => {
         .from('site_settings')
         .upsert({
           setting_key: 'card_payments',
-          setting_value: cardSettings as any,
+          setting_value: cardSettings as unknown as Record<string, unknown>,
           is_active: isCardActive,
           updated_at: new Date().toISOString()
         }, { onConflict: 'setting_key' });
@@ -267,7 +267,7 @@ const PaymentSettingsPanel: React.FC = () => {
         .from('site_settings')
         .upsert({
           setting_key: 'premium_settings',
-          setting_value: premiumSettings as any,
+          setting_value: premiumSettings as unknown as Record<string, unknown>,
           is_active: isPremiumActive,
           updated_at: new Date().toISOString()
         }, { onConflict: 'setting_key' });

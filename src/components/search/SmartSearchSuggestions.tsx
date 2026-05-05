@@ -83,7 +83,7 @@ const SmartSearchSuggestions = ({ query, onSuggestionSelect, isVisible }: SmartS
         if (Array.isArray(c?.subcategories)) visit(c.subcategories);
       }
     };
-    const cats = mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase) as any[];
+    const cats = mergeOfficialAndSupabaseCategories(language, categoriesFromSupabase) as Array<{ name?: string; subcategories?: unknown[] }>;
     visit(cats);
     return names;
   }, [language, categoriesFromSupabase]);
