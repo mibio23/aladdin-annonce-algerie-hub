@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import BackToTopButton from "@/components/shared/BackToTopButton";
 import { supabase } from "@/integrations/supabase/client";
 import { usePopularCategories } from "@/hooks/usePopularCategories";
+import type { RpcScalarResult, CategoryCountRow } from "@/integrations/supabase/types.extended";
 
 // Lazy load heavy components to reduce initial bundle size
 const ShopByCategorySection = React.lazy(() => import("@/components/home/ShopByCategorySection"));
@@ -60,15 +61,15 @@ const Index = () => {
       if (nextJobOffersCount != null) setJobOffersCount(nextJobOffersCount);
       if (nextShopsCount != null) setShopsCount(nextShopsCount);
 
-      const totalFromRpc = Number((totalCountResult as any)?.data ?? NaN);
+      const totalFromRpc = Number((totalCountResult as RpcScalarResult)?.data ?? NaN);
       if (Number.isFinite(totalFromRpc)) {
         setTotalCount(totalFromRpc);
       } else if (nextAnnouncementsCount != null || nextJobOffersCount != null || nextShopsCount != null) {
         setTotalCount((nextAnnouncementsCount ?? 0) + (nextJobOffersCount ?? 0) + (nextShopsCount ?? 0));
       }
 
-      const aggregatedRows = (categoryCountsResult as any)?.data as any[] | null | undefined;
-      const aggregatedError = (categoryCountsResult as any)?.error as any | null | undefined;
+      const aggregatedRows = (categoryCountsResult as RpcScalarResult<CategoryCountRow[]>)?.data;
+      const aggregatedError = (categoryCountsResult as RpcScalarResult<CategoryCountRow[]>)?.error;
 
       if (!aggregatedError && Array.isArray(aggregatedRows)) {
         const next: Record<string, number> = {};

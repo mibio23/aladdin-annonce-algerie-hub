@@ -941,10 +941,11 @@ const MetiersReparateurs: React.FC = () => {
                       {/* Description supprimée sur cette carte */}
 
                       {(() => {
-                        const isGraduate = (announcement as any)?.is_graduate === true || (announcement as any)?.diplome === true;
-                        const homeService = (announcement as any)?.home_service === true || (announcement as any)?.deplacement === true;
-                        const years = typeof (announcement as any)?.years_experience === 'number' ? (announcement as any)?.years_experience : undefined;
-                        const level = (announcement as any)?.experience_level;
+                        const attrs = announcement as unknown as import('@/integrations/supabase/types.extended').MetierAttributes;
+                        const isGraduate = attrs?.is_graduate === true || attrs?.diplome === true;
+                        const homeService = attrs?.home_service === true || attrs?.deplacement === true;
+                        const years = typeof attrs?.years_experience === 'number' ? attrs.years_experience : undefined;
+                        const level = attrs?.experience_level;
                         const isExpert = (typeof years === 'number' && years >= 10) || level === 'expert';
 
                         const graduateLabel = language === 'ar' ? "دبلوم/معتمد" : language === 'es' ? "Titulado/Certificado" : language === 'it' ? "Diplomato/Certificato" : language === 'de' ? "Zertifiziert" : "Diplômé/Certifié";

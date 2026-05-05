@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { MapPin, Calendar, Heart, Share2, Flag, Truck, ShieldCheck, Package, Info, Tag, Ruler, Clock, User, ShieldAlert, ExternalLink, Eye, Home, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -317,9 +317,10 @@ const AnnouncementDetailsPage: React.FC = () => {
         } catch (e) { logger.warn("Vehicle details fetch failed", e); }
 
         // 3. Resolve names
+        const announcementRecord = announcementData as Record<string, unknown>;
         const categoryLookupKey =
-          typeof (announcementData as any).category_slug === 'string' && (announcementData as any).category_slug.trim()
-            ? (announcementData as any).category_slug
+          typeof announcementRecord.category_slug === 'string' && (announcementRecord.category_slug as string).trim()
+            ? announcementRecord.category_slug as string
             : announcementData.category_id;
         const categoryFromMenu = menuCategories.find(c => c.id === categoryLookupKey || c.slug === categoryLookupKey);
         const categoryTranslationKey = `categories.${categoryLookupKey}`;
@@ -338,7 +339,7 @@ const AnnouncementDetailsPage: React.FC = () => {
         let subName = subId || '';
         let subSlug = '';
         if (subId) {
-          const findInSubs = (subs: any[]): string => {
+          const findInSubs = (subs: Array<{ id?: string; slug?: string; name: string; subcategories?: unknown[] }>): string => {
             for (const s of subs) {
               if (s.id === subId || s.slug === subId) return s.name;
               if (s.subcategories) {
@@ -352,7 +353,7 @@ const AnnouncementDetailsPage: React.FC = () => {
             findInSubs(categoryFromMenu?.subcategories || []) ||
             findInSubs(menuCategories.flatMap(c => c.subcategories || []));
 
-          const findSlugInSubs = (subs: any[]): string => {
+          const findSlugInSubs = (subs: Array<{ id?: string; slug?: string; subcategories?: unknown[] }>): string => {
             for (const s of subs) {
               if (s.id === subId || s.slug === subId) return s.slug || '';
               if (s.subcategories) {
@@ -400,16 +401,16 @@ const AnnouncementDetailsPage: React.FC = () => {
           ...announcementData,
           ...realEstateDetails,
           ...vehicleDetails,
-          views_count: announcementData.view_count ?? (announcementData as any).views_count ?? 0,
+          views_count: announcementData.view_count ?? (announcementRecord.views_count as number) ?? 0,
           category: categoryName,
-          categorySlug: typeof (announcementData as any).category_slug === 'string' ? (announcementData as any).category_slug : undefined,
+          categorySlug: typeof announcementRecord.category_slug === 'string' ? announcementRecord.category_slug as string : undefined,
           subcategory: subName || legacySubId,
           subcategory_slug: subSlug || undefined,
           imageUrl: announcementData.image_url || (announcementData.images && announcementData.images[0]),
           imageUrls: announcementData.image_urls || announcementData.images || (announcementData.image_url ? [announcementData.image_url] : []),
           isOnline: announcementData.status === 'active',
-          isFeatured: announcementData.is_featured || (announcementData as any).isFeatured || false,
-          isUrgent: announcementData.is_urgent || (announcementData as any).isUrgent || false,
+          isFeatured: announcementData.is_featured || (announcementRecord.isFeatured as boolean) || false,
+          isUrgent: announcementData.is_urgent || (announcementRecord.isUrgent as boolean) || false,
           phoneNumber: announcementData.phone_number,
           phone_number_masked: announcementData.phone_number,
         } as unknown as DetailedAnnouncement;
@@ -426,13 +427,13 @@ const AnnouncementDetailsPage: React.FC = () => {
         if (announcementData.category_id) {
           const { data: similarData } = await supabase.from('announcements').select('*').eq('category_id', announcementData.category_id).neq('id', id).limit(3);
           if (similarData) {
-            const userIds = [...new Set(similarData.map((item: any) => item.user_id).filter(Boolean))];
-            let profilesMap: Record<string, any> = {};
+            const userIds = [...new Set(similarData.map((item: Record<string, unknown>) => item.user_id as string).filter(Boolean))];
+            let profilesMap: Record<string, { first_name?: string; last_name?: string; avatar_url?: string; user_id: string }> = {};
             if (userIds.length > 0) {
               const { data: pData } = await supabase.from('profiles').select('user_id, first_name, last_name, avatar_url').in('user_id', userIds);
               if (pData) pData.forEach(p => { profilesMap[p.user_id] = p; });
             }
-            setSimilarAnnouncements(similarData.map((item: any) => ({
+            setSimilarAnnouncements(similarData.map((item: Record<string, unknown>) => ({
               ...item,
               id: item.id,
               title: item.title,
@@ -459,7 +460,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                 id: profilesMap[item.user_id].user_id,
                 avatar_url: profilesMap[item.user_id].avatar_url
               } : undefined
-            })) as any);
+            })) as AnnouncementType[]);
           }
         }
 
@@ -915,7 +916,7 @@ const AnnouncementDetailsPage: React.FC = () => {
   };
 
   const localizeLabel = (s: string | undefined, language: string, kind?: string) => {
-    if (!s) return s as any;
+    if (!s) return s;
     let r = String(s);
     if (language === 'ar') {
       r = r.replace(/\bGB\b|\bGo\b/gi, 'ØºÙŠØºØ§Ø¨Ø§ÙŠØª');
@@ -957,7 +958,7 @@ const AnnouncementDetailsPage: React.FC = () => {
       .replace(/[^a-z0-9_]/g, "")
       .trim();
 
-  const pickAttributeValue = (attributes: any, candidateKeys: string[]) => {
+  const pickAttributeValue = (attributes: Record<string, unknown> | undefined | null, candidateKeys: string[]): unknown => {
     if (!attributes || typeof attributes !== "object") return undefined;
     const normalizedCandidates = candidateKeys.map(normalizeKey).filter(Boolean);
     const exact = new Set(normalizedCandidates);
@@ -966,7 +967,7 @@ const AnnouncementDetailsPage: React.FC = () => {
       const nk = normalizeKey(rawKey);
       if (!exact.has(nk)) continue;
       if (Array.isArray(rawValue)) return rawValue.length ? rawValue[0] : undefined;
-      return rawValue as any;
+      return rawValue;
     }
 
     for (const [rawKey, rawValue] of Object.entries(attributes)) {
@@ -975,7 +976,7 @@ const AnnouncementDetailsPage: React.FC = () => {
       const matches = normalizedCandidates.some((c) => (c.length >= 4 ? nk.includes(c) || c.includes(nk) : nk === c));
       if (!matches) continue;
       if (Array.isArray(rawValue)) return rawValue.length ? rawValue[0] : undefined;
-      return rawValue as any;
+      return rawValue;
     }
     return undefined;
   };
@@ -1312,7 +1313,7 @@ const AnnouncementDetailsPage: React.FC = () => {
     return subId;
   })();
 
-  const vehicle = resolveVehicleDetails(announcement as any);
+  const vehicle = resolveVehicleDetails(announcement as unknown as Record<string, unknown>);
   const isVehicleCategory =
     typeof announcement.category_id === "string" && announcement.category_id.toLowerCase().includes("vehicul");
   const purchaseYearForDisplay =
@@ -1320,11 +1321,11 @@ const AnnouncementDetailsPage: React.FC = () => {
     (typeof announcement.purchase_year === "number" && Number.isFinite(announcement.purchase_year)
       ? announcement.purchase_year
       : undefined);
-  const bike = resolveBikeDetails(announcement as any);
+  const bike = resolveBikeDetails(announcement as unknown as Record<string, unknown>);
   const isBikeCategory =
     (typeof announcement.category_id === 'string' && announcement.category_id === 'velo-cyclisme-equipements') ||
     (typeof announcement.categorySlug === 'string' && announcement.categorySlug === 'velo-cyclisme-equipements') ||
-    (announcement as any)?.categories?.slug === 'velo-cyclisme-equipements';
+    (announcement as unknown as { categories?: { slug?: string } })?.categories?.slug === 'velo-cyclisme-equipements';
   const showBikeSpecsBlock =
     isBikeCategory &&
     (bike.frameSize || bike.wheelResolved || typeof bike.isElectric === 'boolean' || typeof bike.isMotorized === 'boolean' || bike.frameMaterial || bike.suspension || bike.brake || bike.gears || bike.bikeType || bike.weight);
@@ -1783,7 +1784,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                           <dd className="font-medium">
                             {Array.isArray(announcement.papers)
                               ? announcement.papers.map(formatDocumentLabel).filter(Boolean).join(', ')
-                              : formatDocumentLabel(announcement.papers as any)}
+                              : formatDocumentLabel(String(announcement.papers))}
                           </dd>
                         </div>
                       )}

@@ -1028,8 +1028,8 @@ const VehicleSearchResultsPage = () => {
             {filteredResults.map((item) => {
               const createdAt =
                 item.created_at ||
-                (item as any)?.createdAt ||
-                (typeof (item as any)?.date === 'string' ? (item as any).date : '');
+                (item as unknown as { createdAt?: string })?.createdAt ||
+                (typeof (item as unknown as { date?: string })?.date === 'string' ? (item as unknown as { date: string }).date : '');
 
               const hasCreatedAt = typeof createdAt === 'string' && createdAt.trim().length > 0;
               const year = Number(item.vehicleDetails.year) || 0;

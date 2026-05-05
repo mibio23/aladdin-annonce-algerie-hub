@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
 import { Notification } from '@/types/notification';
 import { logger } from '@/utils/silentLogger';
+import type { RealtimeNotificationPayload } from '@/integrations/supabase/types.extended';
 
 export const useNotifications = () => {
   const { user } = useAuth();
@@ -59,7 +60,7 @@ export const useNotifications = () => {
         table: 'notifications',
         filter: `user_id=eq.${user.id}`,
       }, (payload) => {
-        const n = payload.new as any;
+        const n = payload.new as RealtimeNotificationPayload;
         const newNotif: Notification = {
           id: n.id,
           type: (n.type || 'info') as Notification['type'],

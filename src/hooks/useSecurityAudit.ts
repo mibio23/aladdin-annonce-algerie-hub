@@ -29,7 +29,7 @@ export const useSecurityAudit = () => {
         p_action_type: event.actionType,
         p_resource_type: event.resourceType,
         p_resource_id: event.resourceId,
-        p_metadata: event.metadata as any
+        p_metadata: (event.metadata ?? {}) as Record<string, unknown>
       });
     } catch (error) {
       logger.error('[Security] Failed to log security event:', error);

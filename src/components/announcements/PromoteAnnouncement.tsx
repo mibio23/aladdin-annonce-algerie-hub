@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
+import type { SettingValue } from '@/integrations/supabase/types.extended';
 
 interface PromoteAnnouncementProps {
   announcementId: string;
@@ -77,10 +78,10 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
         .maybeSingle();
 
       const systems = {
-        stripe: stripeData?.is_active && (stripeData.setting_value as any)?.enabled,
-        algerian: algerianData?.is_active && (algerianData.setting_value as any)?.enabled,
-        paypal: paypalData?.is_active && (paypalData.setting_value as any)?.enabled,
-        card: cardData?.is_active && (cardData.setting_value as any)?.enabled
+        stripe: stripeData?.is_active && (stripeData.setting_value as SettingValue | null)?.enabled,
+        algerian: algerianData?.is_active && (algerianData.setting_value as SettingValue | null)?.enabled,
+        paypal: paypalData?.is_active && (paypalData.setting_value as SettingValue | null)?.enabled,
+        card: cardData?.is_active && (cardData.setting_value as SettingValue | null)?.enabled
       };
 
       setAvailableSystems(systems);
@@ -105,7 +106,7 @@ const PromoteAnnouncement: React.FC<PromoteAnnouncementProps> = ({
   const handlePromotion = async (type: 'featured' | 'urgent') => {
     try {
       let functionName: string;
-      let body: any;
+      let body: Record<string, string>;
 
       switch (selectedSystem) {
         case 'algerian':

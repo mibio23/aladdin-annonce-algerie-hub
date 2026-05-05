@@ -89,7 +89,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
     });
   };
   const localizeLabel = (s: string | undefined, language: string, kind?: string) => {
-    if (!s) return s as any;
+    if (!s) return s;
     let r = String(s);
     if (language === 'ar') {
       r = r.replace(/\bGB\b|\bGo\b/gi, 'ØºÙŠØºØ§Ø¨Ø§ÙŠØª');
@@ -178,7 +178,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
       .replace(/[^\p{L}\p{N}_]/gu, "")
       .trim();
 
-  const pickAttributeValue = (attributes: any, candidateKeys: string[]) => {
+  const pickAttributeValue = (attributes: Record<string, unknown> | undefined | null, candidateKeys: string[]): unknown => {
     if (!attributes || typeof attributes !== "object") return undefined;
     const normalizedCandidates = candidateKeys.map(normalizeKey).filter(Boolean);
     const exact = new Set(normalizedCandidates);
@@ -186,7 +186,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
       const nk = normalizeKey(rawKey);
       if (!exact.has(nk)) continue;
       if (Array.isArray(rawValue)) return rawValue.length ? rawValue[0] : undefined;
-      return rawValue as any;
+      return rawValue;
     }
     for (const [rawKey, rawValue] of Object.entries(attributes)) {
       const nk = normalizeKey(rawKey);
@@ -194,7 +194,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
       const matches = normalizedCandidates.some((c) => (c.length >= 4 ? nk.includes(c) || c.includes(nk) : nk === c));
       if (!matches) continue;
       if (Array.isArray(rawValue)) return rawValue.length ? rawValue[0] : undefined;
-      return rawValue as any;
+      return rawValue;
     }
     return undefined;
   };

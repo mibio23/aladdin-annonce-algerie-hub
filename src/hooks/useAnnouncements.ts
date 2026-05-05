@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { searchService } from '@/services/searchService';
 import { SortOption } from '@/types/search';
+import type { AnnouncementAttributes } from '@/integrations/supabase/types.extended';
 
 // Cache intelligent pour les performances avec invalidation rapide
 const announcementsCache = new Map<string, { data: Announcement[], totalCount?: number, timestamp: number }>();
@@ -201,7 +202,17 @@ export const useAnnouncements = () => {
   }), []);
 
   // Transform banner data to announcement format (Legacy support)
-  const transformBannerToAnnouncement = (banner: any): Announcement => ({
+  const transformBannerToAnnouncement = (banner: {
+    id: string;
+    title?: string;
+    description?: string;
+    image_url?: string;
+    created_by?: string;
+    created_at: string;
+    updated_at: string;
+    is_active: boolean;
+    end_at?: string | null;
+  }): Announcement => ({
     id: banner.id,
     title: banner.title || (t('common.missingTitle') || 'Titre manquant'),
     description: banner.description || '',
@@ -531,9 +542,9 @@ export const useAnnouncements = () => {
           description: announcement.description,
           price: announcement.price,
           condition: announcement.condition,
-          attributes: announcement.attributes as any,
+          attributes: (announcement.attributes ?? {}) as AnnouncementAttributes,
           updated_at: new Date().toISOString()
-        } as any)
+        })
         .eq('id', announcement.id)
         .eq('user_id', user.id); // Check ownership
 

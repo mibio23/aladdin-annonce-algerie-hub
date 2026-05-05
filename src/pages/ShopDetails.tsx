@@ -55,6 +55,7 @@ import SEOHead from '@/components/SEO/SEOHead';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
+import type { ShopSocialMedia, ShopOpeningHours } from '@/integrations/supabase/types.extended';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -140,8 +141,8 @@ const ShopDetails: React.FC = () => {
         (profilesData || []).map((profile) => [
           profile.user_id as string,
           {
-            full_name: (profile as any).full_name ?? null,
-            avatar_url: (profile as any).avatar_url ?? null,
+            full_name: (profile as { full_name?: string | null }).full_name ?? null,
+            avatar_url: (profile as { avatar_url?: string | null }).avatar_url ?? null,
           },
         ])
       );
@@ -258,10 +259,10 @@ const ShopDetails: React.FC = () => {
             website: data.website,
             whatsappNumber: data.whatsapp_number,
             mainCategory: data.main_category,
-            socialMedia: (data.social_media as any) ?? undefined,
-            openingHours: (data.opening_hours as any) ?? undefined,
-            deliveryOptions: (data.delivery_options as any) ?? undefined,
-            paymentMethods: (data.payment_methods as any) ?? undefined,
+            socialMedia: (data.social_media as ShopSocialMedia | null) ?? undefined,
+            openingHours: (data.opening_hours as ShopOpeningHours | null) ?? undefined,
+            deliveryOptions: (data.delivery_options as string[] | null) ?? undefined,
+            paymentMethods: (data.payment_methods as string[] | null) ?? undefined,
             rating: data.rating || 0, // Utiliser la vraie note ou 0
             reviewCount: data.review_count || 0, // Utiliser le vrai count ou 0
             followerCount: data.view_count || 0,
@@ -323,8 +324,9 @@ const ShopDetails: React.FC = () => {
 
         if (error) throw error;
 
-        const isOnlineDb = (data as any)?.is_online as boolean | null | undefined;
-        const lastSeenAt = (data as any)?.last_seen_at as string | null | undefined;
+        const presenceRow = data as { is_online?: boolean | null; last_seen_at?: string | null } | null;
+        const isOnlineDb = presenceRow?.is_online;
+        const lastSeenAt = presenceRow?.last_seen_at;
         
         if (lastSeenAt && isOnlineDb) {
           const lastSeen = new Date(lastSeenAt);

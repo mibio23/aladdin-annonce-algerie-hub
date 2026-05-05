@@ -91,6 +91,30 @@ export default defineConfig(({ mode }) => ({
           if (normalizedId.includes('/src/data/wilayaData') || normalizedId.includes('/src/data/communeData') || normalizedId.includes('/src/data/mock/')) {
             return 'geo-data';
           }
+          // Admin panel (rarely visited, large code)
+          if (normalizedId.includes('/src/components/admin/') || normalizedId.includes('/src/pages/admin/')) {
+            return 'admin';
+          }
+          // Create announcement (large form, only visited when posting)
+          if (normalizedId.includes('CreateAnnouncementComplete') || normalizedId.includes('CreateAnnouncement')) {
+            return 'create-ad';
+          }
+          // Announcement details (heavy per-page component)
+          if (normalizedId.includes('AnnouncementDetailsPage')) {
+            return 'ad-details';
+          }
+          // Shop details (heavy per-page component)
+          if (normalizedId.includes('ShopDetails')) {
+            return 'shop-details';
+          }
+          // Vehicle search results (heavy per-page component)
+          if (normalizedId.includes('VehicleSearchResultsPage')) {
+            return 'vehicle-search';
+          }
+          // Messaging (separate feature)
+          if (normalizedId.includes('/src/components/messaging/')) {
+            return 'messaging';
+          }
         },
       },
     },

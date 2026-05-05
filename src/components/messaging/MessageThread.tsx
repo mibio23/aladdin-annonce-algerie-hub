@@ -144,8 +144,9 @@ const MessageThread: React.FC<MessageThreadProps> = ({
 
         if (error) throw error;
 
-        const isOnlineDb = (data as any)?.is_online as boolean | null | undefined;
-        const lastSeenAt = (data as any)?.last_seen_at as string | null | undefined;
+        const presenceRow = data as { is_online?: boolean | null; last_seen_at?: string | null } | null;
+        const isOnlineDb = presenceRow?.is_online;
+        const lastSeenAt = presenceRow?.last_seen_at;
         
         if (lastSeenAt && isOnlineDb) {
           const lastSeen = new Date(lastSeenAt);

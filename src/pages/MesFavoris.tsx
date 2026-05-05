@@ -87,7 +87,7 @@ const MesFavoris = () => {
         if (error) throw error;
 
         // Filter out favorites where announcement might be null (deleted)
-        const validFavorites = (data || []).filter(f => f.announcement) as any[];
+        const validFavorites = (data || []).filter(f => f.announcement) as Favorite[];
         setFavorites(validFavorites);
       } catch (error) {
         logger.error('Error fetching favorites:', error);
