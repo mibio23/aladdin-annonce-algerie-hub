@@ -232,7 +232,18 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
 
             return (
                <div key={slide.id} className={className}>
-                  <div className="bg-img" style={{ backgroundImage: `url('${slide.image_url}')` }} />
+                  <div className="bg-img">
+                    <img
+                      src={slide.image_url}
+                      alt={slide.title || 'Aladdin Annonces'}
+                      loading={slide.localId === 1 ? 'eager' : 'lazy'}
+                      fetchPriority={slide.localId === 1 ? 'high' : 'auto'}
+                      decoding="async"
+                      width="800"
+                      height="450"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
                   <div className={`slide__inner ${positionClass}`}>
                     <div className={`slide__content ${getAnimationClass(slide.animation_type)}`}>
                       <h2 

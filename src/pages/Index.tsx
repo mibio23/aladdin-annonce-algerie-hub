@@ -6,8 +6,8 @@ import type { RpcScalarResult, CategoryCountRow } from "@/integrations/supabase/
 import SEOHead from "@/components/SEO/SEOHead";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
-// Lazy load ALL heavy components to reduce initial bundle size
-const HeroCarousel = React.lazy(() => import("@/components/home/HeroCarousel"));
+// HeroCarousel chargé en EAGER — critique pour le LCP (ne pas lazy-loader !)
+import HeroCarousel from "@/components/home/HeroCarousel";
 const Hero = React.lazy(() => import("@/components/home/Hero"));
 const ShareButtons = React.lazy(() => import("@/components/shared/ShareButtons"));
 const Footer = React.lazy(() => import("@/components/layout/Footer"));
@@ -133,11 +133,9 @@ const Index = () => {
         image="/og-image.jpg"
         url="/"
       />
-      {/* Carrousel hero - lazy loaded */}
+      {/* Carrousel hero - EAGER pour LCP optimal */}
       <div className="px-4 pt-6 pb-2">
-        <LazySection>
-          <HeroCarousel />
-        </LazySection>
+        <HeroCarousel />
       </div>
 
       {/* Grande bannière avec conteneur centré */}
