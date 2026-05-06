@@ -1,15 +1,15 @@
 
 import React, { Suspense, useEffect, useState } from "react";
-import HeroCarousel from "@/components/home/HeroCarousel";
-import Hero from "@/components/home/Hero";
-import ShareButtons from "@/components/shared/ShareButtons";
-import Footer from "@/components/layout/Footer";
-import BackToTopButton from "@/components/shared/BackToTopButton";
 import { supabase } from "@/integrations/supabase/client";
 import { usePopularCategories } from "@/hooks/usePopularCategories";
 import type { RpcScalarResult, CategoryCountRow } from "@/integrations/supabase/types.extended";
 
-// Lazy load heavy components to reduce initial bundle size
+// Lazy load ALL heavy components to reduce initial bundle size
+const HeroCarousel = React.lazy(() => import("@/components/home/HeroCarousel"));
+const Hero = React.lazy(() => import("@/components/home/Hero"));
+const ShareButtons = React.lazy(() => import("@/components/shared/ShareButtons"));
+const Footer = React.lazy(() => import("@/components/layout/Footer"));
+const BackToTopButton = React.lazy(() => import("@/components/shared/BackToTopButton"));
 const ShopByCategorySection = React.lazy(() => import("@/components/home/ShopByCategorySection"));
 const PremiumAnnouncementsSection = React.lazy(() => import("@/components/home/PremiumAnnouncementsSection"));
 const DiscoverShopsSection = React.lazy(() => import("@/components/home/DiscoverShopsSection"));
@@ -107,14 +107,18 @@ const Index = () => {
 
   return (
     <>
-      {/* Nouveaux Carrousels en plein écran (largeur fluide comme SearchBar) */}
+      {/* Carrousel hero - lazy loaded */}
       <div className="px-4 pt-6 pb-2">
-        <HeroCarousel />
+        <LazySection>
+          <HeroCarousel />
+        </LazySection>
       </div>
 
-      {/* Grande bannière avec conteneur centré - loaded immediately */}
+      {/* Grande bannière avec conteneur centré */}
       <div className="container mx-auto px-4 pb-6">
-        <Hero />
+        <LazySection>
+          <Hero />
+        </LazySection>
       </div>
 
       {/* Contenu principal en plein écran */}
@@ -161,9 +165,15 @@ const Index = () => {
         <DatabaseAdvertisingCarousel />
       </LazySection>
 
-      <ShareButtons />
-      <Footer />
-      <BackToTopButton />
+      <LazySection>
+        <ShareButtons />
+      </LazySection>
+      <LazySection>
+        <Footer />
+      </LazySection>
+      <LazySection>
+        <BackToTopButton />
+      </LazySection>
     </>
   );
 };

@@ -59,9 +59,17 @@ export default defineConfig(({ mode }) => ({
           if (normalizedId.includes('node_modules/lucide-react/')) {
             return 'icons';
           }
-          // Three.js / 3D
+          // Three.js / 3D (lazy loaded only if needed)
           if (normalizedId.includes('node_modules/three/') || normalizedId.includes('node_modules/@react-three/')) {
             return 'three-3d';
+          }
+          // Maps (Leaflet)
+          if (normalizedId.includes('node_modules/leaflet/') || normalizedId.includes('node_modules/react-leaflet/')) {
+            return 'maps';
+          }
+          // File type detection
+          if (normalizedId.includes('node_modules/file-type/') || normalizedId.includes('node_modules/strtok3/') || normalizedId.includes('node_modules/token-types/')) {
+            return 'file-utils';
           }
           // Charts
           if (normalizedId.includes('node_modules/recharts/') || normalizedId.includes('node_modules/d3-')) {
@@ -115,6 +123,10 @@ export default defineConfig(({ mode }) => ({
           if (normalizedId.includes('/src/components/messaging/')) {
             return 'messaging';
           }
+          // Catch-all: all remaining node_modules go to vendor chunk
+          if (normalizedId.includes('node_modules/')) {
+            return 'vendor';
+          }
         },
       },
     },
@@ -126,9 +138,6 @@ export default defineConfig(({ mode }) => ({
       'react-router-dom',
       '@supabase/supabase-js',
       'lucide-react',
-      '@react-three/fiber',
-      '@react-three/drei',
-      'three'
     ],
     // Force la résolution d'une seule version
     force: true,

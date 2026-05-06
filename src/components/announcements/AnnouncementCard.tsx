@@ -352,6 +352,8 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                 <img
                   src={announcement.images[0]}
                   alt={announcement.title}
+                  loading="lazy"
+                  decoding="async"
                   className={imageClass + " rounded-xl"}
                 />
               </div>
@@ -420,6 +422,8 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
                      <img 
                        src="/lovable-uploads/19d6e319-1c10-44f0-a889-e4babb7d2e97.png" 
                        alt="Aladdin" 
+                       loading="lazy"
+                       decoding="async"
                        className="w-full h-full object-contain"
                      />
                   </div>

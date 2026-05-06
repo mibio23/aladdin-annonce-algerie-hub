@@ -7,8 +7,10 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Navigate } from "react-router-dom";
 
 // Import des composants critiques (premier chargement)
-import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
+
+// Homepage & Category - lazy loaded to reduce main bundle
+const Index = React.lazy(() => import("@/pages/Index"));
 
 // Lazy load - pages auth & navigation
 const Connexion = React.lazy(() => import("@/pages/Connexion"));
@@ -105,9 +107,9 @@ export const createLanguageRoutes = (language: Language) => {
   const prefix = `/${language}`;
   
   return [
-    // Routes critiques - eager loaded
-    <Route key={`home-${language}`} path={`${prefix}/`} element={withLayoutEager(Index)} />,
-    <Route key={`category-${language}`} path={`${prefix}/category/:slug`} element={withLayoutEager(CategoryPage)} />,
+    // Routes critiques - lazy loaded with high priority
+    <Route key={`home-${language}`} path={`${prefix}/`} element={withLayout(Index, true, 'high')} />,
+    <Route key={`category-${language}`} path={`${prefix}/category/:slug`} element={withLayout(CategoryPage, true, 'high')} />,
     <Route key={`connexion-${language}`} path={`${prefix}/connexion`} element={withLayoutEager(Connexion)} />,
     <Route key={`inscription-${language}`} path={`${prefix}/inscription`} element={withLayoutEager(Inscription)} />,
     
