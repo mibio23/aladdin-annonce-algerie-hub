@@ -469,7 +469,7 @@ export type Database = {
           availability_date: string | null
           brand: string | null
           cash_discount: number | null
-          category_id: string
+          category_id: string | null
           category_slug: string | null
           color: string | null
           commune: string | null
@@ -534,6 +534,7 @@ export type Database = {
           shop_name: string | null
           status: string | null
           subcategory_id: string | null
+          subcategory_uuid: string | null
           title: string
           type: string | null
           updated_at: string
@@ -560,7 +561,7 @@ export type Database = {
           availability_date?: string | null
           brand?: string | null
           cash_discount?: number | null
-          category_id: string
+          category_id?: string | null
           category_slug?: string | null
           color?: string | null
           commune?: string | null
@@ -625,6 +626,7 @@ export type Database = {
           shop_name?: string | null
           status?: string | null
           subcategory_id?: string | null
+          subcategory_uuid?: string | null
           title: string
           type?: string | null
           updated_at?: string
@@ -651,7 +653,7 @@ export type Database = {
           availability_date?: string | null
           brand?: string | null
           cash_discount?: number | null
-          category_id?: string
+          category_id?: string | null
           category_slug?: string | null
           color?: string | null
           commune?: string | null
@@ -716,6 +718,7 @@ export type Database = {
           shop_name?: string | null
           status?: string | null
           subcategory_id?: string | null
+          subcategory_uuid?: string | null
           title?: string
           type?: string | null
           updated_at?: string
@@ -1286,6 +1289,7 @@ export type Database = {
       }
       categories: {
         Row: {
+          category_uuid: string | null
           created_at: string
           description: string | null
           icon: string | null
@@ -1305,6 +1309,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_uuid?: string | null
           created_at?: string
           description?: string | null
           icon?: string | null
@@ -1324,6 +1329,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_uuid?: string | null
           created_at?: string
           description?: string | null
           icon?: string | null
@@ -1749,6 +1755,7 @@ export type Database = {
           participant_2_id: string
           subject_id: string | null
           subject_type: string | null
+          title: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1759,6 +1766,7 @@ export type Database = {
           participant_2_id: string
           subject_id?: string | null
           subject_type?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1769,6 +1777,7 @@ export type Database = {
           participant_2_id?: string
           subject_id?: string | null
           subject_type?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -3170,7 +3179,15 @@ export type Database = {
           pro_id?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pro_favorites_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "professional_job_offers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       professional_job_offer_addresses: {
         Row: {
@@ -3232,6 +3249,7 @@ export type Database = {
           user_id: string
           view_count: number
           wilaya: string | null
+          years_experience: number | null
         }
         Insert: {
           availability?: string | null
@@ -3260,6 +3278,7 @@ export type Database = {
           user_id: string
           view_count?: number
           wilaya?: string | null
+          years_experience?: number | null
         }
         Update: {
           availability?: string | null
@@ -3288,6 +3307,7 @@ export type Database = {
           user_id?: string
           view_count?: number
           wilaya?: string | null
+          years_experience?: number | null
         }
         Relationships: []
       }
@@ -3944,24 +3964,30 @@ export type Database = {
       }
       shop_reviews: {
         Row: {
+          comment: string | null
           created_at: string
           id: string
           rating: number
           shop_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
+          comment?: string | null
           created_at?: string
           id?: string
           rating: number
           shop_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
+          comment?: string | null
           created_at?: string
           id?: string
           rating?: number
           shop_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -4937,6 +4963,48 @@ export type Database = {
           },
         ]
       }
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          commune: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          is_verified: boolean | null
+          profile_locked: boolean | null
+          updated_at: string | null
+          user_id: string | null
+          wilaya: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          commune?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          profile_locked?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+          wilaya?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          commune?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          profile_locked?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+          wilaya?: string | null
+        }
+        Relationships: []
+      }
       public_search_stats: {
         Row: {
           daily_searches: number | null
@@ -4980,7 +5048,6 @@ export type Database = {
         Returns: string
       }
       enforce_data_retention: { Args: never; Returns: undefined }
-      exec_sql: { Args: { sql: string }; Returns: undefined }
       exec_sql_readonly: { Args: { sql_query: string }; Returns: Json }
       generate_shop_slug: { Args: { shop_name: string }; Returns: string }
       get_announcement_with_protected_contact: {
@@ -5185,7 +5252,7 @@ export type Database = {
           availability_date: string | null
           brand: string | null
           cash_discount: number | null
-          category_id: string
+          category_id: string | null
           category_slug: string | null
           color: string | null
           commune: string | null
@@ -5250,6 +5317,7 @@ export type Database = {
           shop_name: string | null
           status: string | null
           subcategory_id: string | null
+          subcategory_uuid: string | null
           title: string
           type: string | null
           updated_at: string
