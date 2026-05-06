@@ -108,10 +108,12 @@ async function getSimilarAnnouncements(supabase: SupabaseClient, announcementId:
 
   console.log(`[RECOMMENDATION-ENGINE] Getting similar to announcement: ${announcementId}`);
 
+  const safeColumns = 'id, title, description, price, location, image_url, image_urls, category_id, subcategory_id, created_at, updated_at, expires_at, keywords, type, condition, status, is_urgent, urgent_message, view_count, shop_name, shop_id, shop_logo_url, global_listing_number';
+
   // Get the current announcement details
   const { data: currentAnnouncement } = await supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('id', announcementId)
     .single();
 
@@ -120,7 +122,7 @@ async function getSimilarAnnouncements(supabase: SupabaseClient, announcementId:
   // Find similar announcements based on category, price range, and keywords
   const { data: similar } = await supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('is_active', true)
     .eq('category_id', currentAnnouncement.category_id)
     .neq('id', announcementId)
@@ -139,14 +141,14 @@ async function getPersonalizedRecommendations(supabase: SupabaseClient, userId: 
   
   const { data: searchHistory } = await supabase
     .from('search_queries')
-    .select('*')
+    .select('id, query_text, query_normalized, search_context, results_count, user_session_id, created_at')
     .eq(userId ? 'user_session_id' : 'user_session_id', userIdentifier)
     .order('created_at', { ascending: false })
     .limit(20);
 
   const { data: clickHistory } = await supabase
     .from('search_results_clicks')
-    .select('*')
+    .select('id, session_id, result_id, result_type, click_position, created_at')
     .eq('session_id', userIdentifier)
     .order('created_at', { ascending: false })
     .limit(10);
@@ -156,9 +158,10 @@ async function getPersonalizedRecommendations(supabase: SupabaseClient, userId: 
   const _preferredKeywords = extractKeywords(searchHistory || []);
 
   // Get recommendations based on preferences
+  const safeColumns = 'id, title, description, price, location, image_url, image_urls, category_id, subcategory_id, created_at, updated_at, expires_at, keywords, type, condition, status, is_urgent, urgent_message, view_count, shop_name, shop_id, shop_logo_url, global_listing_number';
   let query = supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('status', 'active');
 
   if (preferredCategories.length > 0) {
@@ -176,9 +179,10 @@ async function getTrendingRecommendations(supabase: SupabaseClient, limit: numbe
   console.log(`[RECOMMENDATION-ENGINE] Getting trending recommendations`);
 
   // Get announcements with high view counts and recent activity
+  const safeColumns = 'id, title, description, price, location, image_url, image_urls, category_id, subcategory_id, created_at, updated_at, expires_at, keywords, type, condition, status, is_urgent, urgent_message, view_count, shop_name, shop_id, shop_logo_url, global_listing_number';
   const { data: trending } = await supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('is_active', true)
     .order('views_count', { ascending: false })
     .order('created_at', { ascending: false })
@@ -193,9 +197,10 @@ async function getCategoryBasedRecommendations(supabase: SupabaseClient, prefere
   const categoryId = preferences?.categoryId as string | undefined;
   if (!categoryId) return [];
 
+  const safeColumns = 'id, title, description, price, location, image_url, image_urls, category_id, subcategory_id, created_at, updated_at, expires_at, keywords, type, condition, status, is_urgent, urgent_message, view_count, shop_name, shop_id, shop_logo_url, global_listing_number';
   const { data: categoryRecommendations } = await supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('is_active', true)
     .eq('category_id', categoryId)
     .order('created_at', { ascending: false })
@@ -210,9 +215,10 @@ async function getPriceBasedRecommendations(supabase: SupabaseClient, preference
   const { minPrice, maxPrice } = (preferences || {}) as { minPrice?: number; maxPrice?: number };
   if (!minPrice && !maxPrice) return [];
 
+  const safeColumns = 'id, title, description, price, location, image_url, image_urls, category_id, subcategory_id, created_at, updated_at, expires_at, keywords, type, condition, status, is_urgent, urgent_message, view_count, shop_name, shop_id, shop_logo_url, global_listing_number';
   let query = supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('is_active', true);
 
   if (minPrice) query = query.gte('price', minPrice);
@@ -228,9 +234,10 @@ async function getPriceBasedRecommendations(supabase: SupabaseClient, preference
 async function getDefaultRecommendations(supabase: SupabaseClient, limit: number): Promise<Array<Record<string, unknown>>> {
   console.log(`[RECOMMENDATION-ENGINE] Getting default recommendations`);
 
+  const safeColumns = 'id, title, description, price, location, image_url, image_urls, category_id, subcategory_id, created_at, updated_at, expires_at, keywords, type, condition, status, is_urgent, urgent_message, view_count, shop_name, shop_id, shop_logo_url, global_listing_number';
   const { data: defaultRecommendations } = await supabase
     .from('announcements')
-    .select('*')
+    .select(safeColumns)
     .eq('is_active', true)
     .order('created_at', { ascending: false })
     .limit(limit);

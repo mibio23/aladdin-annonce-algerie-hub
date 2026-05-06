@@ -36,6 +36,19 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // SECURITY: Verify the user has admin role
+    const { data: adminRole, error: roleError } = await supabaseService
+      .from('user_roles')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (roleError) throw new Error("Unable to verify user role");
+    if (!adminRole) throw new Error("Unauthorized: admin role required");
+    logStep("Admin role verified");
+
     const { paypal_client_id, paypal_client_secret } = await req.json();
     
     if (!paypal_client_id || !paypal_client_secret) {

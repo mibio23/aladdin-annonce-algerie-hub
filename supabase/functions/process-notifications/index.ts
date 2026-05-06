@@ -17,6 +17,26 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // SECURITY: Verify admin or service_role authorization
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+
+    const token = authHeader.replace("Bearer ", "");
+    if (token !== supabaseServiceKey) {
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData.user) throw new Error("Authentication failed");
+
+      const { data: adminRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', userData.user.id)
+        .eq('role', 'admin')
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (!adminRole) throw new Error("Unauthorized: admin role required");
+    }
+
     // Récupérer les notifications en attente
     const { data: notifications, error: fetchError } = await supabase
       .from('notifications')

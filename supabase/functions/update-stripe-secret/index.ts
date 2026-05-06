@@ -19,10 +19,11 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    // Authenticate user
+    // Authenticate user with service role to bypass RLS
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
     );
 
     const authHeader = req.headers.get("Authorization");
@@ -36,15 +37,17 @@ serve(async (req) => {
     if (!user) throw new Error("User not authenticated");
     logStep("User authenticated", { userId: user.id });
 
-    // Check if user is admin (you may want to add admin role checking logic here)
-    const { data: _profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+    // SECURITY: Verify the user has admin role
+    const { data: adminRole, error: roleError } = await supabaseClient
+      .from('user_roles')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .eq('is_active', true)
+      .maybeSingle();
 
-    if (profileError) throw new Error("Unable to verify user profile");
-    // Add admin check logic here if needed
+    if (roleError) throw new Error("Unable to verify user role");
+    if (!adminRole) throw new Error("Unauthorized: admin role required");
     
     const { stripe_secret_key } = await req.json();
     if (!stripe_secret_key) {

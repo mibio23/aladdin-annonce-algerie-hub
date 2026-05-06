@@ -26,6 +26,16 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // SECURITY: Require at least authentication (service_role or user token)
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+
+    const token = authHeader.replace("Bearer ", "");
+    if (token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData.user) throw new Error("Authentication failed");
+    }
+
     const { type, data, userId, sessionId, timestamp }: AnalyticsRequest = await req.json();
     const effectiveUserId = userId || '';
     const effectiveTimestamp = timestamp || new Date().toISOString();

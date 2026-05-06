@@ -21,6 +21,27 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Verify admin or service_role authorization
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const token = authHeader.replace("Bearer ", "");
+    if (token !== serviceKey) {
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData.user) throw new Error("Authentication failed");
+
+      const { data: adminRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', userData.user.id)
+        .eq('role', 'admin')
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (!adminRole) throw new Error("Unauthorized: admin role required");
+    }
+
     const { notificationId } = await req.json();
     
     if (!notificationId) {
