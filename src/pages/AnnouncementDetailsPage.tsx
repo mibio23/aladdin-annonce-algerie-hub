@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Navigate, Link } from "react-router-dom";
 import { MapPin, Calendar, Heart, Share2, Flag, Truck, ShieldCheck, Package, Info, Tag, Ruler, Clock, User, ShieldAlert, ExternalLink, Eye, Home, MessageCircle } from "lucide-react";
+import BookingModal from "@/components/booking/BookingModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AvatarDisplay from "@/components/avatar/AvatarDisplay";
@@ -144,6 +145,7 @@ const AnnouncementDetailsPage: React.FC = () => {
     setShowContactModal(true);
   };
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
   const [announcement, setAnnouncement] = useState<DetailedAnnouncement | null>(null);
   const [loading, setLoading] = useState(true);
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
@@ -2074,6 +2076,23 @@ const AnnouncementDetailsPage: React.FC = () => {
                     )}
                   </div>
                   
+                  {/* Booking Button — only for service announcements with booking enabled */}
+                  {(announcement as Record<string, unknown>)?.booking_enabled && (
+                    <Button
+                      className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-md"
+                      onClick={() => {
+                        if (!user) {
+                          window.dispatchEvent(new CustomEvent('open-auth-drawer', { detail: 'login' }));
+                          return;
+                        }
+                        setShowBookingModal(true);
+                      }}
+                    >
+                      <Calendar className="w-4 h-4" />
+                      📅 Réserver un créneau
+                    </Button>
+                  )}
+
                   <Button variant="outline" className="w-full gap-2">
                     <ExternalLink className="w-4 h-4" />
                     {t('createAd.viewOtherAds')}
@@ -2172,6 +2191,16 @@ const AnnouncementDetailsPage: React.FC = () => {
         announcement={showContactModal ? announcement : null}
         onClose={() => setShowContactModal(false)}
       />
+
+      {announcement && (
+        <BookingModal
+          open={showBookingModal}
+          onOpenChange={setShowBookingModal}
+          announcementId={announcement.id}
+          announcementTitle={announcement.title}
+          announcementPrice={announcement.price}
+        />
+      )}
     </div>
   );
 };

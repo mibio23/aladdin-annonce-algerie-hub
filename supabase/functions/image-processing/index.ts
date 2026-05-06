@@ -37,6 +37,16 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // SECURITY: Require authentication to prevent resource abuse
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+
+    const token = authHeader.replace("Bearer ", "");
+    if (token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData.user) throw new Error("Authentication failed");
+    }
+
     const { imageUrl, operations, bucket, filename, quality = 80 }: ImageProcessingRequest = await req.json();
     
     console.log(`[IMAGE-PROCESSING] Processing image: ${filename}`);
