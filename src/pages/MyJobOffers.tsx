@@ -123,12 +123,23 @@ const MyJobOffers = () => {
             {t('navigation.productSearchDesc')}
           </p>
         </div>
-        <LocalizedLink to="/deposer-offre-metier">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
-            <Plus className="h-4 w-4" />
-            {t('jobOffer.title')}
-          </Button>
-        </LocalizedLink>
+        <div className="flex flex-col items-end gap-1">
+          <LocalizedLink to="/deposer-offre-metier" style={{ pointerEvents: offers.length >= 2 ? 'none' : undefined }}>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+              disabled={offers.length >= 2}
+              title={offers.length >= 2 ? 'Maximum 2 offres métiers par compte' : undefined}
+            >
+              <Plus className="h-4 w-4" />
+              {t('jobOffer.title')}
+            </Button>
+          </LocalizedLink>
+          {offers.length >= 2 && (
+            <p className="text-xs text-muted-foreground">
+              {t('myJobOffers.limitReached') || 'Maximum 2 offres métiers par compte'}
+            </p>
+          )}
+        </div>
       </div>
 
       {offers.length === 0 ? (

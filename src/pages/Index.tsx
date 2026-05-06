@@ -3,6 +3,8 @@ import React, { Suspense, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { usePopularCategories } from "@/hooks/usePopularCategories";
 import type { RpcScalarResult, CategoryCountRow } from "@/integrations/supabase/types.extended";
+import SEOHead from "@/components/SEO/SEOHead";
+import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
 // Lazy load ALL heavy components to reduce initial bundle size
 const HeroCarousel = React.lazy(() => import("@/components/home/HeroCarousel"));
@@ -26,6 +28,7 @@ const LazySection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const Index = () => {
   const popularCategories = usePopularCategories();
+  const { t, language } = useSafeI18nWithRouter();
   const [jobOffersCount, setJobOffersCount] = useState<number | null>(null);
   const [shopsCount, setShopsCount] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState<number | null>(null);
@@ -105,8 +108,31 @@ const Index = () => {
     };
   }, [popularCategories]);
 
+  const seoTitles: Record<string, string> = {
+    fr: 'Aladdin Annonces Algérie — Petites Annonces Gratuites',
+    en: 'Aladdin Algeria — Free Classifieds',
+    ar: 'علاء الدين الجزائر — إعلانات مجانية',
+    es: 'Aladdin Argelia — Anuncios Gratis',
+    de: 'Aladdin Algerien — Kostenlose Kleinanzeigen',
+    it: 'Aladdin Algeria — Annunci Gratuiti',
+  };
+  const seoDescs: Record<string, string> = {
+    fr: 'Déposez et consultez des petites annonces gratuites en Algérie : immobilier, voitures, emploi, services, boutiques et bien plus.',
+    en: 'Post and browse free classifieds in Algeria: real estate, cars, jobs, services, shops and more.',
+    ar: 'انشر وتصفح إعلاناتك المجانية في الجزائر: عقارات، سيارات، وظائف، خدمات، متاجر وأكثر.',
+    es: 'Publica y consulta anuncios gratis en Argelia: inmuebles, coches, empleo, servicios, tiendas y más.',
+    de: 'Schalten und durchsuchen Sie kostenlose Kleinanzeigen in Algerien: Immobilien, Autos, Jobs, Dienstleistungen und mehr.',
+    it: 'Pubblica e consulta annunci gratuiti in Algeria: immobili, auto, lavoro, servizi, negozi e altro.',
+  };
+
   return (
     <>
+      <SEOHead
+        title={seoTitles[language] || seoTitles.fr}
+        description={seoDescs[language] || seoDescs.fr}
+        image="/og-image.jpg"
+        url="/"
+      />
       {/* Carrousel hero - lazy loaded */}
       <div className="px-4 pt-6 pb-2">
         <LazySection>

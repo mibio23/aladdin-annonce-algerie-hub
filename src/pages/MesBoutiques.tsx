@@ -167,13 +167,44 @@ function MesBoutiques() {
                     <p className="text-muted-foreground">{t('myShops.subtitle')}</p>
                   </div>
                 </div>
-                {/* Suppression de la limite de 2 boutiques */}
-                <Button asChild>
-                  <Link to={getLocalizedPath('/creer-boutique')}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t('myShops.createShop')}
-                  </Link>
-                </Button>
+                <div>
+                  <Button
+                    asChild={shops.length < 2}
+                    disabled={shops.length >= 2}
+                    title={shops.length >= 2 ? tr('myShops.limitReached', {
+                      fr: 'Limite de 2 boutiques atteinte',
+                      en: 'Shop limit reached (max 2)',
+                      ar: 'تم الوصول إلى الحد الأقصى (2 متاجر)',
+                      es: 'Límite de 2 tiendas alcanzado',
+                      de: 'Limit von 2 Shops erreicht',
+                      it: 'Limite di 2 negozi raggiunto',
+                    }) : undefined}
+                  >
+                    {shops.length < 2 ? (
+                      <Link to={getLocalizedPath('/creer-boutique')}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t('myShops.createShop')}
+                      </Link>
+                    ) : (
+                      <span className="flex items-center">
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t('myShops.createShop')}
+                      </span>
+                    )}
+                  </Button>
+                  {shops.length >= 2 && (
+                    <p className="text-xs text-muted-foreground mt-1 text-right">
+                      {tr('myShops.maxShopsReached', {
+                        fr: 'Maximum 2 boutiques par compte',
+                        en: 'Maximum 2 shops per account',
+                        ar: 'الحد الأقصى متجرين لكل حساب',
+                        es: 'Máximo 2 tiendas por cuenta',
+                        de: 'Maximal 2 Shops pro Konto',
+                        it: 'Massimo 2 negozi per account',
+                      })}
+                    </p>
+                  )}
+                </div>
               </div>
             </CardHeader>
           </Card>

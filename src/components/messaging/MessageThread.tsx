@@ -64,7 +64,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({
       if (conv) {
         const otherUserId = conv.participant_1_id === user.id ? conv.participant_2_id : conv.participant_1_id;
         const { data: profile } = await supabase
-          .from('profiles')
+          .from('profiles_public')
           .select('full_name, avatar_url')
           .eq('user_id', otherUserId)
           .maybeSingle();

@@ -108,6 +108,7 @@ const DeposerOffreMetier = () => {
   const [images, setImages] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<GeolocationCoords | null>(null);
   const [hoveredProfession, setHoveredProfession] = useState<string | null>(null);
+  const [jobLimitReached, setJobLimitReached] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -154,16 +155,26 @@ const DeposerOffreMetier = () => {
     return selected?.fr || formData.commune;
   }, [availableCommunes, formData.commune]);
 
-  // Vérifier si l'utilisateur est connecté
+  // Vérifier si l'utilisateur est connecté + limite de 2 offres
   useEffect(() => {
     if (!authLoading && !user) {
       toast({
         title: t('auth.loginRequired') || 'Connexion requise',
         description: t('auth.loginRequiredDesc') || 'Vous devez vous connecter pour accéder à ce formulaire.',
       });
-      // Stocker l'URL de redirection avant de rediriger vers la page de connexion
       sessionStorage.setItem('authRedirectUrl', window.location.pathname + window.location.search + window.location.hash);
       navigate('/', { state: { openAuth: 'login' }, replace: true });
+      return;
+    }
+    if (!authLoading && user) {
+      // Vérifier la limite de 2 annonces métiers
+      supabase
+        .from('professional_job_offers')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .then(({ count }) => {
+          if ((count ?? 0) >= 2) setJobLimitReached(true);
+        });
     }
   }, [user, authLoading, navigate, toast, t, language]);
 
@@ -393,6 +404,31 @@ const DeposerOffreMetier = () => {
 
   if (!user) {
     return <Navigate to="/" state={{ openAuth: 'login' }} replace />;
+  }
+
+  // Blocage si la limite de 2 offres métiers est atteinte
+  if (jobLimitReached) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 text-center border border-orange-100 dark:border-orange-900/30">
+          <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Briefcase className="h-8 w-8 text-orange-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            {t('myJobOffers.limitReached') || 'Limite atteinte'}
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            {t('myJobOffers.limitReachedDesc') || 'Vous avez déjà 2 offres de service professionnelles. Maximum 2 offres métiers par compte.'}
+          </p>
+          <button
+            onClick={() => navigate(language ? `/${language}/mes-offres-metiers` : '/mes-offres-metiers')}
+            className="w-full bg-primary text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity"
+          >
+            {t('myJobOffers.manageOffers') || 'Gérer mes offres'}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const inputClassName =

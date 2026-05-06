@@ -119,8 +119,7 @@ type DetailedAnnouncement = Announcement & {
 
 type SellerProfile = {
   public_user_id: number | null;
-  first_name: string | null;
-  last_name: string | null;
+  full_name: string | null;
   avatar_url: string | null;
   created_at: string | null;
   wilaya: string | null;
@@ -421,7 +420,7 @@ const AnnouncementDetailsPage: React.FC = () => {
 
         // 5. Seller Profile
         if (announcementData.user_id) {
-          const { data: profileData } = await supabase.from('profiles').select('public_user_id, first_name, last_name, avatar_url, created_at, wilaya, commune').eq('user_id', announcementData.user_id).maybeSingle();
+          const { data: profileData } = await supabase.from('profiles_public').select('public_user_id, full_name, avatar_url, created_at, wilaya, commune').eq('user_id', announcementData.user_id).maybeSingle();
           if (profileData) setSellerProfile(profileData);
         }
 
@@ -432,7 +431,7 @@ const AnnouncementDetailsPage: React.FC = () => {
             const userIds = [...new Set(similarData.map((item: Record<string, unknown>) => item.user_id as string).filter(Boolean))];
             let profilesMap: Record<string, { first_name?: string; last_name?: string; avatar_url?: string; user_id: string }> = {};
             if (userIds.length > 0) {
-              const { data: pData } = await supabase.from('profiles').select('user_id, first_name, last_name, avatar_url').in('user_id', userIds);
+              const { data: pData } = await supabase.from('profiles_public').select('user_id, full_name, avatar_url').in('user_id', userIds);
               if (pData) pData.forEach(p => { profilesMap[p.user_id] = p; });
             }
             setSimilarAnnouncements(similarData.map((item: Record<string, unknown>) => ({
@@ -458,7 +457,7 @@ const AnnouncementDetailsPage: React.FC = () => {
                   item.category_id
               },
               profiles: profilesMap[item.user_id] ? {
-                full_name: `${profilesMap[item.user_id].first_name} ${profilesMap[item.user_id].last_name || ''}`.trim(),
+                full_name: profilesMap[item.user_id].full_name || '',
                 id: profilesMap[item.user_id].user_id,
                 avatar_url: profilesMap[item.user_id].avatar_url
               } : undefined

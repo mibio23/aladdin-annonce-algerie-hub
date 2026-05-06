@@ -129,7 +129,7 @@ const ShopDetails: React.FC = () => {
 
     if (userIds.length > 0) {
       const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('user_id, full_name, avatar_url')
         .in('user_id', userIds);
 

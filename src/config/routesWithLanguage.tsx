@@ -61,6 +61,9 @@ const JobOfferDetailsPage = React.lazy(() => import("@/pages/JobOfferDetailsPage
 const MyJobOffers = React.lazy(() => import("@/pages/MyJobOffers"));
 const Parrainage = React.lazy(() => import("@/pages/Parrainage"));
 const MetiersReparateurs = React.lazy(() => import("@/pages/MetiersReparateurs"));
+const ResetPassword = React.lazy(() => import("@/pages/ResetPassword"));
+const ShopMessages = React.lazy(() => import("@/pages/ShopMessages"));
+const JobOfferMessages = React.lazy(() => import("@/pages/JobOfferMessages"));
 
 // Suspense wrapper optimisé
 const SuspenseWrapper: React.FC<{ children: React.ReactNode; fallback?: React.ReactNode }> = ({ 
@@ -152,6 +155,9 @@ export const createLanguageRoutes = (language: Language) => {
     <Route key={`mes-offres-metiers-${language}`} path={`${prefix}/mes-offres-metiers`} element={withLayout(MyJobOffers, true, 'high')} />,
     <Route key={`parametres-${language}`} path={`${prefix}/parametres`} element={withLayout(Parametres, true, 'high')} />,
     <Route key={`mot-de-passe-oublie-${language}`} path={`${prefix}/mot-de-passe-oublie`} element={withLayout(MotDePasseOublie)} />,
+    <Route key={`reset-password-${language}`} path={`${prefix}/reset-password`} element={withLayout(ResetPassword)} />,
+    <Route key={`shop-messages-${language}`} path={`${prefix}/messages/boutique/:shopId`} element={withLayout(ShopMessages, true, 'high')} />,
+    <Route key={`job-offer-messages-${language}`} path={`${prefix}/messages/offre-metier/:offerId`} element={withLayout(JobOfferMessages, true, 'high')} />,
     
     // Pages basse priorité
     <Route key={`carrieres-${language}`} path={`${prefix}/carrieres`} element={withLayout(Carrieres, true, 'low')} />,
@@ -211,7 +217,8 @@ export const legacyRedirectRoutes = [
   <Route key="legacy-reparation" path="/reparation/:profession" element={<Navigate to={`/${languageConfig.defaultLanguage}/reparation/:profession`} replace />} />,
   <Route key="legacy-creer-boutique" path="/creer-boutique" element={<Navigate to={`/${languageConfig.defaultLanguage}/creer-boutique`} replace />} />,
   <Route key="legacy-deposer-offre-metier" path="/deposer-offre-metier" element={<Navigate to={`/${languageConfig.defaultLanguage}/deposer-offre-metier`} replace />} />,
-  <Route key="legacy-rechercher-reparateur" path="/rechercher-reparateur" element={<Navigate to={`/${languageConfig.defaultLanguage}/deposer-offre-metier`} replace />} />,
+  <Route key="legacy-rechercher-reparateur" path="/rechercher-reparateur" element={<Navigate to={`/${languageConfig.defaultLanguage}/metiers-reparateurs`} replace />} />,
+  <Route key="legacy-reset-password" path="/reset-password" element={<Navigate to={`/${languageConfig.defaultLanguage}/reset-password`} replace />} />,
   <Route key="legacy-boutique" path="/boutique/:id" element={<Navigate to={`/${languageConfig.defaultLanguage}/boutique/:id`} replace />} />,
   <Route key="legacy-shop" path="/shop/:id" element={<Navigate to={`/${languageConfig.defaultLanguage}/shop/:id`} replace />} />,
   <Route key="legacy-boutiques" path="/boutiques" element={<Navigate to={`/${languageConfig.defaultLanguage}/boutiques`} replace />} />,

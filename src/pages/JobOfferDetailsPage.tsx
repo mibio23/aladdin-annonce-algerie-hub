@@ -423,13 +423,13 @@ const JobOfferDetailsPage = () => {
         if (!offerData) throw new Error('Offer not found');
 
         const { data: profileRaw } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, avatar_url')
+          .from('profiles_public')
+          .select('full_name, avatar_url')
           .eq('user_id', offerData.user_id)
           .maybeSingle();
 
         const profileData = profileRaw ? {
-          display_name: [profileRaw.first_name, profileRaw.last_name].filter(Boolean).join(' ') || 'Utilisateur',
+          display_name: profileRaw.full_name || 'Utilisateur',
           avatar_url: profileRaw.avatar_url || ''
         } : undefined;
 

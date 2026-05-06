@@ -78,7 +78,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
           // or just assume we might need a separate query. 
           // Note: accessing auth.users is restricted. We should rely on a public profiles table.
           const { data: profileData } = await supabase
-            .from('profiles')
+            .from('profiles_public')
             .select('full_name, avatar_url')
             .eq('user_id', otherUserId)
             .maybeSingle();

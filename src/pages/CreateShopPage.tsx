@@ -180,6 +180,7 @@ const CreateShopPage: React.FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [_createdShopId, _setCreatedShopId] = useState<string | null>(null);
   const [_subcategories, _setSubcategories] = useState<SimpleSubCategory[]>([]);
+  const [shopLimitReached, setShopLimitReached] = useState(false);
   
   // Fonctionnalités techniques communes
   // Désactivation temporaire de l'auto-save pour résoudre les problèmes d'interaction
@@ -256,12 +257,21 @@ const CreateShopPage: React.FC = () => {
 
   useEffect(() => {
     if (!user) {
-      // Stocker l'URL de redirection actuelle pour après la connexion
       sessionStorage.setItem('authRedirectUrl', window.location.pathname);
       navigate(getLocalizedPath('/connexion'));
       return;
     }
-    
+
+    // Vérifier la limite de 2 boutiques par utilisateur
+    const checkShopLimit = async () => {
+      const { count } = await supabase
+        .from('shops')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if ((count ?? 0) >= 2) setShopLimitReached(true);
+    };
+    checkShopLimit();
+
     // Charger le brouillon s'il existe
     const draft = loadDraft();
     if (draft) {
@@ -677,6 +687,31 @@ const CreateShopPage: React.FC = () => {
 
   if (!user) {
     return null; // Will redirect to auth
+  }
+
+  // Blocage si la limite de 2 boutiques est atteinte
+  if (shopLimitReached) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 text-center border border-red-100 dark:border-red-900/30">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Store className="h-8 w-8 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            {tr('myShops.limitReached', { fr: 'Limite atteinte', en: 'Limit reached', ar: 'تم الوصول إلى الحد', es: 'Límite alcanzado', de: 'Limit erreicht', it: 'Limite raggiunto' })}
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            {tr('myShops.maxShopsReached', { fr: 'Vous avez déjà 2 boutiques. Maximum 2 boutiques par compte.', en: 'You already have 2 shops. Maximum 2 shops per account.', ar: 'لديك بالفعل متجران. الحد الأقصى متجران لكل حساب.', es: 'Ya tienes 2 tiendas. Máximo 2 tiendas por cuenta.', de: 'Sie haben bereits 2 Shops. Maximal 2 Shops pro Konto.', it: 'Hai già 2 negozi. Massimo 2 negozi per account.' })}
+          </p>
+          <button
+            onClick={() => navigate(getLocalizedPath('/mes-boutiques'))}
+            className="w-full bg-primary text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity"
+          >
+            {tr('myShops.manageShops', { fr: 'Gérer mes boutiques', en: 'Manage my shops', ar: 'إدارة متاجري', es: 'Gestionar mis tiendas', de: 'Meine Shops verwalten', it: 'Gestisci i miei negozi' })}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const inputClassName =

@@ -16,9 +16,15 @@ import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
 
 interface PublicProfileData {
   id: string;
+  user_id: string;
+  full_name?: string;
   display_name?: string;
-  bio?: string;
+  phone?: string;
+  wilaya?: string;
+  commune?: string;
   avatar_url?: string;
+  is_verified?: boolean;
+  profession?: string;
   created_at: string;
   public_user_id?: number | null;
 }
@@ -43,8 +49,8 @@ const PublicProfile = () => {
     if (!userId) return;
     try {
       const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('id, display_name, bio, avatar_url, created_at, public_user_id')
+        .from('profiles_public')
+        .select('id, user_id, full_name, display_name, phone, wilaya, commune, avatar_url, is_verified, profession, public_user_id, created_at')
         .eq('id', userId)
         .single();
 
@@ -195,7 +201,7 @@ const PublicProfile = () => {
     );
   }
 
-  const userName = profileData.display_name || tr('publicProfile.user', {
+  const userName = profileData.display_name || profileData.full_name || tr('publicProfile.user', {
     fr: 'Utilisateur',
     en: 'User',
     es: 'Usuario',

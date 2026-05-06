@@ -328,8 +328,8 @@ export const useAnnouncements = () => {
       
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
-          .from('profiles')
-          .select('user_id, first_name, last_name, avatar_url')
+          .from('profiles_public')
+          .select('user_id, full_name, avatar_url')
           .in('user_id', userIds as string[]);
           
         if (profilesData) {
@@ -339,7 +339,7 @@ export const useAnnouncements = () => {
               return {
                 ...announcement,
                 profiles: {
-                  full_name: profile.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : (t('common.user') || 'Utilisateur'),
+                  full_name: profile.full_name || (t('common.user') || 'Utilisateur'),
                   id: profile.user_id,
                   avatar_url: profile.avatar_url
                 }
