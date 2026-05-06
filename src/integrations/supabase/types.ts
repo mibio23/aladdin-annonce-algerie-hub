@@ -467,6 +467,7 @@ export type Database = {
           animal_vaccinated: boolean | null
           attributes: Json | null
           availability_date: string | null
+          booking_enabled: boolean | null
           brand: string | null
           cash_discount: number | null
           category_id: string | null
@@ -559,6 +560,7 @@ export type Database = {
           animal_vaccinated?: boolean | null
           attributes?: Json | null
           availability_date?: string | null
+          booking_enabled?: boolean | null
           brand?: string | null
           cash_discount?: number | null
           category_id?: string | null
@@ -651,6 +653,7 @@ export type Database = {
           animal_vaccinated?: boolean | null
           attributes?: Json | null
           availability_date?: string | null
+          booking_enabled?: boolean | null
           brand?: string | null
           cash_discount?: number | null
           category_id?: string | null
@@ -901,6 +904,73 @@ export type Database = {
           },
         ]
       }
+      availability_slots: {
+        Row: {
+          announcement_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_active: boolean
+          max_bookings_per_slot: number
+          price_override: number | null
+          slot_duration_minutes: number
+          start_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_active?: boolean
+          max_bookings_per_slot?: number
+          price_override?: number | null
+          slot_duration_minutes?: number
+          start_time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          max_bookings_per_slot?: number
+          price_override?: number | null
+          slot_duration_minutes?: number
+          start_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_slots_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "availability_slots_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "availability_slots_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       baby_details: {
         Row: {
           announcement_id: string | null
@@ -1111,6 +1181,55 @@ export type Database = {
           },
           {
             foreignKeyName: "bike_details_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blocked_dates: {
+        Row: {
+          announcement_id: string
+          blocked_date: string
+          created_at: string
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          blocked_date: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          blocked_date?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_dates_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocked_dates_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocked_dates_announcement_id_fkey"
             columns: ["announcement_id"]
             isOneToOne: false
             referencedRelation: "announcements_safe"
@@ -5250,6 +5369,7 @@ export type Database = {
           animal_vaccinated: boolean | null
           attributes: Json | null
           availability_date: string | null
+          booking_enabled: boolean | null
           brand: string | null
           cash_discount: number | null
           category_id: string | null
