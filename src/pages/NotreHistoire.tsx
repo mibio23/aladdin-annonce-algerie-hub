@@ -3,12 +3,18 @@ import React from "react";
 import Footer from "@/components/layout/Footer";
 import BackToTopButton from "@/components/shared/BackToTopButton";
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
+import SEOHead from "@/components/SEO/SEOHead";
 
 const NotreHistoire = () => {
   const { t } = useSafeI18nWithRouter();
 
   return (
     <>
+      <SEOHead
+        title="Notre Histoire — Aladdin Algérie"
+        description="Découvrez la vision, la mission et les valeurs d'Aladdin, la plateforme de petites annonces en Algérie qui connecte vendeurs et acheteurs à travers tout le pays."
+        canonicalUrl="/notre-histoire"
+      />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-center text-gray-800 dark:text-slate-200 mb-8">

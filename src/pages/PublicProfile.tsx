@@ -13,6 +13,7 @@ import ReviewsSection from '@/components/reviews/ReviewsSection';
 import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { useLanguageNavigation } from '@/hooks/useLanguageNavigation';
+import SEOHead from '@/components/SEO/SEOHead';
 
 interface PublicProfileData {
   id: string;
@@ -214,6 +215,15 @@ const PublicProfile = () => {
 
   return (
     <div className="min-h-screen bg-background py-8">
+      <SEOHead
+        title={`${userName} — Profil Aladdin`}
+        description={profileData.profession
+          ? `Découvrez le profil de ${userName}, ${profileData.profession}${profileData.wilaya ? ` à ${profileData.wilaya}` : ''}. Membre Aladdin Annonces Algérie.`
+          : `Découvrez le profil de ${userName}${profileData.wilaya ? ` à ${profileData.wilaya}` : ''}. Membre de la communauté Aladdin Annonces Algérie.`}
+        image={profileData.avatar_url || '/og-image.jpg'}
+        noIndex={false}
+        keywords={['profil', 'vendeur', profileData.profession || '', profileData.wilaya || ''].filter(Boolean)}
+      />
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}

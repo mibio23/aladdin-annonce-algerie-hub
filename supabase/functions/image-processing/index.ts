@@ -6,6 +6,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// ─── W2 SSRF GUARD ────────────────────────────────────────────────────────────
+// Only allow image URLs originating from this project's Supabase Storage.
+// Rejects any private network address (169.254.x.x, 10.x, localhost…) or
+// any external domain, preventing Server-Side Request Forgery attacks.
+const ALLOWED_BUCKETS = new Set(["announcements", "shops", "avatars", "banners", "images"]);
+
+function getSupabaseStorageHost(): string {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  try {
+    return new URL(supabaseUrl).hostname; // e.g. smsvybphkdxzvgawzoru.supabase.co
+  } catch {
+    return "";
+  }
+}
+
+function isAllowedImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false; // reject http, file, data, etc.
+    const storageHost = getSupabaseStorageHost();
+    if (!storageHost) return false;
+    // Must be exactly the Supabase storage host (no subdomain tricks)
+    if (parsed.hostname !== storageHost) return false;
+    // Must be a storage path (not an auth/REST endpoint)
+    if (!parsed.pathname.startsWith("/storage/v1/object/public/")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isAllowedBucket(bucket: string): boolean {
+  return ALLOWED_BUCKETS.has(bucket);
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 interface ImageProcessingRequest {
   imageUrl: string;
   operations: ImageOperation[];
@@ -48,11 +84,27 @@ serve(async (req) => {
     }
 
     const { imageUrl, operations, bucket, filename, quality = 80 }: ImageProcessingRequest = await req.json();
-    
+
+    // ── W2: Validate URL domain before any network request ──
+    if (!imageUrl || !isAllowedImageUrl(imageUrl)) {
+      return new Response(JSON.stringify({
+        error: "Forbidden",
+        details: "imageUrl must be a valid Supabase Storage HTTPS URL for this project."
+      }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ── W2: Validate bucket against allowlist ──
+    if (!bucket || !isAllowedBucket(bucket)) {
+      return new Response(JSON.stringify({
+        error: "Forbidden",
+        details: `Bucket '${bucket}' is not allowed.`
+      }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     console.log(`[IMAGE-PROCESSING] Processing image: ${filename}`);
     console.log(`[IMAGE-PROCESSING] Operations:`, operations);
 
-    // 1. Download the original image
+    // 1. Download the original image (URL already validated above)
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to download image: ${imageResponse.statusText}`);

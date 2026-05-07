@@ -863,7 +863,6 @@ const spanishTranslations = {
   'myJobOffers.confirmDeleteDesc': 'Esta acción es irreversible. Tu oferta será eliminada permanentemente.',
   'myJobOffers.cancel': 'Cancelar',
   'myJobOffers.delete': 'Eliminar',
-  'jobOfferMessages.loadError': 'No se pudieron cargar las ofertas de empleo',
   'jobOfferMessages.statusUpdateError': 'No se pudo actualizar el estado de la oferta',
   'search.errors.processingError': 'No se pudo procesar tu mensaje. Inténtalo de nuevo.',
   'search.errors.imageAnalysisTitle': 'Error de procesamiento',

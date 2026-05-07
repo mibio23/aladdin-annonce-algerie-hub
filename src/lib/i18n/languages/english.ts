@@ -1003,7 +1003,6 @@ const englishTranslations = {
   'myJobOffers.delete': 'Delete',
 
   // Job offer messages (JobOfferMessages)
-  'jobOfferMessages.loadError': 'Unable to load job offers',
   'jobOfferMessages.statusUpdateError': 'Unable to update offer status',
 
   // Search errors (search components)

@@ -924,7 +924,6 @@ const germanTranslations = {
   'myJobOffers.confirmDeleteDesc': 'Diese Aktion kann nicht rückgängig gemacht werden. Ihr Angebot wird dauerhaft gelöscht.',
   'myJobOffers.cancel': 'Abbrechen',
   'myJobOffers.delete': 'Löschen',
-  'jobOfferMessages.loadError': 'Berufsangebote konnten nicht geladen werden',
   'jobOfferMessages.statusUpdateError': 'Angebotsstatus konnte nicht aktualisiert werden',
   'search.errors.processingError': 'Nachricht konnte nicht verarbeitet werden. Versuchen Sie es erneut.',
   'search.errors.imageAnalysisTitle': 'Verarbeitungsfehler',

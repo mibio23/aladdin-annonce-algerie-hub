@@ -21,27 +21,57 @@ serve(async (req) => {
   }
 
   try {
+    // Service-role client for reading public data
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
 
+    // ── W7/W8: Verify caller identity ──────────────────────────────────────────────
+    // We use a separate anon-key client to validate the JWT.
+    // This means we NEVER trust the userId coming from the request body;
+    // instead we extract it from the verified token.
+    let verifiedUserId: string | undefined = undefined;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      // Only validate as a user token (never as service-role key)
+      if (token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+        const anonClient = createClient(
+          Deno.env.get("SUPABASE_URL") ?? "",
+          Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+          { auth: { persistSession: false } }
+        );
+        const { data: { user } } = await anonClient.auth.getUser(token);
+        verifiedUserId = user?.id;
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+
     const { 
-      userId, 
       sessionId, 
       currentAnnouncementId, 
       userPreferences, 
       type, 
       limit = 10 
-    }: RecommendationRequest = await req.json();
+    }: Omit<RecommendationRequest, 'userId'> = await req.json();
 
     if (!type) {
       throw new Error("Type is required");
     }
 
+    // ── W7/W8: 'personalized' requires authentication ───────────────────────────────
+    if (type === 'personalized' && !verifiedUserId) {
+      return new Response(JSON.stringify({
+        error: "Unauthorized",
+        details: "A valid user session is required for personalized recommendations."
+      }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+
     const sanitizedLimit = Math.min(Math.max(1, limit), 50);
-    console.log(`[RECOMMENDATION-ENGINE] Type: ${type}, User: ${userId || sessionId}`);
+    console.log(`[RECOMMENDATION-ENGINE] Type: ${type}, User: ${verifiedUserId || sessionId || 'anonymous'}`);
 
     let recommendations: Array<Record<string, unknown>> = [];
 
@@ -50,7 +80,8 @@ serve(async (req) => {
         recommendations = await getSimilarAnnouncements(supabase, currentAnnouncementId || '', sanitizedLimit);
         break;
       case 'personalized':
-        recommendations = await getPersonalizedRecommendations(supabase, userId || '', sessionId || 'anonymous', sanitizedLimit);
+        // verifiedUserId is guaranteed to be set here (checked above)
+        recommendations = await getPersonalizedRecommendations(supabase, verifiedUserId!, sessionId || 'anonymous', sanitizedLimit);
         break;
       case 'trending':
         recommendations = await getTrendingRecommendations(supabase, sanitizedLimit);
@@ -67,7 +98,7 @@ serve(async (req) => {
 
     // Score and rank recommendations
     const scoredRecommendations = await scoreRecommendations(supabase, recommendations, {
-      userId,
+      userId: verifiedUserId,
       sessionId,
       currentAnnouncementId,
       userPreferences
@@ -76,7 +107,7 @@ serve(async (req) => {
     // Log recommendation for learning
     await logRecommendation(supabase, {
       type,
-      userId,
+      userId: verifiedUserId,  // only log verified identity
       sessionId,
       recommendationIds: scoredRecommendations.map(r => String((r as any).id)),
       context: { currentAnnouncementId, userPreferences }

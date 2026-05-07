@@ -1045,7 +1045,6 @@ const arabicTranslations = {
   'myJobOffers.cancel': 'إلغاء',
   'myJobOffers.delete': 'حذف',
 
-  'jobOfferMessages.loadError': 'تعذر تحميل عروض المهن',
   'jobOfferMessages.statusUpdateError': 'تعذر تحديث حالة العرض',
 
   'search.errors.processingError': 'تعذرت معالجة رسالتك. حاول مجدداً.',

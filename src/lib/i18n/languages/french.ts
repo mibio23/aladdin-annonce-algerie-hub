@@ -1030,7 +1030,6 @@ const frenchTranslations = {
   'myJobOffers.delete': 'Supprimer',
 
   // Messages offres de métier (JobOfferMessages)
-  'jobOfferMessages.loadError': 'Impossible de charger les offres de métiers',
   'jobOfferMessages.statusUpdateError': 'Impossible de mettre à jour le statut de l\'offre',
 
   // Erreurs recherche (composants search)
