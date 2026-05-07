@@ -33,98 +33,107 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
+        // Répartit les bibliothèques en petits fichiers chargés à la demande
         manualChunks(id) {
-          const normalizedId = id.replace(/\\/g, '/');
-          // React core
-          if (normalizedId.includes('node_modules/react/') || normalizedId.includes('node_modules/react-dom/')) {
+          const n = id.replace(/\\/g, '/');
+
+          // ── React core (toujours nécessaire) ──────────────────────────────
+          if (n.includes('node_modules/react/') || n.includes('node_modules/react-dom/') || n.includes('node_modules/scheduler/')) {
             return 'react-core';
           }
-          // React Router
-          if (normalizedId.includes('node_modules/react-router')) {
+          // ── Routing ───────────────────────────────────────────────────────
+          if (n.includes('node_modules/react-router')) {
             return 'react-router';
           }
-          // Supabase
-          if (normalizedId.includes('node_modules/@supabase/')) {
+          // ── Supabase client ───────────────────────────────────────────────
+          if (n.includes('node_modules/@supabase/')) {
             return 'supabase';
           }
-          // React Query
-          if (normalizedId.includes('node_modules/@tanstack/')) {
+          // ── React Query (data fetching) ────────────────────────────────────
+          if (n.includes('node_modules/@tanstack/')) {
             return 'react-query';
           }
-          // Radix UI primitives (shared across all Shadcn components)
-          if (normalizedId.includes('node_modules/@radix-ui/')) {
-            return 'radix-ui';
-          }
-          // Icons (lucide-react is very large)
-          if (normalizedId.includes('node_modules/lucide-react/')) {
+          // ── Icônes Lucide (grande lib, rarement mise à jour) ──────────────
+          if (n.includes('node_modules/lucide-react/')) {
             return 'icons';
           }
-          // Three.js / 3D (lazy loaded only if needed)
-          if (normalizedId.includes('node_modules/three/') || normalizedId.includes('node_modules/@react-three/')) {
-            return 'three-3d';
+          // ── Radix UI primitives (Shadcn) ──────────────────────────────────
+          if (n.includes('node_modules/@radix-ui/')) {
+            return 'radix-ui';
           }
-          // Maps (Leaflet)
-          if (normalizedId.includes('node_modules/leaflet/') || normalizedId.includes('node_modules/react-leaflet/')) {
-            return 'maps';
+          // ── Animations ────────────────────────────────────────────────────
+          if (n.includes('node_modules/framer-motion/')) {
+            return 'framer-motion';
           }
-          // File type detection
-          if (normalizedId.includes('node_modules/file-type/') || normalizedId.includes('node_modules/strtok3/') || normalizedId.includes('node_modules/token-types/')) {
-            return 'file-utils';
+          if (n.includes('node_modules/embla-carousel')) {
+            return 'carousel';
           }
-          // Charts
-          if (normalizedId.includes('node_modules/recharts/') || normalizedId.includes('node_modules/d3-')) {
-            return 'charts';
-          }
-          // Date utilities
-          if (normalizedId.includes('node_modules/date-fns')) {
-            return 'date-utils';
-          }
-          // Forms & validation
-          if (normalizedId.includes('node_modules/zod/') || normalizedId.includes('node_modules/react-hook-form/') || normalizedId.includes('node_modules/@hookform/')) {
+          // ── Formulaires & validation ──────────────────────────────────────
+          if (n.includes('node_modules/react-hook-form/') || n.includes('node_modules/@hookform/') || n.includes('node_modules/zod/')) {
             return 'forms';
           }
-          // Emoji picker
-          if (normalizedId.includes('node_modules/emoji-picker-react/')) {
+          // ── Dates ────────────────────────────────────────────────────────
+          if (n.includes('node_modules/date-fns')) {
+            return 'date-utils';
+          }
+          // ── Charts / graphiques (admin uniquement) ────────────────────────
+          if (n.includes('node_modules/recharts/') || n.includes('node_modules/d3-') || n.includes('node_modules/victory-')) {
+            return 'charts';
+          }
+          // ── Maps / géolocalisation (Leaflet) ─────────────────────────────
+          if (n.includes('node_modules/leaflet/') || n.includes('node_modules/react-leaflet/') || n.includes('node_modules/@react-leaflet/')) {
+            return 'maps';
+          }
+          // ── QR Code (rarement utilisé) ────────────────────────────────────
+          if (n.includes('node_modules/qrcode') || n.includes('node_modules/react-qr')) {
+            return 'qrcode';
+          }
+          // ── PDF / export (admin uniquement) ──────────────────────────────
+          if (n.includes('node_modules/jspdf') || n.includes('node_modules/html2canvas') || n.includes('node_modules/xlsx')) {
+            return 'pdf-export';
+          }
+          // ── Emoji picker ──────────────────────────────────────────────────
+          if (n.includes('node_modules/emoji-picker-react/')) {
             return 'emoji';
           }
-          // Animation libraries
-          if (normalizedId.includes('node_modules/framer-motion/') || normalizedId.includes('node_modules/embla-carousel')) {
-            return 'animations';
+          // ── File type detection ───────────────────────────────────────────
+          if (n.includes('node_modules/file-type/') || n.includes('node_modules/strtok3/') || n.includes('node_modules/token-types/')) {
+            return 'file-utils';
           }
-          // i18n translation data (our own, changes often)
-          if (normalizedId.includes('/src/lib/i18n/translations/') || normalizedId.includes('/src/lib/i18n/locales/')) {
-            return 'i18n-data';
-          }
-          // Wilaya/commune data
-          if (normalizedId.includes('/src/data/wilayaData') || normalizedId.includes('/src/data/communeData') || normalizedId.includes('/src/data/mock/')) {
+          // ── Données géographiques (wilayas / communes) ────────────────────
+          if (n.includes('/src/data/wilayaData') || n.includes('/src/data/communeData') || n.includes('/src/data/mock/')) {
             return 'geo-data';
           }
-          // Admin panel (rarely visited, large code)
-          if (normalizedId.includes('/src/components/admin/') || normalizedId.includes('/src/pages/admin/')) {
+          // ── Traductions i18n ──────────────────────────────────────────────
+          if (n.includes('/src/lib/i18n/languages/') || n.includes('/src/lib/i18n/locales/') || n.includes('/src/lib/i18n/translations/')) {
+            return 'i18n-data';
+          }
+          // ── Panel Admin (rarement visité) ─────────────────────────────────
+          if (n.includes('/src/components/admin/') || n.includes('/src/pages/admin/')) {
             return 'admin';
           }
-          // Create announcement (large form, only visited when posting)
-          if (normalizedId.includes('CreateAnnouncementComplete') || normalizedId.includes('CreateAnnouncement')) {
-            return 'create-ad';
-          }
-          // Announcement details (heavy per-page component)
-          if (normalizedId.includes('AnnouncementDetailsPage')) {
-            return 'ad-details';
-          }
-          // Shop details (heavy per-page component)
-          if (normalizedId.includes('ShopDetails')) {
-            return 'shop-details';
-          }
-          // Vehicle search results (heavy per-page component)
-          if (normalizedId.includes('VehicleSearchResultsPage')) {
-            return 'vehicle-search';
-          }
-          // Messaging (separate feature)
-          if (normalizedId.includes('/src/components/messaging/')) {
+          // ── Messagerie ────────────────────────────────────────────────────
+          if (n.includes('/src/components/messaging/') || n.includes('Messages')) {
             return 'messaging';
           }
-          // Catch-all: all remaining node_modules go to vendor chunk
-          if (normalizedId.includes('node_modules/')) {
+          // ── Pages lourdes (lazy-loaded, chargées à la demande) ────────────
+          if (n.includes('CreateAnnouncementComplete') || n.includes('CreateAnnouncement')) {
+            return 'create-ad';
+          }
+          if (n.includes('AnnouncementDetailsPage')) {
+            return 'ad-details';
+          }
+          if (n.includes('ShopDetails')) {
+            return 'shop-details';
+          }
+          if (n.includes('VehicleSearchResults')) {
+            return 'vehicle-search';
+          }
+          if (n.includes('JobOfferDetailsPage')) {
+            return 'job-details';
+          }
+          // ── Tout le reste de node_modules → vendor générique ─────────────
+          if (n.includes('node_modules/')) {
             return 'vendor';
           }
         },
