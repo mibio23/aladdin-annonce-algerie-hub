@@ -15,16 +15,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="AL@DDIN">
     
-    <!-- Critical fonts: preload for fastest LCP -->
+    <!-- Preconnect / DNS-prefetch : réduit la latence réseau -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Preconnect Supabase pour réduire la latence des premières requêtes DB -->
     <link rel="preconnect" href="https://smsvybphkdxzvgawzoru.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="https://smsvybphkdxzvgawzoru.supabase.co">
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     <link rel="dns-prefetch" href="https://images.unsplash.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Changa:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- Deferred fonts: loaded after initial paint -->
+
+    <!-- FIX 2 : Preload de l'image LCP (image de secours du carousel) -->
+    <!-- Permet au navigateur de la télécharger immédiatement sans attendre la DB -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=75&auto=format&fit=crop" fetchpriority="high">
+
+    <!-- FIX 3 : Polices NON-BLOQUANTES (économise ~150ms de render-blocking) -->
+    <!-- Inter + Changa : passées en preload/swap au lieu de rel=stylesheet bloquant -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Changa:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Changa:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Polices secondaires : déjà en mode différé -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600&family=UnifrakturMaguntia&family=Germania+One&display=swap" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600&family=UnifrakturMaguntia&family=Germania+One&display=swap" rel="stylesheet"></noscript>
     

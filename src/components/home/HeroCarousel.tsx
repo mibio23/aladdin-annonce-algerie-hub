@@ -26,6 +26,31 @@ interface SingleCarouselProps {
   carouselId: number;
 }
 
+/**
+ * FIX 1 — Compression automatique des images
+ * - Images Supabase Storage : /object/public/ → /render/image/public/ + ?width=800&quality=75&format=webp
+ * - Images Unsplash : ajoute ?w=800&q=75&auto=format
+ * - Autres URLs : inchangées
+ */
+const getOptimizedUrl = (url: string, width = 800, quality = 75): string => {
+  if (!url) return url;
+  // Supabase Storage
+  if (url.includes('supabase.co/storage/v1/object/public/')) {
+    const transformed = url.replace(
+      '/storage/v1/object/public/',
+      '/storage/v1/render/image/public/'
+    );
+    const sep = transformed.includes('?') ? '&' : '?';
+    return `${transformed}${sep}width=${width}&quality=${quality}&format=webp`;
+  }
+  // Unsplash
+  if (url.includes('images.unsplash.com')) {
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}w=${width}&q=${quality}&auto=format&fit=crop`;
+  }
+  return url;
+};
+
 const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [intervalMs, setIntervalMs] = useState(3500);
@@ -234,7 +259,7 @@ const SingleCarousel: React.FC<SingleCarouselProps> = ({ carouselId }) => {
                <div key={slide.id} className={className}>
                   <div className="bg-img">
                     <img
-                      src={slide.image_url}
+                      src={getOptimizedUrl(slide.image_url)}
                       alt={slide.title || 'Aladdin Annonces'}
                       loading={slide.localId === 1 ? 'eager' : 'lazy'}
                       fetchPriority={slide.localId === 1 ? 'high' : 'auto'}

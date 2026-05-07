@@ -134,13 +134,19 @@ const Index = () => {
         image="/og-image.jpg"
         url="/"
       />
-      {/* Carrousel hero - lazy avec skeleton à hauteur fixe (CLS = 0) */}
+      {/* Carrousel hero - lazy avec image LCP visible immédiatement (FIX 2) */}
       <div className="px-4 pt-6 pb-2">
         <Suspense fallback={
           <div
-            style={{ height: '450px', borderRadius: '24px' }}
-            className="w-full bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 animate-pulse"
-            aria-hidden="true"
+            style={{
+              height: '450px',
+              borderRadius: '24px',
+              backgroundImage: 'url(https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=75&auto=format&fit=crop)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: '#1e293b',
+            }}
+            aria-label="Chargement du carousel"
           />
         }>
           <HeroCarousel />
