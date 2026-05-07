@@ -5085,40 +5085,46 @@ export type Database = {
       profiles_public: {
         Row: {
           avatar_url: string | null
-          bio: string | null
           commune: string | null
           created_at: string | null
+          display_name: string | null
+          email: string | null
           full_name: string | null
           id: string | null
           is_verified: boolean | null
-          profile_locked: boolean | null
-          updated_at: string | null
+          phone: string | null
+          profession: string | null
+          public_user_id: number | null
           user_id: string | null
           wilaya: string | null
         }
         Insert: {
           avatar_url?: string | null
-          bio?: string | null
           commune?: string | null
           created_at?: string | null
+          display_name?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string | null
           is_verified?: boolean | null
-          profile_locked?: boolean | null
-          updated_at?: string | null
+          phone?: string | null
+          profession?: string | null
+          public_user_id?: number | null
           user_id?: string | null
           wilaya?: string | null
         }
         Update: {
           avatar_url?: string | null
-          bio?: string | null
           commune?: string | null
           created_at?: string | null
+          display_name?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string | null
           is_verified?: boolean | null
-          profile_locked?: boolean | null
-          updated_at?: string | null
+          phone?: string | null
+          profession?: string | null
+          public_user_id?: number | null
           user_id?: string | null
           wilaya?: string | null
         }
@@ -5513,6 +5519,10 @@ export type Database = {
       }
       sanitize_search_query: { Args: { query_text: string }; Returns: string }
       set_current_session: { Args: { session_id: string }; Returns: undefined }
+      user_owns_announcement: {
+        Args: { ann_user_id: string }
+        Returns: boolean
+      }
       validate_password_strength: {
         Args: { password_text: string }
         Returns: boolean
