@@ -6,8 +6,9 @@ import type { RpcScalarResult, CategoryCountRow } from "@/integrations/supabase/
 import SEOHead from "@/components/SEO/SEOHead";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
-// HeroCarousel chargé en EAGER — critique pour le LCP (ne pas lazy-loader !)
-import HeroCarousel from "@/components/home/HeroCarousel";
+// HeroCarousel : lazy-load avec skeleton à hauteur fixe (meilleur pour TBT/FID)
+// L'image LCP vient de Supabase DB (dynamique) → impossible de preload statiquement
+const HeroCarousel = React.lazy(() => import("@/components/home/HeroCarousel"));
 const Hero = React.lazy(() => import("@/components/home/Hero"));
 const ShareButtons = React.lazy(() => import("@/components/shared/ShareButtons"));
 const Footer = React.lazy(() => import("@/components/layout/Footer"));
@@ -133,9 +134,17 @@ const Index = () => {
         image="/og-image.jpg"
         url="/"
       />
-      {/* Carrousel hero - EAGER pour LCP optimal */}
+      {/* Carrousel hero - lazy avec skeleton à hauteur fixe (CLS = 0) */}
       <div className="px-4 pt-6 pb-2">
-        <HeroCarousel />
+        <Suspense fallback={
+          <div
+            style={{ height: '450px', borderRadius: '24px' }}
+            className="w-full bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 animate-pulse"
+            aria-hidden="true"
+          />
+        }>
+          <HeroCarousel />
+        </Suspense>
       </div>
 
       {/* Grande bannière avec conteneur centré */}
