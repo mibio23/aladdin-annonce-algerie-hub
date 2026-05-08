@@ -325,7 +325,7 @@ const AdvancedSearchBar = React.memo(() => {
           <button
             type="submit"
             disabled={isSearching || isLoading}
-            className="btn-publicite neon-button flex items-center justify-center min-w-[180px] disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex items-center justify-center min-w-[180px] px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {(isSearching || isLoading) ? (
               <LoaderCircle className="animate-spin h-5 w-5 mr-2" />

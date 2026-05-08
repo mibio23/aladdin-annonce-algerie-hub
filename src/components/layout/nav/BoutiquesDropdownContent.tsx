@@ -12,7 +12,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink 
               to="/boutiques/magasins"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.stores')}
             </LocalizedLink>
@@ -22,7 +22,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink
               to="/boutiques/cabinets"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.offices')}
             </LocalizedLink>
@@ -32,7 +32,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink
               to="/boutiques/entreprises-privees"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.privateCompanies')}
             </LocalizedLink>
@@ -42,7 +42,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink
               to="/boutiques/entreprises-nationales"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.nationalCompanies')}
             </LocalizedLink>
@@ -52,7 +52,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink
               to="/boutiques/commerce-ambulant"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.streetVendors')}
             </LocalizedLink>
@@ -62,7 +62,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink
               to="/boutiques/associations"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.associations')}
             </LocalizedLink>
@@ -72,7 +72,7 @@ const BoutiquesDropdownContent = () => {
           <NavigationMenuLink asChild>
             <LocalizedLink
               to="/boutiques/boutique-en-ligne"
-              className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+              className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
             >
               {t('menu.shops.onlineShop')}
             </LocalizedLink>

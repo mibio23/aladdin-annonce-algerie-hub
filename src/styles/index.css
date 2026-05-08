@@ -212,31 +212,6 @@
     margin-right: 0;
   }
 
-  /* Styles pour les animations du menu */
-  .category-hover-enter {
-    animation: categoryHoverEnter 0.3s ease-out;
-  }
-
-  .subcategory-slide-enter {
-    animation: subcategorySlideEnter 0.4s ease-out;
-  }
-
-  /* Styles pour la recherche */
-  .search-input:focus {
-    box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3);
-  }
-
-  /* Styles pour les indicateurs visuels */
-  .visual-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--brand-glow-accent);
-    display: inline-block;
-    margin-right: 0.5rem;
-    animation: pulse 2s infinite;
-  }
-
   /* Responsive design pour le menu */
   @media (max-width: 768px) {
     .modern-menu-container {
@@ -263,37 +238,3 @@
   }
 }
 
-/* Animations personnalisées */
-@keyframes categoryHoverEnter {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes subcategorySlideEnter {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
-  }
-}

@@ -17,8 +17,8 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-gray-50 border-b border-gray-200 dark:bg-slate-800 dark:border-slate-700 shadow-sm">
-      <div className="container mx-auto px-4 py-1">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/85 dark:bg-slate-900/90 border-b border-gray-200/60 dark:border-slate-700/50 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="container mx-auto px-4 py-1.5">
         <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
           {/* Left side - Logo */}
           <div className="flex items-center">

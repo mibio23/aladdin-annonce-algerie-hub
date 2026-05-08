@@ -18,93 +18,85 @@ const HeaderUserActions = () => {
   // Activer le timer d'inactivité pour les utilisateurs connectés
   useInactivityTimer({ enabled: !!user });
 
+  const iconBtnClass = "p-2 h-auto rounded-full text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-200";
+
   return (
-    <div className={`flex items-center text-sm ${isRTL ? 'space-x-reverse space-x-1' : 'space-x-1'}`}>
+    <div className={`flex items-center ${isRTL ? 'gap-1' : 'gap-1'}`}>
       {/* Download App Button */}
       <LocalizedButtonLink
         to="/telecharger-app"
         variant="ghost"
         size="sm"
-        className="golden-frame-btn h-8 text-sm font-bold border-0"
+        className="h-8 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary gap-1.5"
       >
-        <Download className="h-6 w-6" />
-        {t('header.downloadApp')}
+        <Download className="h-4 w-4" />
+        <span className="hidden xl:inline">{t('header.downloadApp')}</span>
       </LocalizedButtonLink>
-      
-      <span className="text-muted-foreground">|</span>
       
       {/* Language Switcher */}
       <div className="text-foreground">
         <LanguageSwitcher />
       </div>
       
-      <span className="text-muted-foreground">|</span>
-      
       {/* User Authentication */}
       <div className="flex items-center text-foreground">
         {user ? (
           <UserMenu />
         ) : (
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-bold">{t('header.welcome')}</span>
-            <AuthDrawer>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="golden-frame-btn h-8 text-sm font-bold border-0"
-              >
-                {t('header.loginRegister')}
-              </Button>
-            </AuthDrawer>
-          </div>
+          <AuthDrawer>
+            <Button
+              variant="default"
+              size="sm"
+              className="h-8 text-xs font-medium bg-primary hover:bg-primary/90 text-white rounded-full px-4 shadow-sm"
+            >
+              {t('header.loginRegister')}
+            </Button>
+          </AuthDrawer>
         )}
       </div>
       
-      <span className="text-muted-foreground">|</span>
-      
-      {/* Other actions */}
-      <span className="red-frame-icon" title={t('header.postAd')}>
+      {/* Quick Action Icons */}
+      <div className="flex items-center gap-0.5">
         <LocalizedButtonLink
           to="/deposer-annonce"
           variant="ghost"
           size="sm"
-          className="p-1 h-auto"
+          className={iconBtnClass}
+          title={t('header.postAd')}
         >
-          <PlusCircle className="h-8 w-8" />
+          <PlusCircle className="h-5 w-5" />
         </LocalizedButtonLink>
-      </span>
-      
-      <span className="red-frame-icon" title={t('header.createShop')}>
+        
         <LocalizedButtonLink
           to="/creer-boutique"
           variant="ghost"
           size="sm"
-          className="p-1 h-auto"
+          className={iconBtnClass}
+          title={t('header.createShop')}
         >
-          <Store className="h-8 w-8" />
+          <Store className="h-5 w-5" />
         </LocalizedButtonLink>
-      </span>
-      
-      <span className="red-frame-icon" title={t('header.search')}>
+        
         <LocalizedButtonLink
           to="/deposer-offre-metier"
           variant="ghost"
           size="sm"
-          className="p-1 h-auto"
+          className={iconBtnClass}
+          title={t('header.search')}
         >
-          <Briefcase className="h-8 w-8" />
+          <Briefcase className="h-5 w-5" />
         </LocalizedButtonLink>
-      </span>
+        
+        <span className={iconBtnClass + " cursor-pointer"}>
+          <ThemeToggle />
+        </span>
+      </div>
       
-      <span className="red-frame-icon">
-        <ThemeToggle />
-      </span>
-      
-      <span className="text-foreground">
-        <DigitalClock />
-      </span>
+      {/* Clock */}
+      <DigitalClock />
     </div>
   );
 };
 
 export default HeaderUserActions;
+

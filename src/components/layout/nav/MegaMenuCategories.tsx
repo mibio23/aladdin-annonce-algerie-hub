@@ -51,7 +51,7 @@ const MegaMenuCategories = () => {
               {categoryMenu.map((cat, idx) => (
                 <li key={cat.id}>
                   <div
-                    className={`w-full flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 category-hover-enter ${idx === activeIndex ? 'bg-gray-100 dark:bg-slate-800 font-semibold' : ''}`}
+                    className={`w-full flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 ${idx === activeIndex ? 'bg-gray-100 dark:bg-slate-800 font-semibold' : ''}`}
                     onMouseEnter={() => setActiveIndex(idx)}
                   >
                     <LocalizedLink

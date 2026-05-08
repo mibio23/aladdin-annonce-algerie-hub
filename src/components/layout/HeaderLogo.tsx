@@ -6,7 +6,7 @@ import MagicalParticles from "@/components/effects/MagicalParticles";
 // Reverted to footer-style logo (image + text wordmark)
 
 const HeaderLogo = () => {
-  useSafeI18nWithRouter();
+  const { isRTL } = useSafeI18nWithRouter();
   const [showMagic, setShowMagic] = useState(false);
   const [magicOrigin, setMagicOrigin] = useState({ x: 0, y: 0 });
 
@@ -32,17 +32,17 @@ const HeaderLogo = () => {
   return (
     <>
       <LocalizedLink to="/" className="flex items-center" onClick={handleLogoClick}>
-        <div className="flex items-center justify-center">
+        <div className={`flex items-center justify-center ${isRTL ? 'flex-row-reverse' : ''}`}>
           <img 
             src="/lovable-uploads/19d6e319-1c10-44f0-a889-e4babb7d2e97.png" 
-            alt="AL@DDIN Logo" 
-            className="h-[52.8px] w-auto object-contain max-w-[154px] transition-all duration-200 hover:scale-105 cursor-pointer"
+            alt={isRTL ? "شعار علاء الدين" : "AL@DDIN Logo"}
+            className="h-10 w-auto object-contain max-w-[130px] transition-all duration-200 hover:scale-105 cursor-pointer"
           />
           <span
-            className="ml-2 hidden sm:block text-[2.84rem] font-bold title-section text-black dark:text-slate-200 aladdin-glow hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 hover:drop-shadow-xl hover:text-shadow-red cursor-pointer"
-            aria-label="AL@DDIN"
+            className={`hidden sm:block text-[1.75rem] font-bold title-section text-gray-800 dark:text-slate-200 hover:text-primary transition-all duration-300 cursor-pointer ${isRTL ? 'mr-2 font-arabic' : 'ml-2'}`}
+            aria-label={isRTL ? "علاء الدين" : "AL@DDIN"}
           >
-            AL@DDIN
+            {isRTL ? 'علاء الدين' : 'AL@DDIN'}
           </span>
         </div>
       </LocalizedLink>

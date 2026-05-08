@@ -34,9 +34,9 @@ const DigitalClock = () => {
   const restOfTime = timeString.substring(1);
 
   return (
-    <div className="flex items-center text-3xl font-bold text-gray-700 dark:text-slate-300">
+    <div className="flex items-center text-base font-semibold text-gray-500 dark:text-slate-400 tabular-nums">
       <span>
-        <span className="text-red-500">{firstHourDigit}</span>
+        <span className="text-primary">{firstHourDigit}</span>
         {restOfTime}
       </span>
     </div>

@@ -17,7 +17,7 @@ const SearchInputField: React.FC<SearchInputFieldProps> = ({
   onBlur
 }) => {
   return (
-    <div className="relative flex-grow max-w-2xl neon-input-wrapper">
+    <div className="relative flex-grow max-w-2xl">
       <input
         type="text"
         value={value}
@@ -25,9 +25,9 @@ const SearchInputField: React.FC<SearchInputFieldProps> = ({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}
-        className="neon-input w-full p-4 pl-14 rounded-full bg-[#2a2a2a] text-slate-200 placeholder-slate-300 placeholder:font-extrabold placeholder:text-lg transition-colors duration-200 min-w-[600px]"
+        className="w-full p-4 pl-14 rounded-full bg-[#2a2a2a] text-slate-200 placeholder-slate-300 placeholder:font-extrabold placeholder:text-lg transition-colors duration-200 min-w-[600px] border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
       />
-      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 neon-icon" />
+      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
     </div>
   );
 };

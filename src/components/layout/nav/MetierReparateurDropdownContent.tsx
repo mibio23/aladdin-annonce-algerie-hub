@@ -105,7 +105,7 @@ const MetierReparateurDropdownContent = () => {
         <NavigationMenuLink asChild>
           <LocalizedLink 
             to="/metiers-reparateurs"
-            className="block px-3 py-2 text-sm text-red-600 font-bold hover:text-red-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors border-b border-gray-200 dark:border-gray-600 mb-1"
+            className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors border-b border-gray-200 dark:border-gray-600 mb-1"
           >
             {t('menu.professions.viewAll')}
           </LocalizedLink>
@@ -124,7 +124,7 @@ const MetierReparateurDropdownContent = () => {
                 <NavigationMenuLink asChild>
                   <LocalizedLink
                     to={`/reparation/${item.slug}`}
-                    className="block px-3 py-2 text-sm text-black dark:text-white hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium aladdin-glow-hover"
+                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
                   >
                     {t(item.labelKey)}
                   </LocalizedLink>
