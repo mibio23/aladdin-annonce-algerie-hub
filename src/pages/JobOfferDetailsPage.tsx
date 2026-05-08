@@ -57,8 +57,8 @@ const JobOfferDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { t, isRTL, language } = useSafeI18nWithRouter();
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { navigateWithLanguage, getLocalizedPath } = useLanguageNavigation();
+  const { _toast } = useToast();
+  const { _navigateWithLanguage, getLocalizedPath } = useLanguageNavigation();
   const [offer, setOffer] = useState<JobOffer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/silentLogger';
 import SmartAnnouncementsGrid from './SmartAnnouncementsGrid';
-import { Briefcase, ArrowRight, Phone, MessageCircle, Share2, ShieldCheck, Home, Award, MapPin, Clock, Heart } from 'lucide-react';
+import { Briefcase, ArrowRight, Share2, ShieldCheck, Home, Award, MapPin, Heart } from 'lucide-react';
 import { LocalizedLink } from '@/utils/linkUtils';
-import { Link } from 'react-router-dom';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
@@ -233,7 +232,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                 }
               };
 
-              const handleWhatsApp = (e: React.MouseEvent) => {
+              const _handleWhatsApp = (e: React.MouseEvent) => {
                 e.stopPropagation();
                 const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${offer.title} - ${shareUrl}`)}`;
                 window.open(whatsappUrl, '_blank');
@@ -320,7 +319,7 @@ const TradesAndRepairersSection = ({ jobOffersCount }: TradesAndRepairersSection
                       const expertLabel = isRTL ? "خبير (أكثر من 10 سنوات)" : (language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)");
 
                       const locale = language === 'ar' ? 'ar-DZ' : language === 'es' ? 'es-ES' : language === 'it' ? 'it-IT' : language === 'de' ? 'de-DE' : language === 'en' ? 'en-US' : 'fr-FR';
-                      const publishedAt = new Date(offer.created_at).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                      const _publishedAt = new Date(offer.created_at).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
                       return (
                         <>

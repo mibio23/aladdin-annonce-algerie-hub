@@ -162,7 +162,7 @@ export const useAnnouncements = () => {
 
   // Transform announcement data from database to interface format
   // SECURITY: Uses phone_number from database which is masked for non-authenticated users via RLS
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   type DbAnnouncement = Record<string, any> & {
     id: string;
     created_at: string;
@@ -202,7 +202,7 @@ export const useAnnouncements = () => {
   }), []);
 
   // Transform banner data to announcement format (Legacy support)
-  const transformBannerToAnnouncement = (banner: {
+  const _transformBannerToAnnouncement = (banner: {
     id: string;
     title?: string;
     description?: string;
@@ -502,7 +502,7 @@ export const useAnnouncements = () => {
 
       const { data, error } = await supabase
         .from('announcements')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         .insert(announcementPayload)
         .select()
         .single();
@@ -536,7 +536,7 @@ export const useAnnouncements = () => {
     try {
       const { error } = await supabase
         .from('announcements')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         .update({
           title: announcement.title,
           description: announcement.description,

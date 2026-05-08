@@ -310,7 +310,7 @@ const CategoryManagement = () => {
     }
   };
 
-  const removeCategoryById = (items: CategoryData[], categoryId: string): { tree: CategoryData[]; removed: CategoryData | null } => {
+  const _removeCategoryById = (items: CategoryData[], categoryId: string): { tree: CategoryData[]; removed: CategoryData | null } => {
     let removed: CategoryData | null = null;
 
     const next = items
@@ -383,8 +383,7 @@ const CategoryManagement = () => {
     }
   };
 
-  // Fonctions utilitaires pour manipuler l'arbre de catégories
-  const updateCategoryInTree = (categories: CategoryData[], categoryId: string, updates: Partial<CategoryData>): CategoryData[] => {
+  const _updateCategoryInTree = (categories: CategoryData[], categoryId: string, updates: Partial<CategoryData>): CategoryData[] => {
     return categories.map(category => {
       if (category.id === categoryId) {
         return { ...category, ...updates };
@@ -399,7 +398,7 @@ const CategoryManagement = () => {
     });
   };
 
-  const removeCategoryFromTree = (categories: CategoryData[], categoryId: string): CategoryData[] => {
+  const _removeCategoryFromTree = (categories: CategoryData[], categoryId: string): CategoryData[] => {
     return categories
       .filter(category => category.id !== categoryId)
       .map((category) => ({
@@ -408,7 +407,7 @@ const CategoryManagement = () => {
       }));
   };
 
-  const addChildToCategory = (categories: CategoryData[], parentId: string, newCategory: CategoryData): CategoryData[] => {
+  const _addChildToCategory = (categories: CategoryData[], parentId: string, newCategory: CategoryData): CategoryData[] => {
     return categories.map(category => {
       if (category.id === parentId) {
         return {

@@ -10,8 +10,6 @@ import { fr, ar, enUS, es, de, it } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 interface Conversation {
   id: string;
   participant_1_id: string;
@@ -114,7 +112,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
           return {
             ...conv,
             subject_image_url: subjectImageUrl,
-            other_user: { id: otherUserId, ...profileData } || { id: otherUserId, full_name: 'Utilisateur', avatar_url: undefined },
+            other_user: { id: otherUserId, ...profileData },
             last_message: msgData
           };
         }));
@@ -211,7 +209,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
           }
         });
 
-        setOnlineUsers(prev => {
+        setOnlineUsers(_prev => {
           const next = new Set(onlineSet);
           // Combine with realtime state if available
           const channel = supabase.getChannels().find(c => c.topic === 'realtime:global_presence');

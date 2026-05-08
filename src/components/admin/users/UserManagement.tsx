@@ -85,7 +85,7 @@ const UserManagement = () => {
         .map((p) => p.user_id)
         .filter((v): v is string => Boolean(v));
 
-      let roleMap = new Map<string, "admin" | "moderator" | "user">();
+      const roleMap = new Map<string, "admin" | "moderator" | "user">();
       if (profileUserIds.length > 0) {
         const { data: rolesData } = await supabase
           .from("user_roles")

@@ -123,7 +123,7 @@ const AdminUserDetails = () => {
         .single()
 
       if (p) setProfile(p as unknown as Profile)
-      const emailNormalized = String((p as { email?: string | null } | null)?.email || "").trim().toLowerCase()
+      const _emailNormalized = String((p as { email?: string | null } | null)?.email || "").trim().toLowerCase()
 
       let role: "admin" | "moderator" | "user" | null = null
       if (p?.user_id) {

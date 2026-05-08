@@ -11,15 +11,12 @@ import AnnouncementContactModal from "@/components/announcements/AnnouncementCon
 import AnnouncementCard from "@/components/announcements/AnnouncementCard";
 import { Announcement as AnnouncementType } from "@/hooks/useAnnouncements";
 import { useToast } from "@/hooks/use-toast";
-import { Announcement } from "@/data/types/homePageTypes";
 import { logger } from '@/utils/silentLogger';
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from "@/components/ui/separator";
-import { CATEGORIES } from "@/data/categories";
 import { useLanguageNavigation } from "@/hooks/useLanguageNavigation";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { mockVehicleAnnouncements } from '@/data/mock/vehicleAnnouncements';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { vehicleDictionary } from "@/data/search/vehicleDictionary";
 import { generalAnnouncements } from '@/data/mock/generalAnnouncements';
 import ReportModal from "@/components/common/ReportModal";
@@ -131,7 +128,7 @@ const AnnouncementDetailsPage: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { t, language: currentLanguage } = useSafeI18nWithRouter();
-  const { getSecureAnnouncementDetails } = useSecureContact();
+  const { _getSecureAnnouncementDetails: _getSecureAnnouncementDetails } = useSecureContact();
   const isRTL = currentLanguage === 'ar';
   const { getLocalizedPath } = useLanguageNavigation();
   const [showContactModal, setShowContactModal] = useState(false);
@@ -429,7 +426,7 @@ const AnnouncementDetailsPage: React.FC = () => {
           const { data: similarData } = await supabase.from('announcements').select('*').eq('category_id', announcementData.category_id).neq('id', id).limit(3);
           if (similarData) {
             const userIds = [...new Set(similarData.map((item: Record<string, unknown>) => item.user_id as string).filter(Boolean))];
-            let profilesMap: Record<string, { first_name?: string; last_name?: string; avatar_url?: string; user_id: string }> = {};
+            const profilesMap: Record<string, { first_name?: string; last_name?: string; avatar_url?: string; user_id: string }> = {};
             if (userIds.length > 0) {
               const { data: pData } = await supabase.from('profiles_public').select('user_id, full_name, avatar_url').in('user_id', userIds);
               if (pData) pData.forEach(p => { profilesMap[p.user_id] = p; });

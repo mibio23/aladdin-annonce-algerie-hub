@@ -29,7 +29,7 @@ const LazySection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const Index = () => {
   const popularCategories = usePopularCategories();
-  const { t, language } = useSafeI18nWithRouter();
+  const { _t, language } = useSafeI18nWithRouter();
   const [jobOffersCount, setJobOffersCount] = useState<number | null>(null);
   const [shopsCount, setShopsCount] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState<number | null>(null);

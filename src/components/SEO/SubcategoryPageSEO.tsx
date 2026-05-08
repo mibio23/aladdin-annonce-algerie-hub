@@ -16,7 +16,7 @@ export function SubcategoryPageSEO({
   subcategorySlug,
   announcementCount
 }: SubcategoryPageSEOProps) {
-  const title = `Annonces ${subcategoryName} ${categoryName} en Algérie | Aladdin Annonces`;
+  const _title = `Annonces ${subcategoryName} ${categoryName} en Algérie | Aladdin Annonces`;
   const description = 
     `Trouvez les meilleures annonces ${subcategoryName.toLowerCase()} en ${categoryName.toLowerCase()} en Algérie. ${
       announcementCount ? `${announcementCount} annonces disponibles. ` : ''

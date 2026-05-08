@@ -5,7 +5,6 @@ import { Search, LoaderCircle } from "lucide-react";
 import searchBackground from "@/assets/search-background.png";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
-import { MenuCategory } from "@/data/categoryTypes";
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
 import { logger } from "@/utils/silentLogger";
 import { detectVehicleIntent } from "@/utils/vehicleIntentDetector";

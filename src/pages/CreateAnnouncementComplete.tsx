@@ -14,13 +14,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/useAuth';
 import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
-import { Category } from '@/data/categories';
-import { SimpleSubCategory, getSubcategoriesByCategoryId } from '@/data/subcategories';
+import type { Category as _Category } from '@/data/categories';
+import type { SimpleSubCategory as _SimpleSubCategory } from '@/data/subcategories';
+import { getSubcategoriesByCategoryId } from '@/data/subcategories';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import { logger } from '@/utils/silentLogger';
 import { mergeOfficialAndSupabaseCategories, useCategories } from '@/services/supabaseCategoriesService';
-import { MenuCategory } from '@/data/categoryTypes';
+import type { MenuCategory as _MenuCategory } from '@/data/categoryTypes';
 import { CATEGORY_REFERENCE_IMAGES } from '@/data/categoryReferenceImages';
 import { invalidateCache } from '@/hooks/useAnnouncements';
 import { LocalizedLink } from '@/utils/linkUtils';
@@ -722,7 +723,7 @@ const CreateAnnouncementPage: React.FC = () => {
   const [referralPoints, setReferralPoints] = useState<number>(0);
   
   // Utiliser le hook useCategories pour récupérer les catégories de Supabase
-  const { data: fetchedCategoriesFromSupabase, isLoading: categoriesLoading } = useCategories(language);
+  const { data: fetchedCategoriesFromSupabase, isLoading: _categoriesLoading } = useCategories(language);
 
   // Synchronisation de l'ordre des catégories avec le menu de navigation
   const menuCategories = useMemo(() => {
@@ -1903,7 +1904,7 @@ const CreateAnnouncementPage: React.FC = () => {
       
       const { data, error } = await supabase
         .from('announcements')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         .insert(insertPayload)
         .select()
         .single();

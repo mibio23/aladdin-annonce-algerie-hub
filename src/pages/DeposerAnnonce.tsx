@@ -16,7 +16,6 @@ import { Plus, Loader2, FileText, MapPin, DollarSign, Camera, Check, Star, Phone
 import GeolocationPicker from '@/components/geolocation/GeolocationPicker';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { GeolocationCoords } from '@/hooks/useGeolocation';
-import { Category } from '@/data/categories';
 import { getSubcategoriesByCategoryId, getSubSubcategoriesBySubcategoryId } from '@/data/subcategories';
 import { MenuCategory } from '@/data/categoryTypes';
 import { wilayas } from '@/data/wilayaData';
@@ -1040,7 +1039,7 @@ const DeposerAnnonce = () => {
 
       const { data, error } = await supabase
         .from('announcements')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         .insert(announcementData)
         .select()
         .single();

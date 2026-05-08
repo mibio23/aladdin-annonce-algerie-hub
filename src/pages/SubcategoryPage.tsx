@@ -2,12 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { LocalizedLink } from "@/utils/linkUtils";
-import { Grid } from "lucide-react";
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
 import { useCategories } from "@/services/supabaseCategoriesService";
 import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory, SubCategory } from "@/data/categoryTypes";
-import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from '@/utils/silentLogger';
 import { SubcategoryPageSEO } from "@/components/SEO";
@@ -69,7 +67,7 @@ const SubcategoryPage = () => {
       try {
         // Fetch from announcements_public view
         // subcategory_id is now the slug (TEXT)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const result = await supabase
           .from('announcements_public')
           .select('*')

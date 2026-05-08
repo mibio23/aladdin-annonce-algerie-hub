@@ -26,6 +26,7 @@ import { spanishFooter } from './spanish/footer';
 import { spanishParrainage } from './spanish/parrainage';
 import { createAd } from './spanish/createAd';
 import { spanishCreateShop } from './spanish/createShop';
+import { spanishAttributes } from './spanish/attributes';
 import { spanishPwa } from './spanish/pwa';
 import { shop } from './spanish/shop';
 
@@ -36,6 +37,7 @@ const spanishTranslations = {
   ...spanishCategories,
   ...createAd,
   ...spanishCreateShop,
+  ...spanishAttributes,
   ...shop,
 
   // PWA keys

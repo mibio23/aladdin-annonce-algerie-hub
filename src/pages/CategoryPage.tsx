@@ -4,10 +4,8 @@ import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { useCategories } from "@/services/supabaseCategoriesService";
 import { getCategoryMenu } from "@/data/megaMenu/categoryMenu";
 import { MenuCategory } from "@/data/categoryTypes";
-import { Announcement } from "@/data/types/homePageTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from '@/utils/silentLogger';
-import { mockVehicleAnnouncements } from "@/data/mock/vehicleAnnouncements";
 import { CategoryPageSEO } from "@/components/SEO";
 
 import Footer from "@/components/layout/Footer";

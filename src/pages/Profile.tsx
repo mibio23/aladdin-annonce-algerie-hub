@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { MapPin, Briefcase, User, Mail, Save, Loader2, Phone, Home } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { MapPin, Briefcase, User, Mail, Save, Loader2, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 

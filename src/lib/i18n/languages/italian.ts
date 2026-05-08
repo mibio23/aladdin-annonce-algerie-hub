@@ -24,6 +24,7 @@ import { italianSettings } from './italian/settings';
 import { italianUserMenu } from './italian/userMenu';
 import { italianCreateAd } from './italian/createAd';
 import { italianCreateShop } from './italian/createShop';
+import { italianAttributes } from './italian/attributes';
 import { italianCategories } from './italian/categories';
 import { italianCategories as italianCategoriesGlobal } from '../categories/italianCategories';
 import { italianParrainage } from './italian/parrainage';
@@ -117,6 +118,8 @@ const italianTranslations = {
   ...italianCreateAd,
   // Create Shop page translations
   ...italianCreateShop,
+  // Attributes translations
+  ...italianAttributes,
   // Categories keys
   ...italianCategories,
   // PWA keys

@@ -361,7 +361,7 @@ const DeposerOffreMetier = () => {
               description: (addressError.message || "Adresse non enregistrée") as string,
             });
           }
-        } catch (addrErr) {
+        } catch {
           toast({
             title: t('jobOffer.error') || "Erreur",
             description: "Adresse non enregistrée",

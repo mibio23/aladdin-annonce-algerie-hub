@@ -2,7 +2,6 @@
  * Custom ESLint plugin to detect hardcoded text and enforce translation usage
  */
 import { Rule } from 'eslint';
-import { logger } from '@/utils/silentLogger';
 
 interface EslintPluginTranslations {
   rules: Record<string, Rule.RuleModule>;

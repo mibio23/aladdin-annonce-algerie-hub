@@ -10,7 +10,13 @@
     "migrate": "node scripts/ops/supabase_migration.js api",
     "migrate:rpc": "node scripts/ops/supabase_migration.js rpc",
     "verify": "node scripts/ops/verify_migration.js",
-    "test": "node scripts/ops/test-supabase-migration.js",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "test:supabase": "node scripts/ops/test-supabase-migration.js",
+    "lint": "eslint src/ --ext .ts,.tsx --max-warnings 50",
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky",
     "generate:sitemap": "node scripts/ops/generate-sitemap.js",
     "audit:form": "node scripts/ops/audit-form-supabase.js",
     "audit:menu": "node scripts/ops/audit-menu-form-supabase.cjs",
@@ -101,14 +107,22 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/leaflet": "^1.9.21",
+    "@vitest/coverage-v8": "^4.1.5",
     "baseline-browser-mapping": "^2.10.9",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
+    "lint-staged": "^17.0.2",
     "supabase": "^2.75.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.50.0",
+    "vitest": "^4.1.5"
   }
 }

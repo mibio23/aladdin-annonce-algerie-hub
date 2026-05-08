@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Clock, CheckCircle2, XCircle, Inbox, User, ChevronRight, CalendarDays, Loader2 } from 'lucide-react';
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const BookingCalendar = () => {
-  const { t } = useSafeI18nWithRouter();
+  useSafeI18nWithRouter();
   const { user } = useAuth();
   const { getLocalizedPath } = useLanguageNavigation();
   const { bookings: myBookings, loading: loadingMy, refetch: refetchMy } = useMyBookings();

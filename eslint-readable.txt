@@ -1,0 +1,189 @@
+﻿
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\SEO\CategoryPageSEO.tsx
+  17:9  error  'title' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\SEO\SubcategoryPageSEO.tsx
+  19:9  error  'title' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\admin\categories\CategoryManagement.tsx
+  142:8  warning  React Hook useCallback has a missing dependency: 'buildTreeFromMenu'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  313:9  error    'removeCategoryById' is assigned a value but never used. Allowed unused vars must match /^_/u                           @typescript-eslint/no-unused-vars
+  387:9  error    'updateCategoryInTree' is assigned a value but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+  402:9  error    'removeCategoryFromTree' is assigned a value but never used. Allowed unused vars must match /^_/u                       @typescript-eslint/no-unused-vars
+  411:9  error    'addChildToCategory' is assigned a value but never used. Allowed unused vars must match /^_/u                           @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\admin\dashboard\DashboardHome.tsx
+  66:11  error  'profilesTotalRes' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\admin\users\AdminUserDetails.tsx
+  126:13  error  'emailNormalized' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\admin\users\UserManagement.tsx
+  88:11  error  'roleMap' is never reassigned. Use 'const' instead  prefer-const
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\announcements\AnnouncementCard.tsx
+  746:40  error  Irregular whitespace not allowed  no-irregular-whitespace
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\booking\BookingModal.tsx
+   26:11   error    'user' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  237:105  warning  Forbidden non-null assertion                                                     @typescript-eslint/no-non-null-assertion
+  237:141  warning  Forbidden non-null assertion                                                     @typescript-eslint/no-non-null-assertion
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\home\AdvancedSearchBar.tsx
+  8:10  error  'MenuCategory' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\home\PremiumAnnouncementsSection.tsx
+  16:7   error    'normalizeText' is assigned a value but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  32:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  46:15  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  48:15  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  65:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  67:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  72:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\home\TradesAndRepairersSection.tsx
+    5:33  error    'Phone' is defined but never used. Allowed unused vars must match /^_/u                                              @typescript-eslint/no-unused-vars
+    5:40  error    'MessageCircle' is defined but never used. Allowed unused vars must match /^_/u                                      @typescript-eslint/no-unused-vars
+    5:97  error    'Clock' is defined but never used. Allowed unused vars must match /^_/u                                              @typescript-eslint/no-unused-vars
+    7:10  error    'Link' is defined but never used. Allowed unused vars must match /^_/u                                               @typescript-eslint/no-unused-vars
+   57:6   warning  React Hook useEffect has a missing dependency: 'loadProFavorites'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  236:21  error    'handleWhatsApp' is assigned a value but never used. Allowed unused vars must match /^_/u                            @typescript-eslint/no-unused-vars
+  323:29  error    'publishedAt' is assigned a value but never used. Allowed unused vars must match /^_/u                               @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\job_offer\JobOfferContactModal.tsx
+  1:27  error  'useEffect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\messaging\ConversationList.tsx
+   13:10  error    'Tabs' is defined but never used. Allowed unused vars must match /^_/u                                      @typescript-eslint/no-unused-vars
+   13:16  error    'TabsContent' is defined but never used. Allowed unused vars must match /^_/u                               @typescript-eslint/no-unused-vars
+   13:29  error    'TabsList' is defined but never used. Allowed unused vars must match /^_/u                                  @typescript-eslint/no-unused-vars
+   13:39  error    'TabsTrigger' is defined but never used. Allowed unused vars must match /^_/u                               @typescript-eslint/no-unused-vars
+  117:25  error    Unexpected constant truthiness on the left-hand side of a `||` expression                                   no-constant-binary-expression
+  214:24  error    'prev' is defined but never used. Allowed unused args must match /^_/u                                      @typescript-eslint/no-unused-vars
+  283:6   warning  React Hook useEffect has a missing dependency: 'user.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\navigation\ExtendedCategoryNav.tsx
+  112:20  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  144:30  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\offline\OfflineMode.tsx
+  207:6  warning  React Hook useCallback has a missing dependency: 'tr'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  266:6  warning  React Hook useEffect has a missing dependency: 'tr'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\components\search\visual\CameraCapture.tsx
+  49:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\hooks\useAnnouncements.ts
+  165:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  202:7  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  205:9  error    'transformBannerToAnnouncement' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  368:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  405:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  505:9  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  539:9  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  570:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  614:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  644:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\hooks\useSavedSearches.ts
+  146:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  199:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\lib\i18n\hooks\useTranslationAdmin.ts
+  122:13  error  'style' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\lib\i18n\tools\eslint-plugin.ts
+  5:10  error  'logger' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\AnnouncementDetailsPage.tsx
+   19:10  error    'CATEGORIES' is defined but never used. Allowed unused vars must match /^_/u                                        @typescript-eslint/no-unused-vars
+   21:70  error    'BreadcrumbPage' is defined but never used. Allowed unused vars must match /^_/u                                    @typescript-eslint/no-unused-vars
+  134:11  error    'getSecureAnnouncementDetails' is assigned a value but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  432:17  error    'profilesMap' is never reassigned. Use 'const' instead                                                              prefer-const
+  499:6   warning  React Hook useEffect has a missing dependency: 'currentLanguage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\BookingCalendar.tsx
+   2:16  error  'CardContent' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+   2:29  error  'CardHeader' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   2:41  error  'CardTitle' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+   2:52  error  'CardDescription' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  24:11  error  't' is assigned a value but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\CategoryPage.tsx
+   7:10  error  'Announcement' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  10:10  error  'mockVehicleAnnouncements' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\CreateAnnouncementComplete.tsx
+    17:10  error    'Category' is defined but never used. Allowed unused vars must match /^_/u                              @typescript-eslint/no-unused-vars
+    18:10  error    'SimpleSubCategory' is defined but never used. Allowed unused vars must match /^_/u                     @typescript-eslint/no-unused-vars
+    23:10  error    'MenuCategory' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+   725:59  error    'categoriesLoading' is assigned a value but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+   838:6   warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  1159:6   warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  1906:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\CreateShopPage.tsx
+  80:9  warning  The 'tr' function makes the dependencies of useCallback Hook (at line 218) change on every render. To fix this, wrap the definition of 'tr' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  80:9  warning  The 'tr' function makes the dependencies of useCallback Hook (at line 235) change on every render. To fix this, wrap the definition of 'tr' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\DeposerAnnonce.tsx
+    19:10  error    'Category' is defined but never used. Allowed unused vars must match /^_/u                             @typescript-eslint/no-unused-vars
+  1043:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\DeposerOffreMetier.tsx
+  364:18  error  'addrErr' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\Index.tsx
+  32:11  error  't' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\JobOfferDetailsPage.tsx
+   60:11  error    'toast' is assigned a value but never used. Allowed unused vars must match /^_/u                      @typescript-eslint/no-unused-vars
+   61:11  error    'navigateWithLanguage' is assigned a value but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  474:6   warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\JobOfferMessages.tsx
+  89:6  warning  React Hook useCallback has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\MesFavoris.tsx
+  112:6  warning  React Hook useEffect has missing dependencies: 't' and 'tr'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\Messages.tsx
+    4:68  error    'ArrowLeft' is defined but never used. Allowed unused vars must match /^_/u                            @typescript-eslint/no-unused-vars
+  145:6   warning  React Hook useEffect has a missing dependency: 'tr'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\MetiersReparateurs.tsx
+   23:3   error    'MessageCircle' is defined but never used. Allowed unused vars must match /^_/u                                      @typescript-eslint/no-unused-vars
+   24:3   error    'Phone' is defined but never used. Allowed unused vars must match /^_/u                                              @typescript-eslint/no-unused-vars
+   29:40  error    'MetierAnnouncement' is defined but never used. Allowed unused vars must match /^_/u                                 @typescript-eslint/no-unused-vars
+  294:6   warning  React Hook useEffect has a missing dependency: 'loadProFavorites'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  843:23  error    'handleWhatsAppShare' is assigned a value but never used. Allowed unused vars must match /^_/u                       @typescript-eslint/no-unused-vars
+  956:31  error    'publishedAt' is assigned a value but never used. Allowed unused vars must match /^_/u                               @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\PaymentSuccess.tsx
+  93:6  warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\Profile.tsx
+  5:63  error  'Home' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  6:10  error  'Badge' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\PublicProfile.tsx
+  94:6  warning  React Hook useCallback has missing dependencies: 't' and 'tr'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\ShopDetails.tsx
+   55:70  error    'BreadcrumbPage' is defined but never used. Allowed unused vars must match /^_/u                                 @typescript-eslint/no-unused-vars
+  310:6   warning  React Hook useEffect has missing dependencies: 't' and 'tr'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  660:9   error    'localizedShopCommune' is assigned a value but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\ShopMessages.tsx
+  78:6  warning  React Hook React.useCallback has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\SubcategoryPage.tsx
+   5:10  error    'Grid' is defined but never used. Allowed unused vars must match /^_/u                                 @typescript-eslint/no-unused-vars
+  72:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Users\PROGSM\Desktop\Aladdin correction avec GEMINI vs code\aladdin-annonce-algerie-hub\src\pages\VehicleSearchResultsPage.tsx
+  376:6  warning  React Hook useEffect has a missing dependency: 'tr'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Ô£û 105 problems (60 errors, 45 warnings)
+  2 errors and 12 warnings potentially fixable with the `--fix` option.
+

@@ -63,7 +63,7 @@ const DashboardHome = () => {
         const startSixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
         const [
-          profilesTotalRes,
+          _profilesTotalRes,
           profilesActiveRes,
           profilesCurrentMonthRes,
           profilesPreviousMonthRes,

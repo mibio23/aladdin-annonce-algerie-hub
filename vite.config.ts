@@ -30,10 +30,9 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     target: 'es2019',
     sourcemap: mode === 'development',
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 5000,
     rollupOptions: {
       output: {
-        // Répartit les bibliothèques en petits fichiers chargés à la demande
         manualChunks(id) {
           const n = id.replace(/\\/g, '/');
 
@@ -104,9 +103,37 @@ export default defineConfig(({ mode }) => ({
           if (n.includes('/src/data/wilayaData') || n.includes('/src/data/communeData') || n.includes('/src/data/mock/')) {
             return 'geo-data';
           }
-          // ── Traductions i18n ──────────────────────────────────────────────
-          if (n.includes('/src/lib/i18n/languages/') || n.includes('/src/lib/i18n/locales/') || n.includes('/src/lib/i18n/translations/')) {
-            return 'i18n-data';
+          // ── Traductions i18n par langue (évite un méga-chunk i18n) ────────
+          if (n.includes('/src/lib/i18n/languages/french/')) {
+            return 'i18n-fr';
+          }
+          if (n.includes('/src/lib/i18n/languages/english/')) {
+            return 'i18n-en';
+          }
+          if (n.includes('/src/lib/i18n/languages/arabic/')) {
+            return 'i18n-ar';
+          }
+          if (n.includes('/src/lib/i18n/languages/spanish/')) {
+            return 'i18n-es';
+          }
+          if (n.includes('/src/lib/i18n/languages/italian/')) {
+            return 'i18n-it';
+          }
+          if (n.includes('/src/lib/i18n/languages/german/')) {
+            return 'i18n-de';
+          }
+          if (n.includes('/src/lib/i18n/categories/')) {
+            return 'i18n-categories';
+          }
+          if (n.includes('/src/lib/i18n/')) {
+            return 'i18n-core';
+          }
+          // ── Données catégories lourdes ────────────────────────────────────
+          if (n.includes('/src/data/categories/megaMenuStructures/')) {
+            return 'mega-menu-data';
+          }
+          if (n.includes('/src/data/categories/') || n.includes('/src/data/megaMenu/')) {
+            return 'categories-data';
           }
           // ── Panel Admin (rarement visité) ─────────────────────────────────
           if (n.includes('/src/components/admin/') || n.includes('/src/pages/admin/')) {
@@ -131,6 +158,10 @@ export default defineConfig(({ mode }) => ({
           }
           if (n.includes('JobOfferDetailsPage')) {
             return 'job-details';
+          }
+          // ── Composants home page lourds ───────────────────────────────────
+          if (n.includes('/src/components/home/PopularSearchedAnnouncementsSection') || n.includes('/src/components/home/PremiumAnnouncementsSection')) {
+            return 'home-heavy';
           }
           // ── Tout le reste de node_modules → vendor générique ─────────────
           if (n.includes('node_modules/')) {

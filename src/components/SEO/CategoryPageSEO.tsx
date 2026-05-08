@@ -14,7 +14,7 @@ export function CategoryPageSEO({
   categoryDescription,
   announcementCount
 }: CategoryPageSEOProps) {
-  const title = `Annonces ${categoryName} en Algérie | Aladdin Annonces`;
+  const _title = `Annonces ${categoryName} en Algérie | Aladdin Annonces`;
   const description = categoryDescription || 
     `Trouvez les meilleures annonces ${categoryName.toLowerCase()} en Algérie. ${
       announcementCount ? `${announcementCount} annonces disponibles. ` : ''

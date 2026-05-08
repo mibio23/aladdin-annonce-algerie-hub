@@ -12,6 +12,7 @@ import { germanCategories } from './categories';
 import { createAd } from './createAd';
 import { germanSections } from './sections';
 import { germanAnnouncements } from './announcements';
+import { germanAttributes } from './attributes';
 import homeDe from './home';
 
 const germanTranslations = {
@@ -30,6 +31,7 @@ const germanTranslations = {
   ...createAd,
   ...germanSections,
   ...germanAnnouncements,
+  ...germanAttributes,
   ...homeDe,
 
   // Messages translations

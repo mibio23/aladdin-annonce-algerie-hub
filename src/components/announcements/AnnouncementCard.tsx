@@ -743,7 +743,7 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
         </div>
 
         <div className="space-y-2 text-xs text-muted-foreground pt-2 border-t border-border/10">
-          {/* Ligne wilaya + prix dÃ©jÃ  affichÃ©e au-dessus; on ne rÃ©pÃ¨te pas ici */}
+          {/* Ligne wilaya + prix deja affichee au-dessus; on ne repete pas ici */}
           
           <div className="flex items-center justify-end">
             <div className="flex items-center bg-primary/5 px-2 py-0.5 rounded-full">

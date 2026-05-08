@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Calendar, Clock, User, Phone, Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { useBookingActions, useAvailabilitySlots } from '@/hooks/useBookings';
-import { useAuth } from '@/contexts/useAuth';
 
 interface BookingModalProps {
   open: boolean;
@@ -23,7 +22,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
   announcementTitle,
   announcementPrice,
 }) => {
-  const { user } = useAuth();
   const { createBooking, loading: submitting } = useBookingActions();
   const { getAvailableTimesForDate, slots, blockedDates } = useAvailabilitySlots(announcementId);
 

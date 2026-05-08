@@ -119,7 +119,7 @@ export function useTranslationDebug() {
 
   const logTranslation = useCallback((key: string, value: string, language: Language, source: 'direct' | 'fallback') => {
     if (debugMode) {
-      const style = source === 'fallback' ? 'color: orange' : 'color: green';
+      const _style = source === 'fallback' ? 'color: orange' : 'color: green';
       logger.info(`[i18n] ${language}: ${key} → ${value}`, source);
     }
   }, [debugMode]);

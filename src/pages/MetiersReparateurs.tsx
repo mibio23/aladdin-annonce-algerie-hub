@@ -20,13 +20,11 @@ import {
   Award,
   Eye,
   MapPin,
-  MessageCircle,
-  Phone,
   Share2,
   Heart
 } from 'lucide-react';
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
-import { useMetiersAnnouncements, type MetierAnnouncement } from '@/hooks/useMetiersAnnouncements';
+import { useMetiersAnnouncements } from '@/hooks/useMetiersAnnouncements';
 import { Skeleton } from '@/components/ui/skeleton';
 import { wilayas } from '@/data/wilayaData';
 import { logger } from '@/utils/silentLogger';
@@ -840,7 +838,7 @@ const MetiersReparateurs: React.FC = () => {
                   }
                 };
 
-                const handleWhatsAppShare = (e: React.MouseEvent) => {
+                const _handleWhatsAppShare = (e: React.MouseEvent) => {
                   e.stopPropagation();
                   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(announcement.title + " - " + shareUrl)}`;
                   window.open(whatsappUrl, '_blank');
@@ -953,7 +951,7 @@ const MetiersReparateurs: React.FC = () => {
                         const expertLabel = language === 'ar' ? "خبير (أكثر من 10 سنوات)" : language === 'es' ? "Experto (más de 10 años)" : language === 'it' ? "Esperto (oltre 10 anni)" : language === 'de' ? "Experte (über 10 Jahre)" : "Expert (plus de 10 ans)";
 
                         const locale = language === 'ar' ? 'ar-DZ' : language === 'es' ? 'es-ES' : language === 'it' ? 'it-IT' : language === 'de' ? 'de-DE' : language === 'en' ? 'en-US' : 'fr-FR';
-                        const publishedAt = new Date(announcement.created_at).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        const _publishedAt = new Date(announcement.created_at).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
                         return (
                           <>

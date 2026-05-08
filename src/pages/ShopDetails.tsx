@@ -52,7 +52,7 @@ import { useSafeI18nWithRouter } from '@/lib/i18n/i18nContextWithRouter';
 import { generateSessionId } from '@/utils/searchUtils';
 import { cn } from '@/lib/utils';
 import SEOHead from '@/components/SEO/SEOHead';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { wilayas } from '@/data/wilayaData';
 import { communes } from '@/data/communeData';
 import type { ShopSocialMedia, ShopOpeningHours } from '@/integrations/supabase/types.extended';
@@ -656,8 +656,8 @@ const ShopDetails: React.FC = () => {
     });
 
   const localizedShopAddress = localizeLocationText(shop?.address || '') || [localizeCommune(shop?.commune, shop?.wilaya), localizeWilaya(shop?.wilaya)].filter(Boolean).join(', ');
-  const localizedShopWilaya = localizeWilaya(shop?.wilaya);
-  const localizedShopCommune = localizeCommune(shop?.commune, shop?.wilaya);
+  const _localizedShopWilaya = localizeWilaya(shop?.wilaya);
+  const _localizedShopCommune = localizeCommune(shop?.commune, shop?.wilaya);
 
   if (loading) {
     return (

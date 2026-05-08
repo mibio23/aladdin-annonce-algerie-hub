@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { Heart, MapPin, Phone, MessageCircle, Share2, Eye } from "lucide-react";
 import { wilayas } from '@/data/wilayaData';
 
-const normalizeText = (s: string) =>
+const _normalizeText = (s: string) =>
   (s || "")
     .toLowerCase()
     .normalize("NFKD")
@@ -29,7 +29,7 @@ const PremiumAnnouncementsSection = () => {
   useEffect(() => {
     const fetchPremiumAnnouncements = async () => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data, error } = await supabase
           .from('announcements')
           .select('id, title, price, wilaya, location, images, image_url, created_at, is_urgent, phone_number, user_id, category_id, attributes')
@@ -43,9 +43,9 @@ const PremiumAnnouncementsSection = () => {
         const userIds = Array.from(
           new Set(
             rows
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+               
               .map((r: any) => r.user_id)
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+               
               .filter((id: any) => typeof id === "string" && id.length > 0),
           ),
         );
@@ -62,14 +62,14 @@ const PremiumAnnouncementsSection = () => {
 
         if (profilesError) throw profilesError;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const profileByUserId = new Map<string, any>();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         (profilesData || []).forEach((p: any) => {
           if (typeof p.user_id === "string") profileByUserId.set(p.user_id, p);
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const enriched = rows.map((r: any) => ({
           ...r,
           profiles: r.user_id ? profileByUserId.get(r.user_id) : null,

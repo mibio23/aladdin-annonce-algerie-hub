@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSafeI18nWithRouter  } from "@/lib/i18n/i18nContextWithRouter";
 import { useAuth } from '@/contexts/useAuth';
-import { MessageCircle, Loader2, FileText, ShoppingBag, Briefcase, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Loader2, FileText, ShoppingBag, Briefcase } from 'lucide-react';
 import ConversationList from '@/components/messaging/ConversationList';
 import MessageThread from '@/components/messaging/MessageThread';
 import { useSearchParams, Link } from 'react-router-dom';
