@@ -5,36 +5,36 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 const metierIcons: Record<string, string> = {
-  plumber: '/icons/categories/metier-plumber.png',
-  electrician: '/icons/categories/metier-electrician.png',
-  mechanic: '/icons/categories/metier-mechanic.png',
-  woodworker: '/icons/categories/metier-woodworker.png',
-  painter: '/icons/categories/metier-painter.png',
-  mason: '/icons/categories/metier-mason.png',
-  roofer: '/icons/categories/metier-roofer.png',
-  tiler: '/icons/categories/metier-tiler.png',
-  gardener: '/icons/categories/metier-gardener.png',
-  tailor: '/icons/categories/metier-tailor.png',
-  cook: '/icons/categories/metier-cook.png',
-  hairdresser: '/icons/categories/metier-hairdresser.png',
-  beautician: '/icons/categories/metier-beautician.png',
-  computerTechnician: '/icons/categories/metier-computerTechnician.png',
-  heatingTechnician: '/icons/categories/metier-heatingTechnician.png',
-  applianceRepairman: '/icons/categories/metier-applianceRepairman.png',
-  welder: '/icons/categories/metier-welder.png',
-  ironworker: '/icons/categories/metier-ironworker.png',
-  glazier: '/icons/categories/metier-glazier.png',
-  bodyworker: '/icons/categories/metier-bodyworker.png',
-  cabinetmaker: '/icons/categories/metier-cabinetmaker.png',
-  upholsterer: '/icons/categories/metier-upholsterer.png',
-  airConditioningTechnician: '/icons/categories/metier-airConditioningTechnician.png',
-  photographer: '/icons/categories/metier-photographer.png',
-  videographer: '/icons/categories/metier-videographer.png',
-  translator: '/icons/categories/metier-translator.png',
-  secretary: '/icons/categories/metier-secretary.png',
-  accountant: '/icons/categories/metier-accountant.png',
-  privateTeacher: '/icons/categories/metier-privateTeacher.png',
-  otherProfessions: '/icons/categories/metier-otherProfessions.png',
+  plumber: '/icons/categories/metier-plumber.webp',
+  electrician: '/icons/categories/metier-electrician.webp',
+  mechanic: '/icons/categories/metier-mechanic.webp',
+  woodworker: '/icons/categories/metier-woodworker.webp',
+  painter: '/icons/categories/metier-painter.webp',
+  mason: '/icons/categories/metier-mason.webp',
+  roofer: '/icons/categories/metier-roofer.webp',
+  tiler: '/icons/categories/metier-tiler.webp',
+  gardener: '/icons/categories/metier-gardener.webp',
+  tailor: '/icons/categories/metier-tailor.webp',
+  cook: '/icons/categories/metier-cook.webp',
+  hairdresser: '/icons/categories/metier-hairdresser.webp',
+  beautician: '/icons/categories/metier-beautician.webp',
+  computerTechnician: '/icons/categories/metier-computerTechnician.webp',
+  heatingTechnician: '/icons/categories/metier-heatingTechnician.webp',
+  applianceRepairman: '/icons/categories/metier-applianceRepairman.webp',
+  welder: '/icons/categories/metier-welder.webp',
+  ironworker: '/icons/categories/metier-ironworker.webp',
+  glazier: '/icons/categories/metier-glazier.webp',
+  bodyworker: '/icons/categories/metier-bodyworker.webp',
+  cabinetmaker: '/icons/categories/metier-cabinetmaker.webp',
+  upholsterer: '/icons/categories/metier-upholsterer.webp',
+  airConditioningTechnician: '/icons/categories/metier-airConditioningTechnician.webp',
+  photographer: '/icons/categories/metier-photographer.webp',
+  videographer: '/icons/categories/metier-videographer.webp',
+  translator: '/icons/categories/metier-translator.webp',
+  secretary: '/icons/categories/metier-secretary.webp',
+  accountant: '/icons/categories/metier-accountant.webp',
+  privateTeacher: '/icons/categories/metier-privateTeacher.webp',
+  otherProfessions: '/icons/categories/metier-otherProfessions.webp',
 };
 
 const MetierReparateurDropdownContent = () => {
@@ -160,7 +160,7 @@ const MetierReparateurDropdownContent = () => {
                     className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
                   >
                     <img 
-                      src={metierIcons[item.slug] || '/icons/categories/metier-otherProfessions.png'} 
+                      src={metierIcons[item.slug] || '/icons/categories/metier-otherProfessions.webp'} 
                       alt="" 
                       className="w-11 h-11 object-contain shrink-0" 
                       loading="lazy" 

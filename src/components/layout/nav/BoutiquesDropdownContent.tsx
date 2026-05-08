@@ -3,13 +3,13 @@ import { NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 
 const boutiqueIcons: Record<string, string> = {
-  magasins: '/icons/categories/boutique-magasin.png',
-  cabinets: '/icons/categories/boutique-cabinet.png',
-  'entreprises-privees': '/icons/categories/boutique-entreprise-privee.png',
-  'entreprises-nationales': '/icons/categories/boutique-entreprise-nationale.png',
-  'commerce-ambulant': '/icons/categories/boutique-commerce-ambulant.png',
-  associations: '/icons/categories/boutique-association.png',
-  'boutique-en-ligne': '/icons/categories/boutique-en-ligne.png',
+  magasins: '/icons/categories/boutique-magasin.webp',
+  cabinets: '/icons/categories/boutique-cabinet.webp',
+  'entreprises-privees': '/icons/categories/boutique-entreprise-privee.webp',
+  'entreprises-nationales': '/icons/categories/boutique-entreprise-nationale.webp',
+  'commerce-ambulant': '/icons/categories/boutique-commerce-ambulant.webp',
+  associations: '/icons/categories/boutique-association.webp',
+  'boutique-en-ligne': '/icons/categories/boutique-en-ligne.webp',
 };
 
 const BoutiquesDropdownContent = () => {

@@ -120,6 +120,7 @@
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.2",
+    "sharp": "^0.34.5",
     "supabase": "^2.75.0",
     "tsconfig-paths": "^4.2.0",
     "typescript-eslint": "^8.50.0",
