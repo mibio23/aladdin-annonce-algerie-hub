@@ -31,28 +31,7 @@ const CategorySubList: React.FC<CategorySubListProps> = ({
             >
               {translatedSubName}
             </Link>
-          
-            {sub.subcategories && (
-              <ul className="ml-4 mt-1 space-y-1">
-                {sub.subcategories.map((subSub) => {
-                  // Use translation key if available
-                  const translatedSubSubName = t(`categories.${subSub.slug}`) !== `categories.${subSub.slug}` 
-                    ? t(`categories.${subSub.slug}`) 
-                    : subSub.name;
-                    
-                  return (
-                    <li key={subSub.id}>
-                      <Link 
-                        to={`/category/${parentSlug}/${sub.slug}/${subSub.slug}`}
-                        className="text-black dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs font-medium transition-all duration-300 hover:underline decoration-black dark:decoration-gray-400 underline-offset-1 hover:drop-shadow-md hover:text-shadow-glow"
-                      >
-                        {translatedSubSubName}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+            {/* Sous-sous-catégories masquées du menu — présentes uniquement pour le SEO (sitemap/meta) */}
           </li>
         );
       })}

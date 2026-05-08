@@ -28,7 +28,7 @@ const ModernMegaMenuCategories: React.FC = () => {
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-  const [hoveredSubcategory, setHoveredSubcategory] = useState<string | null>(null);
+  // hoveredSubcategory removed — sub-subcategories hidden from menu
   // Track hovered state only
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,21 +63,13 @@ const ModernMegaMenuCategories: React.FC = () => {
       clearTimeout(menuTimeoutRef.current);
     }
     setHoveredCategory(categoryId);
-    setHoveredSubcategory(null);
     // Menu open implied by hovered category
   };
 
-  const handleSubcategoryHover = (subcategoryId: string | null) => {
-    if (menuTimeoutRef.current) {
-      clearTimeout(menuTimeoutRef.current);
-    }
-    setHoveredSubcategory(subcategoryId);
-  };
 
   const handleMenuLeave = () => {
     menuTimeoutRef.current = setTimeout(() => {
       setHoveredCategory(null);
-      setHoveredSubcategory(null);
       // Menu closed when leaving
     }, 300);
   };
@@ -86,7 +78,6 @@ const ModernMegaMenuCategories: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setHoveredCategory(null);
-      setHoveredSubcategory(null);
     }
   };
 
@@ -316,94 +307,38 @@ const ModernMegaMenuCategories: React.FC = () => {
                 if (!category) return null;
 
                 return (
-                  <div className="flex">
-                    {/* Colonne de gauche avec les sous-catégories */}
-                    <div className="w-1/4 pr-8 border-r border-gray-200 dark:border-slate-700">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        {category.icon && React.isValidElement(category.icon) ? (
-                          <span className="w-5 h-5 flex items-center justify-center text-orange-500">
-                            {category.icon}
-                          </span>
-                        ) : null}
-                        {getCategoryTranslation(category, language, t)}
-                      </h3>
-                      <div className="space-y-2">
-                        {category.subcategories?.map((subcategory) => (
-                          <LocalizedLink
-                            key={subcategory.id}
-                            to={`/category/${category.slug}/${subcategory.slug}`}
-                            className={`relative py-2 px-3 rounded-md cursor-pointer transition-colors block ${
-                              hoveredSubcategory === subcategory.id
-                                ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
-                                : 'hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-300'
-                            }`}
-                            onMouseEnter={() => handleSubcategoryHover(subcategory.id)}
-                            role="menuitem"
-                          >
-                            <div className="flex items-center gap-2">
-                              {subcategory.icon && React.isValidElement(subcategory.icon) ? (
-                                <span className="w-4 h-4 flex items-center justify-center" aria-hidden="true">
-                                  {subcategory.icon}
-                                </span>
-                              ) : (
-                                <div className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center" aria-hidden="true">
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
-                                </div>
-                              )}
-                              <span className="font-medium">{getCategoryTranslation(subcategory, language, t)}</span>
-                            </div>
-                            {subcategory.subcategories && subcategory.subcategories.length > 0 && (
-                              <ChevronRight className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-transform duration-200 ${
-                                hoveredSubcategory === subcategory.id ? 'text-orange-500' : 'text-gray-400'
-                              }`} />
+                  <div>
+                    {/* Sous-catégories uniquement — sous-sous-catégories masquées (SEO uniquement) */}
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      {category.icon && React.isValidElement(category.icon) ? (
+                        <span className="w-5 h-5 flex items-center justify-center text-orange-500">
+                          {category.icon}
+                        </span>
+                      ) : null}
+                      {getCategoryTranslation(category, language, t)}
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                      {category.subcategories?.map((subcategory) => (
+                        <LocalizedLink
+                          key={subcategory.id}
+                          to={`/category/${category.slug}/${subcategory.slug}`}
+                          className="py-2 px-3 rounded-md cursor-pointer transition-colors block hover:bg-orange-50 dark:hover:bg-orange-900/20 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400"
+                          role="menuitem"
+                        >
+                          <div className="flex items-center gap-2">
+                            {subcategory.icon && React.isValidElement(subcategory.icon) ? (
+                              <span className="w-4 h-4 flex items-center justify-center" aria-hidden="true">
+                                {subcategory.icon}
+                              </span>
+                            ) : (
+                              <div className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center" aria-hidden="true">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
+                              </div>
                             )}
-                          </LocalizedLink>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Colonne de droite avec les sous-sous-catégories */}
-                    <div className="w-3/4 pl-8">
-                      {hoveredSubcategory && (() => {
-                        const subcategory = category.subcategories?.find(sub => sub.id === hoveredSubcategory);
-                        if (!subcategory || !subcategory.subcategories || subcategory.subcategories.length === 0) return null;
-
-                        return (
-                          <div>
-                            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                              {subcategory.icon && React.isValidElement(subcategory.icon) ? (
-                                <span className="w-5 h-5 flex items-center justify-center text-orange-500">
-                                  {subcategory.icon}
-                                </span>
-                              ) : null}
-                              {getCategoryTranslation(subcategory, language, t)}
-                            </h4>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                              {subcategory.subcategories.map((subSubcategory) => (
-                                <LocalizedLink
-                                  key={subSubcategory.id}
-                                  to={`/category/${category.slug}/${subcategory.slug}`}
-                                  className="flex flex-col items-center p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-orange-300 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-all duration-200 group"
-                                  role="menuitem"
-                                >
-                                  {subSubcategory.icon && React.isValidElement(subSubcategory.icon) ? (
-                                    <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-slate-700 flex items-center justify-center mb-2 group-hover:bg-orange-100 dark:group-hover:bg-orange-900/30 transition-colors" aria-hidden="true">
-                                      {subSubcategory.icon}
-                                    </div>
-                                  ) : (
-                                    <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-slate-700 flex items-center justify-center mb-2 group-hover:bg-orange-100 dark:group-hover:bg-orange-900/30 transition-colors" aria-hidden="true">
-                                      <span className="text-sm text-gray-500 dark:text-gray-400">•</span>
-                                    </div>
-                                  )}
-                                  <span className="text-sm text-gray-800 dark:text-gray-200 group-hover:text-orange-600 dark:group-hover:text-orange-400 font-medium text-center">
-                                    {getCategoryTranslation(subSubcategory, language, t)}
-                                  </span>
-                                  </LocalizedLink>
-                              ))}
-                            </div>
+                            <span className="font-medium text-sm">{getCategoryTranslation(subcategory, language, t)}</span>
                           </div>
-                        );
-                      })()}
+                        </LocalizedLink>
+                      ))}
                     </div>
                   </div>
                 );
