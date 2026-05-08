@@ -9,6 +9,7 @@ import BoutiquesDropdownContent from "./nav/BoutiquesDropdownContent";
 import MetierReparateurDropdownContent from "./nav/MetierReparateurDropdownContent";
 import MegaMenuCategories from "./nav/MegaMenuCategories";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
+import { Menu, ShoppingBag, HardHat } from "lucide-react";
 
 const HeaderDesktopNav = () => {
   const { t, isRTL } = useSafeI18nWithRouter();
@@ -21,7 +22,7 @@ const HeaderDesktopNav = () => {
         <NavigationMenuList className="flex items-center">
           <NavigationMenuItem>
             <NavigationMenuTrigger className={navLinkClass}>
-              <span className="flex items-center">{t('categories.title')}</span>
+              <span className="flex items-center gap-1.5"><Menu className="h-4 w-4" />{t('categories.title')}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-gray-200/80 dark:border-slate-700/80 shadow-xl rounded-lg">
               <MegaMenuCategories />
@@ -34,7 +35,7 @@ const HeaderDesktopNav = () => {
         <NavigationMenuList className="flex items-center">
           <NavigationMenuItem>
             <NavigationMenuTrigger className={navLinkClass}>
-              <span className="flex items-center">{t('header.shops')}</span>
+              <span className="flex items-center gap-1.5"><ShoppingBag className="h-4 w-4" />{t('header.shops')}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-gray-200/80 dark:border-slate-700/80 shadow-xl rounded-lg">
               <BoutiquesDropdownContent />
@@ -47,7 +48,7 @@ const HeaderDesktopNav = () => {
         <NavigationMenuList className="flex items-center">
           <NavigationMenuItem>
             <NavigationMenuTrigger className={navLinkClass}>
-              <span className="flex items-center">{t('menu.professions.title')}</span>
+              <span className="flex items-center gap-1.5"><HardHat className="h-4 w-4" />{t('menu.professions.title')}</span>
             </NavigationMenuTrigger>
             <NavigationMenuContent className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border border-gray-200/80 dark:border-slate-700/80 shadow-xl rounded-lg">
               <MetierReparateurDropdownContent />

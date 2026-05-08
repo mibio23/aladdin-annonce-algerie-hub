@@ -4,6 +4,39 @@ import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
+const metierIcons: Record<string, string> = {
+  plumber: '/icons/categories/metier-plumber.png',
+  electrician: '/icons/categories/metier-electrician.png',
+  mechanic: '/icons/categories/metier-mechanic.png',
+  woodworker: '/icons/categories/metier-woodworker.png',
+  painter: '/icons/categories/metier-painter.png',
+  mason: '/icons/categories/metier-mason.png',
+  roofer: '/icons/categories/metier-roofer.png',
+  tiler: '/icons/categories/metier-tiler.png',
+  gardener: '/icons/categories/metier-gardener.png',
+  tailor: '/icons/categories/metier-tailor.png',
+  cook: '/icons/categories/metier-cook.png',
+  hairdresser: '/icons/categories/metier-hairdresser.png',
+  beautician: '/icons/categories/metier-beautician.png',
+  computerTechnician: '/icons/categories/metier-computerTechnician.png',
+  heatingTechnician: '/icons/categories/metier-heatingTechnician.png',
+  applianceRepairman: '/icons/categories/metier-applianceRepairman.png',
+  welder: '/icons/categories/metier-welder.png',
+  ironworker: '/icons/categories/metier-ironworker.png',
+  glazier: '/icons/categories/metier-glazier.png',
+  bodyworker: '/icons/categories/metier-bodyworker.png',
+  cabinetmaker: '/icons/categories/metier-cabinetmaker.png',
+  upholsterer: '/icons/categories/metier-upholsterer.png',
+  airConditioningTechnician: '/icons/categories/metier-airConditioningTechnician.png',
+  photographer: '/icons/categories/metier-photographer.png',
+  videographer: '/icons/categories/metier-videographer.png',
+  translator: '/icons/categories/metier-translator.png',
+  secretary: '/icons/categories/metier-secretary.png',
+  accountant: '/icons/categories/metier-accountant.png',
+  privateTeacher: '/icons/categories/metier-privateTeacher.png',
+  otherProfessions: '/icons/categories/metier-otherProfessions.png',
+};
+
 const MetierReparateurDropdownContent = () => {
   const { t } = useSafeI18nWithRouter();
 
@@ -100,12 +133,12 @@ const MetierReparateurDropdownContent = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 min-w-[250px]">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 min-w-[280px]">
       <div className="space-y-1">
         <NavigationMenuLink asChild>
           <LocalizedLink 
             to="/metiers-reparateurs"
-            className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors border-b border-gray-200 dark:border-gray-600 mb-1"
+            className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors border-b border-gray-200 dark:border-gray-600 mb-1"
           >
             {t('menu.professions.viewAll')}
           </LocalizedLink>
@@ -124,9 +157,15 @@ const MetierReparateurDropdownContent = () => {
                 <NavigationMenuLink asChild>
                   <LocalizedLink
                     to={`/reparation/${item.slug}`}
-                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
+                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors font-medium"
                   >
-                    {t(item.labelKey)}
+                    <img 
+                      src={metierIcons[item.slug] || '/icons/categories/metier-otherProfessions.png'} 
+                      alt="" 
+                      className="w-11 h-11 object-contain shrink-0" 
+                      loading="lazy" 
+                    />
+                    <span>{t(item.labelKey)}</span>
                   </LocalizedLink>
                 </NavigationMenuLink>
               </li>

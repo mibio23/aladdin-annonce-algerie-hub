@@ -2,7 +2,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import UserMenu from "./UserMenu";
 import HeaderLogo from "./HeaderLogo";
 import ThemeToggle from "./ThemeToggle";
-import { Download, PlusCircle, Store, Briefcase, Phone } from "lucide-react";
+import { Download, Phone } from "lucide-react";
 import { useSafeI18nWithRouter } from "@/lib/i18n/i18nContextWithRouter";
 import { useAuth } from "@/contexts/useAuth";
 import { LocalizedButtonLink } from "@/utils/linkUtils";
@@ -20,7 +20,7 @@ const HeaderTopBar = () => {
           {/* Left — Logo */}
           <HeaderLogo />
 
-          {/* Right — Download + Langue + Connexion */}
+          {/* Right — Contact, Download, Langue, Theme, Connexion */}
           <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
 
             {/* Contact Us */}
@@ -32,35 +32,6 @@ const HeaderTopBar = () => {
             >
               <Phone className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">{t('paymentCancel.contactUs')}</span>
-            </LocalizedButtonLink>
-
-            {/* Quick Action Icons */}
-            <LocalizedButtonLink
-              to="/deposer-annonce"
-              variant="ghost"
-              size="sm"
-              className="p-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
-              title={t('header.postAd')}
-            >
-              <PlusCircle className="h-4 w-4" />
-            </LocalizedButtonLink>
-            <LocalizedButtonLink
-              to="/creer-boutique"
-              variant="ghost"
-              size="sm"
-              className="p-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
-              title={t('header.createShop')}
-            >
-              <Store className="h-4 w-4" />
-            </LocalizedButtonLink>
-            <LocalizedButtonLink
-              to="/deposer-offre-metier"
-              variant="ghost"
-              size="sm"
-              className="p-1 h-auto text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
-              title={t('header.search')}
-            >
-              <Briefcase className="h-4 w-4" />
             </LocalizedButtonLink>
 
             <span className="w-px h-3.5 bg-gray-300 dark:bg-gray-600" />

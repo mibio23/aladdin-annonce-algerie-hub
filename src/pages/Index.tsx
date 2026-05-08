@@ -170,11 +170,8 @@ const Index = () => {
             />
           </LazySection>
 
-          <div className="px-4">
-            <LazySection>
-              <AdvancedSearchBar />
-            </LazySection>
-          </div>
+
+
 
           {/* Sections d'annonces - lazy loaded */}
           <div className="space-y-6">

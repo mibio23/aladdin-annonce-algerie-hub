@@ -38,12 +38,27 @@ const HeaderLogo = () => {
             alt={isRTL ? "شعار علاء الدين" : "AL@DDIN Logo"}
             className="h-10 w-auto object-contain max-w-[130px] transition-all duration-200 hover:scale-105 cursor-pointer"
           />
-          <span
-            className={`hidden sm:block text-[1.75rem] font-bold title-section text-gray-800 dark:text-slate-200 hover:text-primary transition-all duration-300 cursor-pointer ${isRTL ? 'mr-2 font-arabic' : 'ml-2'}`}
-            aria-label={isRTL ? "علاء الدين" : "AL@DDIN"}
-          >
-            {isRTL ? 'علاء الدين' : 'AL@DDIN'}
-          </span>
+          <div className={`hidden sm:flex flex-col ${isRTL ? 'mr-2 items-end' : 'ml-2 items-start'}`}>
+            <span
+              className={`text-3xl font-black cursor-pointer transition-all duration-300 text-amber-500 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] hover:text-amber-400 leading-none ${
+                isRTL ? 'font-arabic' : ''
+              }`}
+              aria-label={isRTL ? "علاء الدين" : "AL@DDIN"}
+            >
+              {isRTL ? 'علاء الدين' : 'AL@DDIN'}
+            </span>
+            <span
+              className={`font-bold tracking-wide leading-none mt-0.5 text-amber-500 ${
+                isRTL ? 'font-arabic text-base' : 'uppercase text-xs'
+              }`}
+              style={{
+                WebkitTextStroke: '0.3px #000',
+                paintOrder: 'stroke fill'
+              }}
+            >
+              {isRTL ? 'منصة الإعلانات' : 'Plateforme Annonce'}
+            </span>
+          </div>
         </div>
       </LocalizedLink>
       

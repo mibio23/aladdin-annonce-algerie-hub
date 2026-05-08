@@ -4,6 +4,8 @@ import { Loader2, Palette, Plane, Image } from "lucide-react";
 import React from "react";
 import { LocalizedLink } from "@/utils/linkUtils";
 import { mergeOfficialAndSupabaseCategories, useCategories } from "@/services/supabaseCategoriesService";
+import { getRealisticIcon } from "@/data/categories/icons/realisticIconMapping";
+import { getSubcategoryEmoji } from "@/data/categories/icons/emojiMapping";
 import "@/styles/modern-menu.css";
 
 const MegaMenuCategories = () => {
@@ -58,15 +60,16 @@ const MegaMenuCategories = () => {
                       to={`/category/${cat.slug}`}
                       className={`flex-grow flex items-center gap-2 px-3 py-2 ${isRTL ? 'flex-row-reverse text-right' : ''}`}
                     >
-                      <span className="shrink-0">
-                        {cat.icon ? (
-                          cat.icon
-                        ) : (
-                          (() => {
-                            const Icon = getIconForSlug(cat.slug);
-                            return <Icon className="h-4 w-4 text-gray-500" />;
-                          })()
-                        )}
+                      <span className="shrink-0 w-11 h-11 flex items-center justify-center">
+                        {(() => {
+                          const realisticSrc = getRealisticIcon(cat.slug);
+                          if (realisticSrc) {
+                            return <img src={realisticSrc} alt={cat.name} className="w-11 h-11 object-contain" loading="lazy" />;
+                          }
+                          if (cat.icon) return cat.icon;
+                          const Icon = getIconForSlug(cat.slug);
+                          return <Icon className="h-4 w-4 text-gray-500" />;
+                        })()}
                       </span>
                       <span className="category-link text-sm leading-tight">
                         {cat.slug === 'education-loisirs' ? t('categories.education-loisirs') : (t(`categories.${cat.slug}`) !== `categories.${cat.slug}`
@@ -94,20 +97,11 @@ const MegaMenuCategories = () => {
                   <LocalizedLink
                     key={sub.id}
                     to={`/category/${activeCategory.slug}/${sub.slug}`}
-                    className={`flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${isRTL ? 'flex-row-reverse' : ''}`}
+                    className={`block px-5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ${isRTL ? 'text-right' : ''}`}
                   >
-                    <span className="w-5 h-5 flex items-center justify-center shrink-0 text-gray-400">
-                      {sub.icon && React.isValidElement(sub.icon) ? (
-                        <span className="w-4 h-4">{sub.icon}</span>
-                      ) : (
-                        <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-                      )}
-                    </span>
-                    <span className="flex-1">
-                      {t(`categories.${sub.slug}`) !== `categories.${sub.slug}`
-                        ? t(`categories.${sub.slug}`)
-                        : sub.name}
-                    </span>
+                    {t(`categories.${sub.slug}`) !== `categories.${sub.slug}`
+                      ? t(`categories.${sub.slug}`)
+                      : sub.name}
                   </LocalizedLink>
                 ))}
               </div>
